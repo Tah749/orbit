@@ -20,6 +20,7 @@
     "motion": "^13.4.4",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
+    "simple-icons": "^16.33.0",
     "three": "^0.186.1"
   },
   "devDependencies": {

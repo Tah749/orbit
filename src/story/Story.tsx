@@ -1,12 +1,14 @@
 import { Suspense, lazy, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { motion, useReducedMotion } from "motion/react";
 import Lenis from "lenis";
-import { ArrowRight, SquaresFour } from "@phosphor-icons/react";
+import { ArrowRight, SquaresFour, SpeakerSimpleHigh, SpeakerSimpleSlash } from "@phosphor-icons/react";
 import { Logo, Orb } from "../components/ui/Logo";
 import { ButtonLink } from "../components/ui/Button";
 import { WaitlistForm } from "../components/WaitlistForm";
 import { story, actAt, actCount } from "./state";
-import { apps } from "./canvas";
+import { networkNames } from "./apps";
+import { sfx } from "./sound";
+import { OrbitAppIcon } from "../components/ui/OrbitAppIcon";
 
 const StoryScene = lazy(() => import("./StoryScene"));
 
@@ -19,8 +21,49 @@ const acts = [
   { id: "return", label: "V · The return" },
 ];
 
-/** Network node order in the scene: payline apps first, then their neighbours. */
-const nodeApps = [0, 1, 4, 5, 2, 3, 6, 7, 8, 9];
+/** Sound is off until the visitor asks for it (browsers block audio before a click anyway). */
+function useSound() {
+  const [on, setOn] = useState(sfx.on);
+  useEffect(() => sfx.subscribe(setOn), []);
+  return [on, () => void sfx.set(!sfx.on)] as const;
+}
+
+function SoundHint() {
+  const [on, toggle] = useSound();
+  const reduce = useReducedMotion();
+  if (on) return null;
+  return (
+    <motion.button
+      type="button"
+      onClick={toggle}
+      initial={reduce ? false : { opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay: 2.3, duration: 1 }}
+      className="mt-5 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-[0.18em] text-muted transition-colors hover:text-ink"
+    >
+      <SpeakerSimpleHigh size={14} weight="fill" className="text-[#c9b8ff]" /> Best with sound on
+    </motion.button>
+  );
+}
+
+function SoundToggle({ compact = false }: { compact?: boolean }) {
+  const [on, toggle] = useSound();
+  const I = on ? SpeakerSimpleHigh : SpeakerSimpleSlash;
+  return (
+    <button
+      type="button"
+      onClick={toggle}
+      aria-pressed={on}
+      aria-label={on ? "Turn sound off" : "Turn sound on"}
+      className={`inline-flex h-9 items-center gap-2 rounded-full border px-3 text-[13px] backdrop-blur transition-colors ${
+        on ? "border-[#c9b8ff]/50 bg-[#1f1936]/70 text-ink" : "border-white/10 bg-[#16141d]/60 text-muted hover:text-ink"
+      }`}
+    >
+      <I size={15} weight="fill" className={on ? "text-[#c9b8ff]" : ""} />
+      {!compact && <span className="hidden sm:inline">{on ? "Sound on" : "Sound off"}</span>}
+    </button>
+  );
+}
 
 const ease = [0.16, 1, 0.3, 1] as const;
 const shadow = "[text-shadow:0_2px_30px_rgba(7,6,10,0.95)]";
@@ -108,13 +151,13 @@ function Sub({ children }: { children: ReactNode }) {
 function NodeLabels() {
   return (
     <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-[5] hidden overflow-hidden md:block">
-      {nodeApps.map((a, i) => (
+      {networkNames.map((name, i) => (
         <span
-          key={a}
+          key={name}
           ref={(el) => void (story.labels[i] = el)}
           className="absolute left-0 top-0 whitespace-nowrap rounded-full border border-[#c9b8ff]/25 bg-[#0d0b16]/70 px-2.5 py-0.5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#e6e0ff] opacity-0 backdrop-blur will-change-transform"
         >
-          {apps[a].name}
+          {name}
         </span>
       ))}
     </div>
@@ -274,7 +317,8 @@ export default function Story() {
             <Logo />
           </button>
           <div className="flex items-center gap-2">
-            <a href="#/" className="hidden rounded-full px-3 py-2 text-[14px] text-muted transition-colors hover:text-ink md:inline-flex">
+            <SoundToggle />
+            <a href="#/" className="hidden rounded-full px-3 py-2 text-[14px] text-muted transition-colors hover:text-ink lg:inline-flex">
               Classic site
             </a>
             <span className="hidden sm:inline-flex">
@@ -337,6 +381,7 @@ export default function Story() {
                   Skip to the waitlist
                 </ButtonLink>
               </motion.div>
+              <SoundHint />
             </div>
           </div>
           <motion.div
@@ -361,7 +406,7 @@ export default function Story() {
         <Act id="problem" place="left" mobile="top" height="min-h-[210svh]">
           <Kicker>Act II · The problem</Kicker>
           <Line id="s-problem-title">But keeping it all together is another story.</Line>
-          <Sub>Every morning you spin through the same apps, hoping the thing that matters lands in front of you before it's too late.</Sub>
+          <Sub>Gmail, WhatsApp, your bank, your calendar, the group chat. Every morning you pull the lever again and hope the thing that matters lands in front of you in time.</Sub>
         </Act>
 
         <Act id="connection" place="right" mobile="bottom" height="min-h-[190svh]">
@@ -387,9 +432,13 @@ export default function Story() {
             transition={{ duration: 1.2, ease }}
             className="mx-auto flex w-full max-w-[600px] flex-col items-center px-4 text-center sm:px-6"
           >
-            <p className="holo-text text-[64px] font-semibold leading-none tracking-[-0.05em] sm:text-[84px]" aria-hidden="true">
-              Orbit
-            </p>
+            <div className="flex items-center gap-4" aria-hidden="true">
+              <div className="relative">
+                <div className="absolute inset-0 -z-10 scale-150 rounded-full bg-[radial-gradient(closest-side,rgba(255,77,122,0.45),rgba(124,77,255,0.2),transparent)] blur-xl" />
+                <OrbitAppIcon className="size-14 drop-shadow-[0_10px_30px_rgba(124,77,255,0.45)] sm:size-16" />
+              </div>
+              <p className="holo-text text-[56px] font-semibold leading-none tracking-[-0.05em] sm:text-[72px]">Orbit</p>
+            </div>
             <h2 id="s-return-title" className={`mt-4 text-balance text-[24px] font-medium tracking-[-0.02em] text-ink sm:text-[30px] ${shadow}`}>
               Orbit. Join the waitlist now.
             </h2>
@@ -403,7 +452,11 @@ export default function Story() {
               Or explore the live demo <ArrowRight size={14} />
             </a>
           </motion.div>
-          <footer className="mx-auto mt-16 flex w-full max-w-[1240px] flex-col items-center justify-between gap-4 border-t border-white/[0.06] px-4 pt-6 text-[12.5px] text-muted sm:flex-row sm:px-6">
+          <p className="mx-auto mt-14 max-w-[70ch] px-4 text-center text-[11.5px] leading-relaxed text-muted/80">
+            App names and logos shown in this story are trademarks of their respective owners and appear for illustration
+            only. Orbit is not affiliated with, endorsed by or connected to any of them.
+          </p>
+          <footer className="mx-auto mt-6 flex w-full max-w-[1240px] flex-col items-center justify-between gap-4 border-t border-white/[0.06] px-4 pt-6 text-[12.5px] text-muted sm:flex-row sm:px-6">
             <span className="flex items-center gap-2">
               <Orb className="size-3.5" /> © {new Date().getFullYear()} Orbit · Scenes use illustrative demo data
             </span>

@@ -16,6 +16,7 @@ import {
   Sparkle,
 } from "@phosphor-icons/react";
 import { iconImage, roundRect } from "../journey/textures";
+import { brandIndex, drawBrandTile, drawOrbitIcon } from "./brands";
 
 /* Everything drawn here is illustrative demo content, labelled as such where it's legible. */
 
@@ -151,24 +152,24 @@ export async function makeIconAtlas() {
 export const screenSize = { w: 600, h: 1314 };
 
 const lockNotes = [
-  { app: 0, title: "Priya Shah", body: "Numbers for the Q4 review?", t: "now" },
-  { app: 2, title: "Sam", body: "Still on for Friday?", t: "1m" },
-  { app: 9, title: "Council tax", body: "Payment due in 3 days", t: "4m" },
-  { app: 1, title: "Dentist", body: "Moved to Thursday, 3:30pm", t: "9m" },
-  { app: 5, title: "Check-in open", body: "LHR to EDI, tomorrow 16:20", t: "12m" },
-  { app: 4, title: "Statement ready", body: "Your October statement", t: "20m" },
-  { app: 3, title: "12 new mentions", body: "You were tagged in a thread", t: "26m" },
-  { app: 6, title: "Move goal", body: "You're 40% of the way there", t: "31m" },
-  { app: 7, title: "Weekly update", body: "Your portfolio summary", t: "40m" },
-  { app: 8, title: "Reminder", body: "Reply to the landlord", t: "1h" },
-  { app: 0, title: "School office", body: "Trip consent form due", t: "1h" },
-  { app: 2, title: "Family", body: "Who's picking up Mum?", t: "2h" },
-  { app: 9, title: "Broadband", body: "Your bill is ready", t: "2h" },
-  { app: 5, title: "Hotel Calder", body: "Booking confirmed", t: "3h" },
+  { app: "Gmail", title: "Priya Shah", body: "Numbers for the Q4 review?", t: "now" },
+  { app: "WhatsApp", title: "Family", body: "Mum: who's picking up Dad?", t: "1m" },
+  { app: "X", title: "23 new notifications", body: "You were mentioned in a thread", t: "3m" },
+  { app: "Calendar", title: "Dentist", body: "Moved to Thursday, 3:30pm", t: "5m" },
+  { app: "Monzo", title: "£18.40 on coffee", body: "That's your third this week", t: "9m" },
+  { app: "Uber", title: "Your driver is 2 min away", body: "Silver hatchback, look out front", t: "12m" },
+  { app: "Airbnb", title: "Lisbon check-in details", body: "Your host sent you a message", t: "20m" },
+  { app: "Strava", title: "Sam gave you kudos", body: "Morning Run · 5.2 km", t: "31m" },
+  { app: "Todoist", title: "3 tasks overdue", body: "Reply to the landlord", t: "40m" },
+  { app: "Duolingo", title: "Don't lose your streak!", body: "12 days and counting", t: "1h" },
+  { app: "Netflix", title: "New episode available", body: "Continue watching tonight?", t: "1h" },
+  { app: "Instagram", title: "3 people liked your photo", body: "and 12 others", t: "2h" },
+  { app: "Deliveroo", title: "Your order is on its way", body: "Arriving in 12 minutes", t: "2h" },
+  { app: "Revolut", title: "Payment received", body: "£24.00 from Sam", t: "3h" },
 ];
 
 export async function makeLockScreen() {
-  const gl = await loadGlyphs();
+  await loadGlyphs();
   const { w, h } = screenSize;
   const [c, g] = canvas(w, h);
   const texture = tex(c);
@@ -216,7 +217,7 @@ export async function makeLockScreen() {
       g.fill();
       g.strokeStyle = "rgba(255,255,255,0.07)";
       g.stroke();
-      appTile(g, 42, y + 22, 60, note.app, gl[note.app]);
+      drawBrandTile(g, 42, y + 22, 60, brandIndex(note.app));
       text(g, note.title, 122, y + 46, 25, "#fff", 600, sans, "left", w - 240);
       text(g, note.body, 122, y + 80, 22, "rgba(255,255,255,0.72)", 400, sans, "left", w - 180);
       text(g, note.t, w - 46, y + 44, 20, "rgba(255,255,255,0.5)", 400, sans, "right");
@@ -231,7 +232,7 @@ export async function makeLockScreen() {
       roundRect(g, w / 2 - 150, y + 44, 300, 50, 25);
       g.fillStyle = "rgba(255,77,122,0.9)";
       g.fill();
-      text(g, `+${n - 7} more notifications`, w / 2, y + 77, 22, "#0B0A10", 600, sans, "center");
+      text(g, `+${(n - 7) * 4} more notifications`, w / 2, y + 77, 22, "#0B0A10", 600, sans, "center");
     }
     // Lock-screen buttons and home indicator
     for (const x of [86, w - 86]) {
@@ -267,7 +268,7 @@ export async function makeDashboard() {
   g.fill();
   text(g, "9:41", 48, 54, 24, "#fff", 600);
 
-  orb(g, 52, 124, 18);
+  drawOrbitIcon(g, 30, 102, 44);
   text(g, "Orbit", 82, 133, 28, "#F8F6FB", 500);
   g.beginPath();
   g.arc(w - 52, 124, 22, 0, Math.PI * 2);
@@ -332,7 +333,7 @@ export async function makeDashboard() {
   roundRect(g, 24, 1074, w - 48, 90, 20);
   g.fillStyle = "#16141D";
   g.fill();
-  appTile(g, 40, 1092, 54, 0, gl[0]);
+  drawBrandTile(g, 40, 1092, 54, brandIndex("Gmail"));
   text(g, "Priya Shah", 112, 1112, 22, "#F8F6FB", 600);
   text(g, "Numbers for the Q4 review", 112, 1144, 20, "#A39DB0");
   roundRect(g, w - 144, 1102, 100, 34, 17);
@@ -558,26 +559,35 @@ export async function makeHoloPanels() {
   return [calendar, briefing, bills, inbox, investments, bookings];
 }
 
-export function makeMarquee() {
+/** Marquee over the machine: two lines of copy, each with two bulb phases for the chase lights. */
+export function makeMarquee(label: string, phase: 0 | 1, win = false) {
   const [c, g] = canvas(1024, 176);
   roundRect(g, 4, 4, 1016, 168, 36);
-  g.fillStyle = "#120f19";
+  g.fillStyle = win ? "#1c1024" : "#120f19";
   g.fill();
-  g.strokeStyle = "rgba(255,77,122,0.5)";
+  g.strokeStyle = win ? "rgba(255,210,122,0.8)" : "rgba(255,77,122,0.5)";
   g.lineWidth = 3;
   g.stroke();
   for (let i = 0; i < 26; i++) {
     for (const y of [22, 154]) {
+      const lit = (i + (y > 100 ? 1 : 0) + phase) % 2 === 0;
       g.beginPath();
       g.arc(40 + i * 37.6, y, 5.5, 0, Math.PI * 2);
-      g.fillStyle = i % 2 ? "#FFD6E1" : "#FFA24D";
+      g.fillStyle = lit ? (win ? "#FFE6A8" : "#FFD6E1") : win ? "#7a5a2a" : "#4a2a38";
+      if (lit) {
+        g.shadowColor = win ? "#FFD27A" : "#FF4D7A";
+        g.shadowBlur = 14;
+      }
       g.fill();
+      g.shadowBlur = 0;
     }
   }
-  g.shadowColor = "#FF4D7A";
-  g.shadowBlur = 28;
-  for (let k = 0; k < 2; k++) text(g, "TOO MANY APPS", 512, 116, 78, "#FF6B93", 600, mono, "center");
+  const glow = win ? "#FFB84D" : "#FF4D7A";
+  const fill = win ? "#FFD98A" : "#FF6B93";
+  g.shadowColor = glow;
+  g.shadowBlur = 30;
+  for (let k = 0; k < 2; k++) text(g, label, 512, 116, win ? 92 : 78, fill, 600, mono, "center");
   g.shadowBlur = 0;
-  text(g, "TOO MANY APPS", 512, 116, 78, "#FFE6EE", 600, mono, "center");
+  text(g, label, 512, 116, win ? 92 : 78, win ? "#FFF6DC" : "#FFE6EE", 600, mono, "center");
   return tex(c);
 }

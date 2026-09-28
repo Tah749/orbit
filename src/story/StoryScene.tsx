@@ -4,8 +4,10 @@ import * as THREE from "three";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import { story, actAt, actCount, smooth, ramp } from "./state";
 import { noise } from "../journey/glsl";
-import { makeCardAtlas, makeGlowTexture, atlasGrid } from "../journey/textures";
-import { apps, iconGrid, makeDashboard, makeHoloPanels, makeIconAtlas, makeLockScreen, makeMarquee, panelSize } from "./canvas";
+import { makeGlowTexture, atlasGrid } from "../journey/textures";
+import { makeDashboard, makeHoloPanels, makeLockScreen, makeMarquee, panelSize } from "./canvas";
+import { ORBIT, aboveApps, belowApps, brandGrid, brands, makeBrandAtlas, makeBrandCardAtlas, networkApps } from "./brands";
+import { sfx } from "./sound";
 
 /* ------------------------------------------------------------------------------------------------
  * Timeline (act positions, 0 to 5)
@@ -41,9 +43,9 @@ const keys: Key[] = [
   { pos: V(0, 0.3, 17), look: V(0, 0, 0), desk: [0.2, 0], mob: [0, -0.2], m: 1.7 },
   { pos: V(0, 0, 12), look: V(0, 0, 0), desk: [0.2, 0], mob: [0, -0.17], m: 1.6 },
   { pos: V(0, 0.3, -2), look: C, desk: [0.19, 0], mob: [0, -0.14], m: 1.15 },
-  { pos: V(-5, 2.5, -9), look: C, desk: [-0.17, 0], mob: [0, 0.2], m: 1.4 },
+  { pos: V(-5, 2.5, -9), look: C, desk: [-0.2, 0], mob: [0, 0.2], m: 1.4 },
   { pos: V(0, 0, -15.5), look: C, desk: [0, -0.16], mob: [0, -0.2], m: 1 },
-  { pos: V(0, 5, 31), look: V(0, 1.6, 0), desk: [0, 0.25], mob: [0, 0.27], m: 1.3 },
+  { pos: V(0, 5, 31), look: V(0, 1.6, 0), desk: [0, 0.3], mob: [0, 0.35], m: 1.5 },
 ];
 
 const curve = (pts: THREE.Vector3[]) => new THREE.CatmullRomCurve3(pts, false, "centripetal");
@@ -51,7 +53,13 @@ const deskPos = curve(keys.map((k) => k.pos));
 const mobPos = curve(keys.map((k) => k.look.clone().add(k.pos.clone().sub(k.look).multiplyScalar(k.m))));
 const lookCurve = curve(keys.map((k) => k.look));
 
-const live = { k: 0, time: 0, mobile: false, inner: 1 };
+const live = { k: 0, prevK: 0, time: 0, mobile: false, inner: 1, shake: 0 };
+/** True on the frame the story passes act position a going forward. */
+const crossed = (a: number) => live.prevK < a && live.k >= a;
+
+/** One shared app-icon atlas for the reels and the flying icons. */
+let brandAtlas: Promise<THREE.Texture> | null = null;
+const getBrandAtlas = () => (brandAtlas ??= Promise.resolve().then(makeBrandAtlas));
 
 /* Phone dimensions */
 const PH = { w: 3.6, h: 7.6, depth: 0.34, bevel: 0.06, screenW: 3.34, screenH: 7.32 };
@@ -84,7 +92,7 @@ function rotAxis(v: THREE.Vector3, axis: THREE.Vector3, a: number) {
 function Rig({ reduce }: { reduce: boolean }) {
   const { camera, size } = useThree();
   const cam = camera as THREE.PerspectiveCamera;
-  const s = useRef({ k: 0, px: 0, py: 0, start: -1 });
+  const s = useRef({ k: 0, px: 0, py: 0, start: -1, lastDz: 0 });
   const tmp = useMemo(() => ({ pos: new THREE.Vector3(), look: new THREE.Vector3(), a: new THREE.Vector3(), r: new THREE.Vector3(), u: new THREE.Vector3() }), []);
 
   useFrame((state, delta) => {
@@ -96,6 +104,7 @@ function Rig({ reduce }: { reduce: boolean }) {
     live.mobile = size.width / size.height < 0.8;
     live.inner = live.mobile ? 0.6 : 1;
 
+    live.prevK = st.k;
     st.k += (actAt(story.progress) - st.k) * (1 - Math.exp(-dt * (reduce ? 20 : 4.5)));
     const k = st.k;
     live.k = k;
@@ -124,9 +133,15 @@ function Rig({ reduce }: { reduce: boolean }) {
       cam.lookAt(tmp.look);
     }
     cam.fov = 45 + dive * 12;
+    // Jackpot shake.
+    if (live.shake > 0 && !reduce) {
+      cam.position.x += Math.sin(t * 71) * live.shake * 0.12;
+      cam.position.y += Math.cos(t * 53) * live.shake * 0.1;
+    }
 
     const i = Math.min(actCount - 2, Math.floor(k));
-    const f = smooth(0, 0.5, k - i);
+    // Hold the machine in place through the jackpot before panning to the network.
+    const f = i === 2 ? smooth(0.5, 0.95, k - i) : smooth(0, 0.5, k - i);
     const a = live.mobile ? keys[i].mob : keys[i].desk;
     const b = live.mobile ? keys[i + 1].mob : keys[i + 1].desk;
     const sx = (a[0] + (b[0] - a[0]) * f) * (1 - dive);
@@ -136,6 +151,12 @@ function Rig({ reduce }: { reduce: boolean }) {
 
     // White-violet flashes as we cross the screen and when the machine collapses.
     const dz = cam.position.z - screenZ;
+    if (st.lastDz !== 0 && Math.sign(dz) !== Math.sign(st.lastDz) && k > 1) sfx.whoosh();
+    st.lastDz = dz;
+    if (crossed(0.47)) sfx.ping();
+    if (crossed(2.72)) sfx.swell();
+    if (crossed(3.52)) sfx.shimmer();
+    if (crossed(4.8)) sfx.powerUp();
     const cross = (k > 1 && k < 2.2) || (k > 4 && k < 5) ? Math.exp(-dz * dz * 0.9) : 0;
     const flash = Math.max(cross * 0.85, ramp(2.72, 2.8, 2.8, 2.95, k) * 0.5);
     const el = document.getElementById("story-flash");
@@ -244,6 +265,7 @@ function Glow({ glow, color, scale, opacity }: { glow: THREE.Texture; color: str
 
 function Phone({ glow }: { glow: THREE.Texture }) {
   const group = useRef<THREE.Group>(null);
+  const lastCount = useRef(-1);
   const [tex, setTex] = useState<{ lock: Awaited<ReturnType<typeof makeLockScreen>>; dash: THREE.Texture } | null>(null);
   useEffect(() => {
     let alive = true;
@@ -323,7 +345,10 @@ function Phone({ glow }: { glow: THREE.Texture }) {
     // Hidden whenever the camera is behind the glass (inside the phone world).
     g.visible = camera.position.z > screenZ - 0.05 || k > 4.9;
 
-    tex?.lock.draw(Math.round(smooth(0.55, 1.2, k) * 14));
+    const count = Math.round(smooth(0.55, 1.2, k) * 14);
+    if (lastCount.current >= 0 && count > lastCount.current && count - lastCount.current < 4) sfx.notify(count);
+    lastCount.current = count;
+    tex?.lock.draw(count);
     screenMat.uniforms.uMix.value = k > 2.5 ? 1 : 0;
     screenMat.uniforms.uBright.value = smooth(0.45, 0.58, k) + ramp(0.45, 0.52, 0.55, 0.8, k) * 0.9;
     const dz = camera.position.z - screenZ;
@@ -360,7 +385,7 @@ function Burst() {
   const [atlas, setAtlas] = useState<THREE.Texture | null>(null);
   useEffect(() => {
     let alive = true;
-    makeCardAtlas().then((t) => alive && setAtlas(t));
+    makeBrandCardAtlas().then((t) => alive && setAtlas(t));
     return () => {
       alive = false;
     };
@@ -442,27 +467,27 @@ function Burst() {
  * Act II: the slot machine
  * ---------------------------------------------------------------------------------------------- */
 
-const REEL = { r: 3.6, len: 3.2, gap: 3.45, cells: 10 };
+const REEL = { r: 3.6, len: 3.2, gap: 3.45, cells: 12 };
 const cellA = (Math.PI * 2) / REEL.cells;
+const cellArc = REEL.r * cellA;
 const reelZ = C.z + 0.3 - REEL.r;
-/** What lands on the payline, and which neighbour each reel sends into the network. */
-const payline = [0, 1, 4, 5, 2];
-const extras = [3, 6, 7, 8, 9];
-const stopCell = [0, 2, 4, 6, 8];
+/** Each reel lands Orbit on the payline; the apps either side of it break out into the network. */
+const stopCell = [0, 3, 6, 9, 2];
+/** Act positions where each reel stops. The last one holds on for suspense. */
+const stopAt = [2.06, 2.11, 2.16, 2.21, 2.34];
+const JACKPOT = 2.36;
 
-const reelOrders = payline.map((p, r) => {
+const reelOrders = stopCell.map((c, r) => {
   const order = new Array<number>(REEL.cells).fill(-1);
-  const c = stopCell[r];
-  order[c] = p;
-  order[(c + (r % 2 ? REEL.cells - 1 : 1)) % REEL.cells] = extras[r];
-  const rest = apps.map((_, i) => i).filter((i) => i !== p && i !== extras[r]);
-  // Shuffle deterministically so reels differ.
-  for (let i = 0; i < rest.length; i++) {
-    const j = (i * 7 + r * 3) % rest.length;
-    [rest[i], rest[j]] = [rest[j], rest[i]];
-  }
+  order[c] = ORBIT;
+  order[(c + 1) % REEL.cells] = aboveApps[r];
+  order[(c + REEL.cells - 1) % REEL.cells] = belowApps[r];
+  // A second Orbit on the far side flashes past while the reels spin.
+  order[(c + 6) % REEL.cells] = ORBIT;
+  const pool = brands.map((_, i) => i).filter((i) => i !== ORBIT && !networkApps.includes(i));
+  const fill = [...pool.slice(r * 4), ...pool.slice(0, r * 4)];
   let n = 0;
-  for (let i = 0; i < REEL.cells; i++) if (order[i] < 0) order[i] = rest[n++];
+  for (let i = 0; i < REEL.cells; i++) if (order[i] < 0) order[i] = fill[n++ % fill.length];
   return order;
 });
 
@@ -474,42 +499,49 @@ function reelMaterial(order: number[]) {
       uBlur: { value: 0 },
       uOrder: { value: order },
       uWin: { value: 0 },
-      uGrid: { value: new THREE.Vector2(iconGrid.cols, iconGrid.rows) },
+      uGrid: { value: new THREE.Vector2(brandGrid.cols, brandGrid.rows) },
+      uGold: { value: col("#FFD27A") },
       uRose: { value: col(pal.rose) },
     },
     vertexShader: /* glsl */ `varying vec3 vP; void main(){ vP = position; gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.); }`,
     fragmentShader: /* glsl */ `
-      uniform sampler2D uMap; uniform float uAngle, uBlur, uOrder[10], uWin; uniform vec2 uGrid; uniform vec3 uRose;
+      uniform sampler2D uMap; uniform float uAngle, uBlur, uOrder[${REEL.cells}], uWin; uniform vec2 uGrid; uniform vec3 uGold, uRose;
       varying vec3 vP;
-      const float N = 10.;
-      const float CA = 6.2831853 / 10.;
+      const float N = ${REEL.cells.toFixed(1)};
+      const float CA = 6.2831853 / N;
       vec4 icon(float ang, float lx){
         float a = ang / CA + 0.5;
         float cell = mod(floor(a), N);
         float ly = fract(a);
         int ci = int(cell + 0.5);
         float id = uOrder[ci];
-        vec2 l = vec2(lx, ly);
-        vec2 inset = (l - 0.5) * 1.2 + 0.5;
+        vec2 inset = (vec2(lx, ly) - 0.5) * 1.12 + 0.5;
         if (inset.x < 0. || inset.x > 1. || inset.y < 0. || inset.y > 1.) return vec4(0.);
         float c = mod(id, uGrid.x); float r = floor(id / uGrid.x);
-        return texture2D(uMap, vec2((c + inset.x) / uGrid.x, 1. - (r + 1. - inset.y) / uGrid.y));
+        vec4 t = texture2D(uMap, vec2((c + inset.x) / uGrid.x, 1. - (r + 1. - inset.y) / uGrid.y));
+        return t;
       }
       void main(){
         float ang = atan(vP.y, vP.z) + uAngle;
-        float lx = vP.x / ${REEL.len.toFixed(2)} + 0.5;
+        // Square icons: local x in units of one cell's arc length.
+        float lx = vP.x / ${cellArc.toFixed(3)} + 0.5;
         vec4 acc = vec4(0.);
-        for (int i = 0; i < 7; i++) acc += icon(ang + (float(i) - 3.) * uBlur * 0.05, lx);
+        for (int i = 0; i < 7; i++) acc += icon(ang + (float(i) - 3.) * uBlur * 0.045, lx);
         acc /= 7.;
-        vec3 bg = mix(vec3(0.07, 0.065, 0.095), vec3(0.11, 0.1, 0.15), smoothstep(0.1, 0.9, lx));
+        float rx = vP.x / ${REEL.len.toFixed(2)} + 0.5;
+        vec3 bg = mix(vec3(0.075, 0.068, 0.1), vec3(0.12, 0.11, 0.16), smoothstep(0.1, 0.9, rx));
+        // Faint separators between cells.
+        float cf = fract(ang / CA + 0.5);
+        float sep = smoothstep(0.03, 0., cf) + smoothstep(0.97, 1., cf);
+        bg += vec3(0.05) * sep * (1. - uBlur);
         vec3 c = mix(bg, acc.rgb, acc.a);
         float facing = max(vP.z / ${REEL.r.toFixed(2)}, 0.);
-        c *= 0.2 + 0.95 * pow(facing, 1.6);
-        // Payline highlight once the reels land.
-        float onLine = exp(-pow(vP.y * 1.2, 2.)) * facing;
-        c += uRose * onLine * uWin * 0.35;
-        float edge = smoothstep(0.02, 0., lx) + smoothstep(0.98, 1., lx);
-        c += uRose * edge * 0.25;
+        c *= 0.18 + 0.97 * pow(facing, 1.7);
+        // The winning line glows gold.
+        float onLine = exp(-pow(vP.y * 0.9, 2.)) * facing;
+        c = mix(c, c * 1.35 + uGold * 0.12, onLine * uWin);
+        float edge = smoothstep(0.015, 0., rx) + smoothstep(0.985, 1., rx);
+        c += uRose * edge * 0.3;
         gl_FragColor = vec4(c, 1.);
         ${outro}
       }`,
@@ -525,11 +557,15 @@ function neonTube(w: number, h: number, r: number, y: number, z: number, radius:
 function Machine({ glow }: { glow: THREE.Texture }) {
   const group = useRef<THREE.Group>(null);
   const lever = useRef<THREE.Group>(null);
+  const marqueeMat = useRef<THREE.MeshBasicMaterial>(null);
   const [atlas, setAtlas] = useState<THREE.Texture | null>(null);
-  const marquee = useMemo(() => makeMarquee(), []);
+  const marquees = useMemo(
+    () => [makeMarquee("TOO MANY APPS", 0), makeMarquee("TOO MANY APPS", 1), makeMarquee("JACKPOT", 0, true), makeMarquee("JACKPOT", 1, true)],
+    [],
+  );
   useEffect(() => {
     let alive = true;
-    makeIconAtlas().then((t) => alive && setAtlas(t));
+    getBrandAtlas().then((t) => alive && setAtlas(t));
     return () => {
       alive = false;
     };
@@ -555,17 +591,24 @@ function Machine({ glow }: { glow: THREE.Texture }) {
       fragmentShader: /* glsl */ `uniform vec3 uC; uniform float uI; varying vec3 vN; void main(){ float i = pow(abs(vN.z), 2.); gl_FragColor = vec4(uC*i*0.35*uI, 1.); ${outro} }`,
     });
     const haloA = neonTube(17.95, 6.75, 0.6, -0.6, 0.78, 0.4);
-    const reelGeo = new THREE.CylinderGeometry(REEL.r, REEL.r, REEL.len, 96, 1, true);
+    // Gold frame that lights up around the winning line.
+    const winTube = neonTube(17.3, cellArc * 1.08, 0.35, -0.6, 0.62, 0.06);
+    const winMat = new THREE.MeshBasicMaterial({ color: new THREE.Color("#FFD27A").multiplyScalar(1.8), toneMapped: false, transparent: true, opacity: 0 });
+    const winHalo = neonTube(17.3, cellArc * 1.08, 0.35, -0.6, 0.62, 0.34);
+    const winHaloMat = haloMat.clone();
+    winHaloMat.uniforms.uC.value = col("#FFB84D");
+    const reelGeo = new THREE.CylinderGeometry(REEL.r, REEL.r, REEL.len, 128, 1, true);
     reelGeo.rotateZ(Math.PI / 2);
     const mats = reelOrders.map(reelMaterial);
-    return { frame, frameMat, neonA, neonB, neonMat, neonMatB, haloMat, haloA, reelGeo, mats };
+    return { frame, frameMat, neonA, neonB, neonMat, neonMatB, haloMat, haloA, winTube, winMat, winHalo, winHaloMat, reelGeo, mats };
   }, []);
 
   useEffect(() => {
     if (atlas) parts.mats.forEach((m) => (m.uniforms.uMap.value = atlas));
   }, [atlas, parts]);
 
-  const reels = useRef(payline.map((_, i) => ({ angle: stopCell[i] * cellA + i * 1.3, v: 0 })));
+  const reels = useRef(stopCell.map((c, i) => ({ angle: c * cellA + i * 1.3, v: 0, aim: null as number | null, spinning: false })));
+  const tick = useRef(0);
   const { camera } = useThree();
 
   useFrame((_, delta) => {
@@ -580,27 +623,51 @@ function Machine({ glow }: { glow: THREE.Texture }) {
     g.visible = vis > 0.001;
     g.scale.setScalar(Math.max(0.001, live.inner * (0.55 + 0.45 * through) * (1 - collapse * 0.95)));
     g.rotation.y = collapse * 0.9;
-    const win = ramp(2.45, 2.52, 2.68, 2.8, k) * (0.75 + 0.25 * Math.sin(live.time * 18));
+    const won = k >= JACKPOT;
+    const win = ramp(JACKPOT, JACKPOT + 0.03, 2.62, 2.72, k) * (0.7 + 0.3 * Math.sin(live.time * 22));
+
+    let anySpin = 0;
     reels.current.forEach((r, i) => {
-      const stopAt = 2.12 + i * 0.07;
-      const spinning = k > 1.3 && k < stopAt;
+      const spinning = k > 1.3 && k < stopAt[i];
       if (spinning) {
-        r.v = 9 + i * 0.7;
+        // The last reel slows right down before it lands.
+        const slow = i === 4 ? 1 - smooth(stopAt[3], stopAt[4], k) * 0.8 : 1;
+        r.v = (9 + i * 0.7) * slow;
         r.angle += r.v * dt;
+        r.aim = null;
+        anySpin = Math.max(anySpin, r.v);
       } else {
-        const target = stopCell[i] * cellA;
-        const turns = Math.ceil((r.angle - target) / (Math.PI * 2) - 1e-3);
-        const aim = target + turns * Math.PI * 2;
-        const prev = r.angle;
-        r.angle += (aim - r.angle) * (1 - Math.exp(-dt * 7));
-        r.v = (r.angle - prev) / Math.max(dt, 1e-3);
+        if (r.aim === null) {
+          const target = stopCell[i] * cellA;
+          r.aim = target + Math.ceil((r.angle - target) / (Math.PI * 2) + 0.02) * Math.PI * 2;
+          if (r.spinning && k > live.prevK) sfx.clunk(i === 4);
+        }
+        // A damped spring, so each reel lands with a small bounce.
+        r.v += ((r.aim - r.angle) * 90 - r.v * 11) * dt;
+        r.angle += r.v * dt;
       }
+      r.spinning = spinning;
       const m = parts.mats[i];
       m.uniforms.uAngle.value = r.angle;
       m.uniforms.uBlur.value = Math.min(1, Math.abs(r.v) / 9);
-      m.uniforms.uWin.value = win;
+      m.uniforms.uWin.value = won ? Math.max(0.35, win) * (1 - collapse) : 0;
     });
+
+    // Reel ticks while spinning.
+    if (anySpin > 0 && through > 0.5) {
+      tick.current += dt * anySpin;
+      if (tick.current > 0.55) {
+        tick.current = 0;
+        sfx.tick();
+      }
+    }
+    if (crossed(1.78)) sfx.lever();
+
+    const phase = Math.floor(live.time * (won ? 9 : 3)) % 2;
+    if (marqueeMat.current) marqueeMat.current.map = marquees[(won ? 2 : 0) + phase];
     parts.haloMat.uniforms.uI.value = 0.8 + win * 1.5 + Math.sin(live.time * 3) * 0.1;
+    parts.winMat.opacity = win;
+    parts.winHaloMat.uniforms.uI.value = win * 2.2;
     if (lever.current) lever.current.rotation.x = ramp(1.75, 1.9, 1.95, 2.15, k) * 1.1;
   });
 
@@ -613,6 +680,8 @@ function Machine({ glow }: { glow: THREE.Texture }) {
         <mesh geometry={parts.neonA} material={parts.neonMat} />
         <mesh geometry={parts.haloA} material={parts.haloMat} />
         <mesh geometry={parts.neonB} material={parts.neonMatB} />
+        <mesh geometry={parts.winTube} material={parts.winMat} />
+        <mesh geometry={parts.winHalo} material={parts.winHaloMat} />
         {/* Backplate behind the reels */}
         <mesh position={[0, -0.6, -REEL.r * 2 + 0.2]}>
           <planeGeometry args={[19, 8]} />
@@ -622,15 +691,17 @@ function Machine({ glow }: { glow: THREE.Texture }) {
           parts.mats.map((m, i) => (
             <mesh key={i} geometry={parts.reelGeo} material={m} position={[(i - 2) * REEL.gap, -0.6, reelZ - C.z]} />
           ))}
-        {/* Payline */}
-        <mesh position={[0, -0.6, 0.4]}>
-          <planeGeometry args={[17.6, 0.05]} />
-          <meshBasicMaterial color={new THREE.Color(pal.rose).multiplyScalar(1.5)} toneMapped={false} transparent opacity={0.7} />
-        </mesh>
+        {/* Payline arrows */}
+        {[-1, 1].map((side) => (
+          <mesh key={side} position={[side * 9.25, -0.6, 0.7]} rotation={[0, 0, side > 0 ? Math.PI / 2 : -Math.PI / 2]}>
+            <circleGeometry args={[0.32, 3]} />
+            <meshBasicMaterial color={new THREE.Color("#FFD27A").multiplyScalar(1.5)} toneMapped={false} />
+          </mesh>
+        ))}
         {/* Marquee */}
         <mesh position={[0, 4.15, 0.78]}>
           <planeGeometry args={[11, 1.89]} />
-          <meshBasicMaterial map={marquee} toneMapped={false} />
+          <meshBasicMaterial ref={marqueeMat} map={marquees[0]} toneMapped={false} />
         </mesh>
         {/* Lever */}
         <group position={[11.4, -1.6, 0]}>
@@ -654,6 +725,132 @@ function Machine({ glow }: { glow: THREE.Texture }) {
   );
 }
 
+/** Ding ding ding: sparks and spinning Orbit coins burst out of the machine on the jackpot. */
+function Jackpot({ glow }: { glow: THREE.Texture }) {
+  const [atlas, setAtlas] = useState<THREE.Texture | null>(null);
+  useEffect(() => {
+    let alive = true;
+    getBrandAtlas().then((t) => alive && setAtlas(t));
+    return () => {
+      alive = false;
+    };
+  }, []);
+  const start = useRef(-1);
+  const coinRefs = useRef<(THREE.Sprite | null)[]>([]);
+  const flash = useRef<THREE.Sprite>(null);
+  const COINS = 26;
+  const { geo, mat, coins } = useMemo(() => {
+    const n = 700;
+    const pos = new Float32Array(n * 3);
+    const vel = new Float32Array(n * 3);
+    const misc = new Float32Array(n * 3);
+    const front = reelZ - C.z + REEL.r + 0.4;
+    for (let i = 0; i < n; i++) {
+      pos.set([(Math.floor(Math.random() * 5) - 2) * REEL.gap + (Math.random() - 0.5) * 2, -0.6 + (Math.random() - 0.5) * 1.4, front], i * 3);
+      vel.set([(Math.random() - 0.5) * 14, 3 + Math.random() * 12, 2 + Math.random() * 12], i * 3);
+      misc.set([Math.random() * 3, 1.5 + Math.random() * 3.5, Math.random() * 6.28], i * 3);
+    }
+    const geo = new THREE.BufferGeometry();
+    geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+    geo.setAttribute("aVel", new THREE.BufferAttribute(vel, 3));
+    geo.setAttribute("aMisc", new THREE.BufferAttribute(misc, 3));
+    const mat = new THREE.ShaderMaterial({
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      uniforms: { uT: { value: -1 }, uPR: { value: 1 }, uTime: { value: 0 }, uGold: { value: col("#FFD27A") }, uRose: { value: col(pal.rose) }, uWhite: { value: col("#FFF4E0") } },
+      vertexShader: /* glsl */ `
+        attribute vec3 aVel; attribute vec3 aMisc; uniform float uT, uPR, uTime;
+        varying float vA; varying float vKind;
+        void main(){
+          float t = max(uT, 0.);
+          vec3 p = position + aVel * t * 0.9 + vec3(0., -7., 0.) * t * t;
+          vec4 mv = modelViewMatrix * vec4(p, 1.);
+          gl_Position = projectionMatrix * mv;
+          vA = step(0., uT) * (1. - smoothstep(0.6, 2.2, t)) * (0.6 + 0.4 * sin(uTime * 20. + aMisc.z));
+          vKind = aMisc.x;
+          gl_PointSize = aMisc.y * uPR * clamp(40. / -mv.z, 0.6, 3.);
+        }`,
+      fragmentShader: /* glsl */ `
+        uniform vec3 uGold, uRose, uWhite; varying float vA; varying float vKind;
+        void main(){
+          vec2 q = gl_PointCoord - 0.5;
+          float star = max(smoothstep(0.5, 0., length(q)) , 0.) * (0.4 + 0.6 * smoothstep(0.08, 0., min(abs(q.x), abs(q.y))));
+          vec3 c = vKind < 1. ? uGold : vKind < 2. ? uRose : uWhite;
+          gl_FragColor = vec4(c * star * vA * 1.4, 1.);
+          ${outro}
+        }`,
+    });
+    const coins = Array.from({ length: COINS }, () => ({
+      o: V((Math.floor(Math.random() * 5) - 2) * REEL.gap, -0.6, reelZ - C.z + REEL.r + 0.6),
+      v: V((Math.random() - 0.5) * 12, 5 + Math.random() * 9, 6 + Math.random() * 10),
+      spin: (Math.random() - 0.5) * 10,
+      delay: Math.random() * 0.35,
+    }));
+    return { geo, mat, coins };
+  }, []);
+  const coinMats = useMemo(() => {
+    if (!atlas) return [];
+    const t = atlas.clone();
+    t.repeat.set(1 / brandGrid.cols, 1 / brandGrid.rows);
+    t.offset.set(0, 1 - 1 / brandGrid.rows);
+    t.needsUpdate = true;
+    return coins.map(() => new THREE.SpriteMaterial({ map: t, transparent: true, depthWrite: false }));
+  }, [atlas, coins]);
+
+  const { gl } = useThree();
+  const group = useRef<THREE.Group>(null);
+  const tmp = useMemo(() => new THREE.Vector3(), []);
+  useFrame(() => {
+    const k = live.k;
+    if (crossed(JACKPOT)) {
+      start.current = live.time;
+      sfx.jackpot();
+    }
+    if (k < JACKPOT - 0.02) start.current = -1;
+    const t = start.current < 0 ? -1 : live.time - start.current;
+    live.shake = t >= 0 ? Math.max(0, 1 - t / 0.6) : 0;
+    mat.uniforms.uT.value = t;
+    mat.uniforms.uPR.value = gl.getPixelRatio();
+    mat.uniforms.uTime.value = live.time;
+    if (group.current) {
+      group.current.scale.setScalar(live.inner);
+      group.current.visible = t >= 0 && t < 3;
+    }
+    if (flash.current) {
+      const f = t >= 0 ? Math.exp(-t * 4) : 0;
+      flash.current.material.opacity = f * 0.9;
+      flash.current.scale.setScalar(10 + (1 - f) * 30);
+    }
+    coinRefs.current.forEach((sp, i) => {
+      if (!sp) return;
+      const c = coins[i];
+      const tt = Math.max(0, t - c.delay);
+      tmp.copy(c.o).addScaledVector(c.v, tt * 0.9);
+      tmp.y -= 7 * tt * tt;
+      sp.position.copy(tmp);
+      sp.material.rotation = tt * c.spin;
+      sp.material.opacity = t >= c.delay ? 1 - smooth(1.4, 2.4, tt) : 0;
+      sp.scale.setScalar(1.1 + Math.sin(tt * 8 + i) * 0.08);
+    });
+  });
+
+  return (
+    <group position={C}>
+      <group ref={group} visible={false}>
+        <points geometry={geo} material={mat} frustumCulled={false} />
+        {coinMats.map((m, i) => (
+          <sprite key={i} ref={(el) => void (coinRefs.current[i] = el)} material={m} />
+        ))}
+        <sprite ref={flash} position={[0, -0.6, 2]}>
+          <spriteMaterial map={glow} color="#FFD9A0" transparent opacity={0} blending={THREE.AdditiveBlending} depthWrite={false} />
+        </sprite>
+      </group>
+    </group>
+  );
+}
+
+
 /* ------------------------------------------------------------------------------------------------
  * Act III: the network and the sphere
  * ---------------------------------------------------------------------------------------------- */
@@ -661,20 +858,16 @@ function Machine({ glow }: { glow: THREE.Texture }) {
 const R_SPHERE = 5;
 
 /** Where each app sits on the reels when they stop (relative to C, before scaling). */
-const nodeStart = [
-  ...payline.map((_, i) => V((i - 2) * REEL.gap, -0.6, reelZ - C.z + REEL.r + 0.1)),
-  ...extras.map((_, i) => {
-    const up = i % 2 ? -1 : 1;
-    return V((i - 2) * REEL.gap, -0.6 + up * REEL.r * Math.sin(cellA), reelZ - C.z + REEL.r * Math.cos(cellA) + 0.1);
-  }),
-];
-const nodeApps = [...payline, ...extras];
+const rowPos = (reel: number, row: -1 | 0 | 1) =>
+  V((reel - 2) * REEL.gap, -0.6 + row * REEL.r * Math.sin(cellA), reelZ - C.z + REEL.r * Math.cos(row * cellA) + 0.1);
+const nodeStart = [...aboveApps.map((_, i) => rowPos(i, 1)), ...belowApps.map((_, i) => rowPos(i, -1))];
+const nodeApps = networkApps;
+/** The five winning Orbit icons, which fly into the centre and become the sphere. */
+const tokenStart = stopCell.map((_, i) => rowPos(i, 0));
+/** A ring around the sphere that opens on the right, where the copy sits. */
 const nodeTarget = nodeApps.map((_, i) => {
-  const n = nodeApps.length;
-  const y = 1 - ((i + 0.5) / n) * 2;
-  const r = Math.sqrt(1 - y * y);
-  const th = i * 2.39996 + 0.6;
-  return V(Math.cos(th) * r * 11.5, y * 7, Math.sin(th) * r * 4.5);
+  const a = (Math.PI / 3) + (i / (nodeApps.length - 1)) * (Math.PI * 4) / 3;
+  return V(Math.cos(a) * 8, Math.sin(a) * 6.2, Math.sin(a * 2) * 2.5 + 1);
 });
 /** The phone's screen centre and facing direction in its final, tilted pose. */
 const finalNormal = V(0, 0, 1).applyAxisAngle(V(1, 0, 0), finalTilt);
@@ -788,22 +981,24 @@ function Network({ glow }: { glow: THREE.Texture }) {
   const [atlas, setAtlas] = useState<THREE.Texture | null>(null);
   useEffect(() => {
     let alive = true;
-    makeIconAtlas().then((t) => alive && setAtlas(t));
+    getBrandAtlas().then((t) => alive && setAtlas(t));
     return () => {
       alive = false;
     };
   }, []);
   const sprites = useRef<(THREE.Group | null)[]>([]);
+  const tokens = useRef<(THREE.Sprite | null)[]>([]);
   const lines = useRef<THREE.LineSegments>(null);
-  const icons = useMemo(() => {
-    if (!atlas) return [];
-    return nodeApps.map((a) => {
+  const { icons, tokenMat } = useMemo(() => {
+    if (!atlas) return { icons: [], tokenMat: null };
+    const tile = (a: number) => {
       const t = atlas.clone();
-      t.repeat.set(1 / iconGrid.cols, 1 / iconGrid.rows);
-      t.offset.set((a % iconGrid.cols) / iconGrid.cols, 1 - (Math.floor(a / iconGrid.cols) + 1) / iconGrid.rows);
+      t.repeat.set(1 / brandGrid.cols, 1 / brandGrid.rows);
+      t.offset.set((a % brandGrid.cols) / brandGrid.cols, 1 - (Math.floor(a / brandGrid.cols) + 1) / brandGrid.rows);
       t.needsUpdate = true;
       return new THREE.SpriteMaterial({ map: t, transparent: true, depthWrite: false });
-    });
+    };
+    return { icons: nodeApps.map(tile), tokenMat: tile(ORBIT) };
   }, [atlas]);
 
   const { geo, mat } = useMemo(() => {
@@ -879,7 +1074,7 @@ function Network({ glow }: { glow: THREE.Texture }) {
       tmp.a.copy(nodeStart[i]).lerp(nodeTarget[i], fly);
       tmp.a.z += Math.sin(fly * Math.PI) * 4;
       tmp.a.multiplyScalar(inner * (1 - leave)).add(C);
-      let scale = (1.9 - fly * 0.4) * inner * (1 - leave);
+      let scale = (1.95 - fly * 0.45) * inner * (1 - leave);
       let vis = k > 2.58 && k < 4.45;
       // Finale: orbit the hologram above the phone.
       if (k > 4.7) {
@@ -893,6 +1088,18 @@ function Network({ glow }: { glow: THREE.Texture }) {
       g.position.copy(tmp.a);
       g.scale.setScalar(Math.max(0.001, scale));
       g.visible = vis;
+    });
+
+    // The winning Orbit icons pull into the centre, where the sphere is born.
+    tokens.current.forEach((sp, j) => {
+      if (!sp) return;
+      const q = smooth(2.55 + j * 0.02, 2.82 + j * 0.02, k);
+      tmp.a.copy(tokenStart[j]).multiplyScalar(1 - q);
+      tmp.a.z += Math.sin(q * Math.PI) * 3;
+      sp.position.copy(tmp.a.multiplyScalar(inner).add(C));
+      sp.scale.setScalar(Math.max(0.001, 1.95 * inner * (1 - q * 0.8)));
+      sp.material.rotation = q * Math.PI * 2 * (j % 2 ? 1 : -1);
+      sp.visible = k > 2.55 && q < 0.995;
     });
 
     // Labels for the network (desktop only; they avoid the copy column).
@@ -911,6 +1118,8 @@ function Network({ glow }: { glow: THREE.Texture }) {
   return (
     <>
       <lineSegments ref={lines} geometry={geo} material={mat} position={C} frustumCulled={false} />
+      {tokenMat &&
+        tokenStart.map((_, j) => <sprite key={`t${j}`} ref={(el) => void (tokens.current[j] = el)} material={tokenMat.clone()} visible={false} />)}
       {icons.map((m, i) => (
         <group key={i} ref={(el) => void (sprites.current[i] = el)} visible={false}>
           <Glow glow={glow} color={pal.violet} scale={2.2} opacity={0.45} />
@@ -1158,6 +1367,7 @@ function World({ reduce }: { reduce: boolean }) {
       <Phone glow={glow} />
       <Burst />
       <Machine glow={glow} />
+      <Jackpot glow={glow} />
       <Sphere glow={glow} />
       <Network glow={glow} />
       <Hologram glow={glow} />
