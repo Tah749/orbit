@@ -1,0 +1,1174 @@
+{
+  "version": 2,
+  "generated": "2026-09-28",
+  "tokenOrder": [
+    "paper",
+    "white",
+    "soft",
+    "line",
+    "ink",
+    "muted",
+    "green",
+    "sage",
+    "sageDeep",
+    "coral",
+    "blue",
+    "yellow"
+  ],
+  "recommendations": {
+    "Best light-first": "oat",
+    "Best dark-first": "nightbloom",
+    "Best all-rounder": "porcelain"
+  },
+  "schemes": [
+    {
+      "id": "porcelain",
+      "name": "Porcelain",
+      "primaryMode": "light",
+      "tags": [
+        "Neutral",
+        "Cool grey"
+      ],
+      "accent": "Cobalt",
+      "secondary": "Slate blue",
+      "mood": "Cool, quiet, engineered. Pale cool greys with one confident cobalt. Feels like a well-made bank app that got a design budget.",
+      "suits": "Money-first positioning, privacy-conscious professionals, anyone who distrusts 'lifestyle' branding. Easiest to extend into a full product UI.",
+      "risks": "Can read as generic SaaS or 'another fintech blue'. Personality has to come from type, motion and copy, not colour.",
+      "light": {
+        "paper": "#F4F5F7",
+        "white": "#FFFFFF",
+        "soft": "#EBEDF1",
+        "line": "#DADDE3",
+        "ink": "#111318",
+        "muted": "#5B616E",
+        "green": "#2941CC",
+        "sage": "#E8EBFB",
+        "sageDeep": "#1C2E99",
+        "coral": "#C8322B",
+        "blue": "#3E6A8A",
+        "yellow": "#8F5F00"
+      },
+      "dark": {
+        "paper": "#0E1014",
+        "white": "#16181D",
+        "soft": "#1F2228",
+        "line": "#2B2F37",
+        "ink": "#F2F3F5",
+        "muted": "#9CA2AE",
+        "green": "#8C9DFF",
+        "sage": "#1B2146",
+        "sageDeep": "#C3CCFF",
+        "coral": "#FF7A70",
+        "blue": "#86B8D9",
+        "yellow": "#F2BE55"
+      },
+      "dataViz": {
+        "light": [
+          "#2941CC",
+          "#2F8F5B",
+          "#8A4FC0",
+          "#D0672B",
+          "#00879E"
+        ],
+        "dark": [
+          "#8C9DFF",
+          "#6FCB8F",
+          "#C39BF0",
+          "#F29A5E",
+          "#4FC9DC"
+        ]
+      },
+      "buttonText": {
+        "light": {
+          "use": "light",
+          "hex": "#FFFFFF",
+          "ratio": 7.71
+        },
+        "dark": {
+          "use": "dark",
+          "hex": "#0E1014",
+          "ratio": 7.6
+        }
+      },
+      "contrast": {
+        "light": {
+          "Ink on paper": 17.03,
+          "Muted on paper": 5.7,
+          "Muted on card": 6.21,
+          "Accent text on paper": 7.07,
+          "Button text on accent": 7.71,
+          "sageDeep on sage": 9.32,
+          "Coral on paper": 4.88,
+          "Yellow on paper": 5.06,
+          "Accent text on card": 7.71,
+          "Coral on card": 5.32,
+          "Yellow on card": 5.52,
+          "Muted on soft": 5.3,
+          "Data viz 1 on card": 7.71,
+          "Data viz 2 on card": 4.04,
+          "Data viz 3 on card": 5.3,
+          "Data viz 4 on card": 3.71,
+          "Data viz 5 on card": 4.23
+        },
+        "dark": {
+          "Ink on paper": 17.15,
+          "Muted on paper": 7.43,
+          "Muted on card": 6.93,
+          "Accent text on paper": 7.6,
+          "Button text on accent": 7.6,
+          "sageDeep on sage": 9.91,
+          "Coral on paper": 7.5,
+          "Yellow on paper": 11.13,
+          "Accent text on card": 7.09,
+          "Coral on card": 6.99,
+          "Yellow on card": 10.38,
+          "Muted on soft": 6.22,
+          "Data viz 1 on card": 7.09,
+          "Data viz 2 on card": 8.98,
+          "Data viz 3 on card": 7.84,
+          "Data viz 4 on card": 8.08,
+          "Data viz 5 on card": 9.07
+        }
+      },
+      "adjustments": []
+    },
+    {
+      "id": "oat",
+      "name": "Oat",
+      "primaryMode": "light",
+      "tags": [
+        "Neutral",
+        "Warm grey"
+      ],
+      "accent": "Petrol",
+      "secondary": "Heather",
+      "mood": "Warm, unhurried, grown-up. Oatmeal greys like linen paper, with a deep petrol teal that feels steady rather than techy.",
+      "suits": "The broadest audience: busy parents, 30-55 professionals, people who want their life to feel handled. Good in daylight and in print.",
+      "risks": "Warm grey plus teal is a familiar 'calm wellness' combination, so it may feel too quiet for a launch that needs to be noticed.",
+      "light": {
+        "paper": "#F5F3EF",
+        "white": "#FFFFFF",
+        "soft": "#ECE8E1",
+        "line": "#DDD7CD",
+        "ink": "#1D1B18",
+        "muted": "#67625A",
+        "green": "#0C6B66",
+        "sage": "#E1EFEC",
+        "sageDeep": "#084B47",
+        "coral": "#B8382A",
+        "blue": "#6B4F8F",
+        "yellow": "#8C5C00"
+      },
+      "dark": {
+        "paper": "#151412",
+        "white": "#1D1B19",
+        "soft": "#272522",
+        "line": "#35322D",
+        "ink": "#F2EFEA",
+        "muted": "#A9A399",
+        "green": "#5CC9BC",
+        "sage": "#12302D",
+        "sageDeep": "#A8E3DA",
+        "coral": "#F07A68",
+        "blue": "#BBA3DD",
+        "yellow": "#E4B458"
+      },
+      "dataViz": {
+        "light": [
+          "#00836C",
+          "#C0652B",
+          "#6B4F8F",
+          "#A07A12",
+          "#2F6DB5"
+        ],
+        "dark": [
+          "#5CC9BC",
+          "#EE9A62",
+          "#B99AF0",
+          "#D9B85A",
+          "#7AAEF5"
+        ]
+      },
+      "buttonText": {
+        "light": {
+          "use": "light",
+          "hex": "#FFFFFF",
+          "ratio": 6.34
+        },
+        "dark": {
+          "use": "dark",
+          "hex": "#151412",
+          "ratio": 9.24
+        }
+      },
+      "contrast": {
+        "light": {
+          "Ink on paper": 15.5,
+          "Muted on paper": 5.46,
+          "Muted on card": 6.05,
+          "Accent text on paper": 5.72,
+          "Button text on accent": 6.34,
+          "sageDeep on sage": 8.43,
+          "Coral on paper": 5.21,
+          "Yellow on paper": 5.2,
+          "Accent text on card": 6.34,
+          "Coral on card": 5.77,
+          "Yellow on card": 5.76,
+          "Muted on soft": 4.95,
+          "Data viz 1 on card": 4.71,
+          "Data viz 2 on card": 4.09,
+          "Data viz 3 on card": 6.69,
+          "Data viz 4 on card": 3.97,
+          "Data viz 5 on card": 5.28
+        },
+        "dark": {
+          "Ink on paper": 16.05,
+          "Muted on paper": 7.35,
+          "Muted on card": 6.86,
+          "Accent text on paper": 9.24,
+          "Button text on accent": 9.24,
+          "sageDeep on sage": 9.87,
+          "Coral on paper": 6.74,
+          "Yellow on paper": 9.62,
+          "Accent text on card": 8.61,
+          "Coral on card": 6.29,
+          "Yellow on card": 8.97,
+          "Muted on soft": 6.1,
+          "Data viz 1 on card": 8.61,
+          "Data viz 2 on card": 7.71,
+          "Data viz 3 on card": 7.31,
+          "Data viz 4 on card": 8.96,
+          "Data viz 5 on card": 7.52
+        }
+      },
+      "adjustments": []
+    },
+    {
+      "id": "broadsheet",
+      "name": "Broadsheet",
+      "primaryMode": "light",
+      "tags": [
+        "Editorial",
+        "High contrast"
+      ],
+      "accent": "Vermilion",
+      "secondary": "Press blue",
+      "mood": "Black ink, white stock, one red. Confident and editorial, like a well-set newspaper front page. Says 'we have nothing to hide'.",
+      "suits": "Brand-led launch, press and investor pages, a design-literate audience. Also the most legible option for older users.",
+      "risks": "A red-orange accent sits near 'danger', so alerts need icons and labels. Can feel stark or cold across a whole app, and heavy black is tiring in dark rooms.",
+      "light": {
+        "paper": "#FAFAF7",
+        "white": "#FFFFFF",
+        "soft": "#F0F0EC",
+        "line": "#D4D4CF",
+        "ink": "#0A0A0A",
+        "muted": "#555552",
+        "green": "#D63816",
+        "sage": "#FDEBE5",
+        "sageDeep": "#A3260B",
+        "coral": "#A5103F",
+        "blue": "#1F3FBF",
+        "yellow": "#8A6100"
+      },
+      "dark": {
+        "paper": "#0A0A0A",
+        "white": "#141414",
+        "soft": "#1E1E1E",
+        "line": "#2E2E2E",
+        "ink": "#FFFFFF",
+        "muted": "#A3A3A0",
+        "green": "#FF5A36",
+        "sage": "#2B1109",
+        "sageDeep": "#FFB3A0",
+        "coral": "#FF6B8E",
+        "blue": "#8FA5FF",
+        "yellow": "#F5C451"
+      },
+      "dataViz": {
+        "light": [
+          "#0A0A0A",
+          "#D63816",
+          "#8C8C87",
+          "#1F3FBF",
+          "#B8860B"
+        ],
+        "dark": [
+          "#F2F2F2",
+          "#FF5A36",
+          "#8F8F8B",
+          "#8FA5FF",
+          "#F5C451"
+        ]
+      },
+      "buttonText": {
+        "light": {
+          "use": "light",
+          "hex": "#FFFFFF",
+          "ratio": 4.73
+        },
+        "dark": {
+          "use": "dark",
+          "hex": "#0A0A0A",
+          "ratio": 6.38
+        }
+      },
+      "contrast": {
+        "light": {
+          "Ink on paper": 18.93,
+          "Muted on paper": 7.15,
+          "Muted on card": 7.48,
+          "Accent text on paper": 4.53,
+          "Button text on accent": 4.73,
+          "sageDeep on sage": 6.41,
+          "Coral on paper": 7.31,
+          "Yellow on paper": 5.3,
+          "Accent text on card": 4.73,
+          "Coral on card": 7.65,
+          "Yellow on card": 5.54,
+          "Muted on soft": 6.55,
+          "Data viz 1 on card": 19.8,
+          "Data viz 2 on card": 4.73,
+          "Data viz 3 on card": 3.38,
+          "Data viz 4 on card": 8.33,
+          "Data viz 5 on card": 3.25
+        },
+        "dark": {
+          "Ink on paper": 19.8,
+          "Muted on paper": 7.83,
+          "Muted on card": 7.28,
+          "Accent text on paper": 6.38,
+          "Button text on accent": 6.38,
+          "sageDeep on sage": 10.29,
+          "Coral on paper": 7.3,
+          "Yellow on paper": 12.16,
+          "Accent text on card": 5.94,
+          "Coral on card": 6.8,
+          "Yellow on card": 11.31,
+          "Muted on soft": 6.59,
+          "Data viz 1 on card": 16.46,
+          "Data viz 2 on card": 5.94,
+          "Data viz 3 on card": 5.68,
+          "Data viz 4 on card": 7.89,
+          "Data viz 5 on card": 11.31
+        }
+      },
+      "adjustments": [
+        {
+          "mode": "light",
+          "token": "green",
+          "old": "#E8401C",
+          "new": "#D63816",
+          "before": 3.88,
+          "after": 4.53,
+          "against": "paper/white"
+        }
+      ]
+    },
+    {
+      "id": "sorbet",
+      "name": "Sorbet",
+      "primaryMode": "light",
+      "tags": [
+        "Pastel",
+        "Soft"
+      ],
+      "accent": "Grape",
+      "secondary": "Lagoon",
+      "mood": "Soft, friendly, a little playful. Lavender mist with peach and mint tints, anchored by a ripe grape accent so it never goes limp.",
+      "suits": "Wellbeing and family angles, a younger or more female-skewing audience, social and app-store assets.",
+      "risks": "Pastels can undersell the 'we handle your money' seriousness. Pale tints wash out on cheap screens, and the dark mode is the weaker half.",
+      "light": {
+        "paper": "#F8F5FD",
+        "white": "#FFFFFF",
+        "soft": "#FDEEE6",
+        "line": "#E6DDF0",
+        "ink": "#231D33",
+        "muted": "#6A6180",
+        "green": "#7A3AA0",
+        "sage": "#F2E6FA",
+        "sageDeep": "#5A2380",
+        "coral": "#C0394E",
+        "blue": "#2D7A89",
+        "yellow": "#8E6000"
+      },
+      "dark": {
+        "paper": "#17141F",
+        "white": "#201C2B",
+        "soft": "#2A2538",
+        "line": "#3A3449",
+        "ink": "#F6F2FC",
+        "muted": "#B0A7C4",
+        "green": "#D2A6F5",
+        "sage": "#33224A",
+        "sageDeep": "#E7CDFB",
+        "coral": "#FF8A98",
+        "blue": "#86D3DE",
+        "yellow": "#F5CB77"
+      },
+      "dataViz": {
+        "light": [
+          "#7A3AA0",
+          "#DF7565",
+          "#008CA8",
+          "#BB8D1A",
+          "#5A74D6"
+        ],
+        "dark": [
+          "#D2A6F5",
+          "#FF9E7A",
+          "#5FCFE3",
+          "#F5CB77",
+          "#A9B8FF"
+        ]
+      },
+      "buttonText": {
+        "light": {
+          "use": "light",
+          "hex": "#FFFFFF",
+          "ratio": 7.14
+        },
+        "dark": {
+          "use": "dark",
+          "hex": "#17141F",
+          "ratio": 9.09
+        }
+      },
+      "contrast": {
+        "light": {
+          "Ink on paper": 15.04,
+          "Muted on paper": 5.36,
+          "Muted on card": 5.78,
+          "Accent text on paper": 6.62,
+          "Button text on accent": 7.14,
+          "sageDeep on sage": 8.8,
+          "Coral on paper": 4.95,
+          "Yellow on paper": 5.09,
+          "Accent text on card": 7.14,
+          "Coral on card": 5.33,
+          "Yellow on card": 5.49,
+          "Muted on soft": 5.1,
+          "Data viz 1 on card": 7.14,
+          "Data viz 2 on card": 3.06,
+          "Data viz 3 on card": 3.95,
+          "Data viz 4 on card": 3.03,
+          "Data viz 5 on card": 4.28
+        },
+        "dark": {
+          "Ink on paper": 16.45,
+          "Muted on paper": 7.93,
+          "Muted on card": 7.26,
+          "Accent text on paper": 9.09,
+          "Button text on accent": 9.09,
+          "sageDeep on sage": 9.89,
+          "Coral on paper": 8.08,
+          "Yellow on paper": 11.84,
+          "Accent text on card": 8.33,
+          "Coral on card": 7.4,
+          "Yellow on card": 10.85,
+          "Muted on soft": 6.46,
+          "Data viz 1 on card": 8.33,
+          "Data viz 2 on card": 8.26,
+          "Data viz 3 on card": 9.13,
+          "Data viz 4 on card": 10.85,
+          "Data viz 5 on card": 8.7
+        }
+      },
+      "adjustments": [
+        {
+          "mode": "light",
+          "token": "blue",
+          "old": "#2E7D8C",
+          "new": "#2D7A89",
+          "before": 4.4,
+          "after": 4.57,
+          "against": "paper/white"
+        }
+      ]
+    },
+    {
+      "id": "riso",
+      "name": "Riso",
+      "primaryMode": "light",
+      "tags": [
+        "Bold",
+        "Print"
+      ],
+      "accent": "Fluoro magenta",
+      "secondary": "Riso blue",
+      "mood": "Loud and joyful, like a two-colour risograph zine. Warm uncoated-paper white, fluorescent magenta and a hard riso blue.",
+      "suits": "A launch that needs to stand out on social, a creative early-adopter crowd, and marketing pages more than the daily app.",
+      "risks": "The least 'bank-like' option. Magenta across bills and investments may feel unserious, and it tires quickly at full app scale.",
+      "light": {
+        "paper": "#FFFBF3",
+        "white": "#FFFFFF",
+        "soft": "#FFF1E0",
+        "line": "#EADFCC",
+        "ink": "#14110F",
+        "muted": "#5F574D",
+        "green": "#DA1787",
+        "sage": "#FFE3F0",
+        "sageDeep": "#99095A",
+        "coral": "#C22A1D",
+        "blue": "#1646C8",
+        "yellow": "#8A5B00"
+      },
+      "dark": {
+        "paper": "#110E14",
+        "white": "#1B1720",
+        "soft": "#25202C",
+        "line": "#362F3F",
+        "ink": "#FFF8F0",
+        "muted": "#B3A9B8",
+        "green": "#FF5CB0",
+        "sage": "#3A1029",
+        "sageDeep": "#FFB6DB",
+        "coral": "#FF7355",
+        "blue": "#7AA2FF",
+        "yellow": "#FFD15C"
+      },
+      "dataViz": {
+        "light": [
+          "#E0188A",
+          "#1646C8",
+          "#C58800",
+          "#0F9D8A",
+          "#6A3FB8"
+        ],
+        "dark": [
+          "#FF5CB0",
+          "#7AA2FF",
+          "#FFD15C",
+          "#3FD9BE",
+          "#FF8A4C"
+        ]
+      },
+      "buttonText": {
+        "light": {
+          "use": "light",
+          "hex": "#FFFFFF",
+          "ratio": 4.72
+        },
+        "dark": {
+          "use": "dark",
+          "hex": "#110E14",
+          "ratio": 6.76
+        }
+      },
+      "contrast": {
+        "light": {
+          "Ink on paper": 18.22,
+          "Muted on paper": 6.88,
+          "Muted on card": 7.1,
+          "Accent text on paper": 4.57,
+          "Button text on accent": 4.72,
+          "sageDeep on sage": 6.89,
+          "Coral on paper": 5.59,
+          "Yellow on paper": 5.69,
+          "Accent text on card": 4.72,
+          "Coral on card": 5.76,
+          "Yellow on card": 5.87,
+          "Muted on soft": 6.4,
+          "Data viz 1 on card": 4.5,
+          "Data viz 2 on card": 7.65,
+          "Data viz 3 on card": 3.05,
+          "Data viz 4 on card": 3.38,
+          "Data viz 5 on card": 6.96
+        },
+        "dark": {
+          "Ink on paper": 18.18,
+          "Muted on paper": 8.47,
+          "Muted on card": 7.8,
+          "Accent text on paper": 6.76,
+          "Button text on accent": 6.76,
+          "sageDeep on sage": 10.08,
+          "Coral on paper": 7.14,
+          "Yellow on paper": 13.25,
+          "Accent text on card": 6.23,
+          "Coral on card": 6.58,
+          "Yellow on card": 12.21,
+          "Muted on soft": 7.02,
+          "Data viz 1 on card": 6.23,
+          "Data viz 2 on card": 7.09,
+          "Data viz 3 on card": 12.21,
+          "Data viz 4 on card": 9.98,
+          "Data viz 5 on card": 7.56
+        }
+      },
+      "adjustments": [
+        {
+          "mode": "light",
+          "token": "green",
+          "old": "#E0188A",
+          "new": "#DA1787",
+          "before": 4.36,
+          "after": 4.57,
+          "against": "paper/white"
+        },
+        {
+          "mode": "light",
+          "token": "viz3",
+          "old": "#E09A00",
+          "new": "#C58800",
+          "before": 2.39,
+          "after": 3.05,
+          "against": "white"
+        }
+      ]
+    },
+    {
+      "id": "nightbloom",
+      "name": "Nightbloom",
+      "primaryMode": "dark",
+      "tags": [
+        "Midnight",
+        "Current direction"
+      ],
+      "accent": "Rose",
+      "secondary": "Cyan",
+      "mood": "The 3D story world made into a system. Deep midnight blue, cyan light and a single rose bloom. Cinematic, calm, with a pulse.",
+      "suits": "Continuity with the story page and waitlist, evening use, tech-forward early adopters. The strongest 'personality with trust' balance of the dark set.",
+      "risks": "Rose and red sit close, so danger is pushed to orange-red and needs an icon. Midnight blue is popular in AI products, so the rose has to do the distinguishing.",
+      "light": {
+        "paper": "#F3F6FC",
+        "white": "#FFFFFF",
+        "soft": "#E8EEF9",
+        "line": "#D5DEEE",
+        "ink": "#0A1330",
+        "muted": "#52607E",
+        "green": "#D11E55",
+        "sage": "#FDE6ED",
+        "sageDeep": "#9B1340",
+        "coral": "#C2410C",
+        "blue": "#0A7A99",
+        "yellow": "#8F5E00"
+      },
+      "dark": {
+        "paper": "#060B1C",
+        "white": "#0D1530",
+        "soft": "#14203F",
+        "line": "#1F2D52",
+        "ink": "#EEF4FF",
+        "muted": "#93A3C4",
+        "green": "#FF4D7A",
+        "sage": "#2A1030",
+        "sageDeep": "#FFB1C6",
+        "coral": "#FF6B4A",
+        "blue": "#3DD6F5",
+        "yellow": "#FFC24D"
+      },
+      "dataViz": {
+        "light": [
+          "#D11E55",
+          "#00799F",
+          "#6D4ED8",
+          "#B7791F",
+          "#0F8A6E"
+        ],
+        "dark": [
+          "#FF4D7A",
+          "#3DD6F5",
+          "#A78BFA",
+          "#FFC24D",
+          "#5EEAD4"
+        ]
+      },
+      "buttonText": {
+        "light": {
+          "use": "light",
+          "hex": "#FFFFFF",
+          "ratio": 5.21
+        },
+        "dark": {
+          "use": "dark",
+          "hex": "#060B1C",
+          "ratio": 6.15
+        }
+      },
+      "contrast": {
+        "light": {
+          "Ink on paper": 16.89,
+          "Muted on paper": 5.82,
+          "Muted on card": 6.3,
+          "Accent text on paper": 4.82,
+          "Button text on accent": 5.21,
+          "sageDeep on sage": 6.92,
+          "Coral on paper": 4.78,
+          "Yellow on paper": 5.15,
+          "Accent text on card": 5.21,
+          "Coral on card": 5.18,
+          "Yellow on card": 5.57,
+          "Muted on soft": 5.41,
+          "Data viz 1 on card": 5.21,
+          "Data viz 2 on card": 4.96,
+          "Data viz 3 on card": 5.63,
+          "Data viz 4 on card": 3.64,
+          "Data viz 5 on card": 4.3
+        },
+        "dark": {
+          "Ink on paper": 17.74,
+          "Muted on paper": 7.72,
+          "Muted on card": 7.09,
+          "Accent text on paper": 6.15,
+          "Button text on accent": 6.15,
+          "sageDeep on sage": 10.17,
+          "Coral on paper": 6.95,
+          "Yellow on paper": 12.19,
+          "Accent text on card": 5.65,
+          "Coral on card": 6.39,
+          "Yellow on card": 11.2,
+          "Muted on soft": 6.33,
+          "Data viz 1 on card": 5.65,
+          "Data viz 2 on card": 10.4,
+          "Data viz 3 on card": 6.61,
+          "Data viz 4 on card": 11.2,
+          "Data viz 5 on card": 12.16
+        }
+      },
+      "adjustments": []
+    },
+    {
+      "id": "graphite",
+      "name": "Graphite",
+      "primaryMode": "dark",
+      "tags": [
+        "Neutral",
+        "Charcoal"
+      ],
+      "accent": "Signal orange",
+      "secondary": "Steel",
+      "mood": "Pure charcoal and one signal orange, like well-made hardware. Precise, confident, zero decoration.",
+      "suits": "Power users, people who live in dark mode, anyone who likes Teenage Engineering or Braun. Very good for dense data views.",
+      "risks": "Orange next to red danger and amber warning is a crowded warm corner, so status colours lean on icons. Colder than the brief's 'calm' in light mode.",
+      "light": {
+        "paper": "#F6F6F6",
+        "white": "#FFFFFF",
+        "soft": "#EDEDEE",
+        "line": "#DDDDE0",
+        "ink": "#111113",
+        "muted": "#5E5E66",
+        "green": "#C24A00",
+        "sage": "#FCEBDD",
+        "sageDeep": "#8A3500",
+        "coral": "#C62828",
+        "blue": "#4A6480",
+        "yellow": "#8C5E00"
+      },
+      "dark": {
+        "paper": "#0F0F10",
+        "white": "#18181A",
+        "soft": "#212124",
+        "line": "#2E2E32",
+        "ink": "#F4F4F5",
+        "muted": "#A1A1A8",
+        "green": "#FF8A3D",
+        "sage": "#2E1A0C",
+        "sageDeep": "#FFC49C",
+        "coral": "#FF5C5C",
+        "blue": "#9BB4CF",
+        "yellow": "#F5CF4F"
+      },
+      "dataViz": {
+        "light": [
+          "#C24A00",
+          "#3D6FA8",
+          "#B8860B",
+          "#1E8F76",
+          "#8A5AB8"
+        ],
+        "dark": [
+          "#FF8A3D",
+          "#7FA8F0",
+          "#E8C547",
+          "#4FC9A8",
+          "#C09CF0"
+        ]
+      },
+      "buttonText": {
+        "light": {
+          "use": "light",
+          "hex": "#FFFFFF",
+          "ratio": 4.91
+        },
+        "dark": {
+          "use": "dark",
+          "hex": "#0F0F10",
+          "ratio": 8.17
+        }
+      },
+      "contrast": {
+        "light": {
+          "Ink on paper": 17.45,
+          "Muted on paper": 5.94,
+          "Muted on card": 6.42,
+          "Accent text on paper": 4.55,
+          "Button text on accent": 4.91,
+          "sageDeep on sage": 6.98,
+          "Coral on paper": 5.2,
+          "Yellow on paper": 5.23,
+          "Accent text on card": 4.91,
+          "Coral on card": 5.62,
+          "Yellow on card": 5.65,
+          "Muted on soft": 5.49,
+          "Data viz 1 on card": 4.91,
+          "Data viz 2 on card": 5.2,
+          "Data viz 3 on card": 3.25,
+          "Data viz 4 on card": 4.0,
+          "Data viz 5 on card": 4.96
+        },
+        "dark": {
+          "Ink on paper": 17.43,
+          "Muted on paper": 7.46,
+          "Muted on card": 6.91,
+          "Accent text on paper": 8.17,
+          "Button text on accent": 8.17,
+          "sageDeep on sage": 10.74,
+          "Coral on paper": 6.33,
+          "Yellow on paper": 12.7,
+          "Accent text on card": 7.56,
+          "Coral on card": 5.86,
+          "Yellow on card": 11.75,
+          "Muted on soft": 6.25,
+          "Data viz 1 on card": 7.56,
+          "Data viz 2 on card": 7.4,
+          "Data viz 3 on card": 10.56,
+          "Data viz 4 on card": 8.66,
+          "Data viz 5 on card": 7.81
+        }
+      },
+      "adjustments": []
+    },
+    {
+      "id": "ember",
+      "name": "Ember",
+      "primaryMode": "dark",
+      "tags": [
+        "Warm",
+        "Espresso"
+      ],
+      "accent": "Honey",
+      "secondary": "Dusty sky",
+      "mood": "Espresso browns and a honey glow, like a lamp-lit study at night. Warm, reassuring, quietly luxurious.",
+      "suits": "Evening 'wind-down' positioning, a premium or older audience, anyone who finds blue-black UIs cold.",
+      "risks": "Honey accent and amber warning are neighbours, so warning is pushed to orange and must carry an icon. Brown-black can look muddy on poor displays.",
+      "light": {
+        "paper": "#FAF6F0",
+        "white": "#FFFFFF",
+        "soft": "#F2EBE0",
+        "line": "#E4D9C9",
+        "ink": "#231A12",
+        "muted": "#6E6154",
+        "green": "#955A00",
+        "sage": "#FBEBCF",
+        "sageDeep": "#6B3F00",
+        "coral": "#B8322A",
+        "blue": "#3F6A8E",
+        "yellow": "#B04A0C"
+      },
+      "dark": {
+        "paper": "#14100C",
+        "white": "#1D1813",
+        "soft": "#28211A",
+        "line": "#3A3027",
+        "ink": "#F6EEE4",
+        "muted": "#B0A392",
+        "green": "#F2A93B",
+        "sage": "#33230E",
+        "sageDeep": "#FFD59A",
+        "coral": "#FF6B5E",
+        "blue": "#8FB5D6",
+        "yellow": "#FF9152"
+      },
+      "dataViz": {
+        "light": [
+          "#955A00",
+          "#336FA8",
+          "#A8483A",
+          "#7A5A9A",
+          "#3F8545"
+        ],
+        "dark": [
+          "#F2A93B",
+          "#72AAF2",
+          "#F08A74",
+          "#C29BF2",
+          "#8FD07A"
+        ]
+      },
+      "buttonText": {
+        "light": {
+          "use": "light",
+          "hex": "#FFFFFF",
+          "ratio": 5.61
+        },
+        "dark": {
+          "use": "dark",
+          "hex": "#14100C",
+          "ratio": 9.48
+        }
+      },
+      "contrast": {
+        "light": {
+          "Ink on paper": 15.88,
+          "Muted on paper": 5.57,
+          "Muted on card": 6.0,
+          "Accent text on paper": 5.21,
+          "Button text on accent": 5.61,
+          "sageDeep on sage": 7.66,
+          "Coral on paper": 5.53,
+          "Yellow on paper": 5.09,
+          "Accent text on card": 5.61,
+          "Coral on card": 5.95,
+          "Yellow on card": 5.48,
+          "Muted on soft": 5.07,
+          "Data viz 1 on card": 5.61,
+          "Data viz 2 on card": 5.28,
+          "Data viz 3 on card": 5.75,
+          "Data viz 4 on card": 5.59,
+          "Data viz 5 on card": 4.51
+        },
+        "dark": {
+          "Ink on paper": 16.47,
+          "Muted on paper": 7.66,
+          "Muted on card": 7.13,
+          "Accent text on paper": 9.48,
+          "Button text on accent": 9.48,
+          "sageDeep on sage": 10.98,
+          "Coral on paper": 6.78,
+          "Yellow on paper": 8.5,
+          "Accent text on card": 8.82,
+          "Coral on card": 6.3,
+          "Yellow on card": 7.9,
+          "Muted on soft": 6.43,
+          "Data viz 1 on card": 8.82,
+          "Data viz 2 on card": 7.34,
+          "Data viz 3 on card": 7.21,
+          "Data viz 4 on card": 7.77,
+          "Data viz 5 on card": 9.62
+        }
+      },
+      "adjustments": []
+    },
+    {
+      "id": "ultra",
+      "name": "Ultra",
+      "primaryMode": "dark",
+      "tags": [
+        "Bold",
+        "Saturated"
+      ],
+      "accent": "Electric mint",
+      "secondary": "Lilac",
+      "mood": "Deep ultramarine instead of black, with an electric mint that pops like a highlighter. Unmistakable and optimistic.",
+      "suits": "A launch that wants a signature colour people remember, app icon and social presence, a younger confident audience.",
+      "risks": "Saturated blue fatigues over long sessions and dominates photography. Mint accent sits close to 'success green', so paid/success states need a different treatment.",
+      "light": {
+        "paper": "#F2F4FF",
+        "white": "#FFFFFF",
+        "soft": "#E6EAFF",
+        "line": "#D2D8F5",
+        "ink": "#0B1466",
+        "muted": "#4A548C",
+        "green": "#0A7A55",
+        "sage": "#DDF7EC",
+        "sageDeep": "#065A3E",
+        "coral": "#C8283A",
+        "blue": "#4B3FD1",
+        "yellow": "#8A5C00"
+      },
+      "dark": {
+        "paper": "#0A1150",
+        "white": "#111A63",
+        "soft": "#1A2575",
+        "line": "#28348A",
+        "ink": "#F2F4FF",
+        "muted": "#AEB6E8",
+        "green": "#3EF0B0",
+        "sage": "#0E3A52",
+        "sageDeep": "#B5FFE2",
+        "coral": "#FF7A88",
+        "blue": "#C4B5FF",
+        "yellow": "#FFD166"
+      },
+      "dataViz": {
+        "light": [
+          "#0A7A55",
+          "#4B3FD1",
+          "#D9486A",
+          "#C28A00",
+          "#1E88C8"
+        ],
+        "dark": [
+          "#3EF0B0",
+          "#C4B5FF",
+          "#FF8FA3",
+          "#FFD166",
+          "#6CC8FF"
+        ]
+      },
+      "buttonText": {
+        "light": {
+          "use": "light",
+          "hex": "#FFFFFF",
+          "ratio": 5.35
+        },
+        "dark": {
+          "use": "dark",
+          "hex": "#0A1150",
+          "ratio": 11.83
+        }
+      },
+      "contrast": {
+        "light": {
+          "Ink on paper": 14.67,
+          "Muted on paper": 6.52,
+          "Muted on card": 7.15,
+          "Accent text on paper": 4.88,
+          "Button text on accent": 5.35,
+          "sageDeep on sage": 7.32,
+          "Coral on paper": 5.01,
+          "Yellow on paper": 5.31,
+          "Accent text on card": 5.35,
+          "Coral on card": 5.5,
+          "Yellow on card": 5.81,
+          "Muted on soft": 5.98,
+          "Data viz 1 on card": 5.35,
+          "Data viz 2 on card": 7.17,
+          "Data viz 3 on card": 4.13,
+          "Data viz 4 on card": 3.03,
+          "Data viz 5 on card": 3.88
+        },
+        "dark": {
+          "Ink on paper": 15.85,
+          "Muted on paper": 8.81,
+          "Muted on card": 7.88,
+          "Accent text on paper": 11.83,
+          "Button text on accent": 11.83,
+          "sageDeep on sage": 10.52,
+          "Coral on paper": 6.94,
+          "Yellow on paper": 12.05,
+          "Accent text on card": 10.58,
+          "Coral on card": 6.21,
+          "Yellow on card": 10.77,
+          "Muted on soft": 6.81,
+          "Data viz 1 on card": 10.58,
+          "Data viz 2 on card": 8.43,
+          "Data viz 3 on card": 7.18,
+          "Data viz 4 on card": 10.77,
+          "Data viz 5 on card": 8.39
+        }
+      },
+      "adjustments": []
+    },
+    {
+      "id": "bramble",
+      "name": "Bramble",
+      "primaryMode": "dark",
+      "tags": [
+        "Moody",
+        "Plum"
+      ],
+      "accent": "Pistachio",
+      "secondary": "Blush",
+      "mood": "Blackberry plum darks with a soft pistachio green. Unexpected, gentle and a little botanical. Premium without gold.",
+      "suits": "Wellbeing and fitness crossover, a design-literate audience that wants something nobody else has, lifestyle press.",
+      "risks": "Plum plus green is an acquired taste. Pistachio reads as 'success', so it must be kept for brand and 'paid' only. The light mode is less distinctive.",
+      "light": {
+        "paper": "#F7F4F6",
+        "white": "#FFFFFF",
+        "soft": "#EEE8EC",
+        "line": "#DED4DB",
+        "ink": "#1E1520",
+        "muted": "#66596A",
+        "green": "#3F6B1F",
+        "sage": "#E7F1DC",
+        "sageDeep": "#2C4D14",
+        "coral": "#C0303F",
+        "blue": "#9A3F6B",
+        "yellow": "#8A5B00"
+      },
+      "dark": {
+        "paper": "#120C14",
+        "white": "#1B141E",
+        "soft": "#251C29",
+        "line": "#352A3A",
+        "ink": "#F4EEF5",
+        "muted": "#AFA2B4",
+        "green": "#B5D99C",
+        "sage": "#22301A",
+        "sageDeep": "#D8F0C6",
+        "coral": "#FF7A85",
+        "blue": "#F2A6C4",
+        "yellow": "#F0C267"
+      },
+      "dataViz": {
+        "light": [
+          "#3F6B1F",
+          "#9A3F6B",
+          "#B07A12",
+          "#1F7BA8",
+          "#C25E1F"
+        ],
+        "dark": [
+          "#A8DC88",
+          "#F59CC0",
+          "#F0C267",
+          "#6CC0EA",
+          "#F29A6A"
+        ]
+      },
+      "buttonText": {
+        "light": {
+          "use": "light",
+          "hex": "#FFFFFF",
+          "ratio": 6.3
+        },
+        "dark": {
+          "use": "dark",
+          "hex": "#120C14",
+          "ratio": 12.28
+        }
+      },
+      "contrast": {
+        "light": {
+          "Ink on paper": 16.25,
+          "Muted on paper": 6.0,
+          "Muted on card": 6.56,
+          "Accent text on paper": 5.77,
+          "Button text on accent": 6.3,
+          "sageDeep on sage": 8.27,
+          "Coral on paper": 5.15,
+          "Yellow on paper": 5.37,
+          "Accent text on card": 6.3,
+          "Coral on card": 5.62,
+          "Yellow on card": 5.87,
+          "Muted on soft": 5.43,
+          "Data viz 1 on card": 6.3,
+          "Data viz 2 on card": 6.37,
+          "Data viz 3 on card": 3.72,
+          "Data viz 4 on card": 4.71,
+          "Data viz 5 on card": 4.27
+        },
+        "dark": {
+          "Ink on paper": 16.9,
+          "Muted on paper": 7.95,
+          "Muted on card": 7.42,
+          "Accent text on paper": 12.28,
+          "Button text on accent": 12.28,
+          "sageDeep on sage": 11.42,
+          "Coral on paper": 7.69,
+          "Yellow on paper": 11.59,
+          "Accent text on card": 11.47,
+          "Coral on card": 7.19,
+          "Yellow on card": 10.83,
+          "Muted on soft": 6.77,
+          "Data viz 1 on card": 11.38,
+          "Data viz 2 on card": 8.92,
+          "Data viz 3 on card": 10.83,
+          "Data viz 4 on card": 8.89,
+          "Data viz 5 on card": 8.24
+        }
+      },
+      "adjustments": []
+    }
+  ]
+}

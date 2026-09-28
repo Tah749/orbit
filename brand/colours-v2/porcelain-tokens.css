@@ -1,0 +1,52 @@
+/*
+ * Orbit colour tokens: "Porcelain" scheme (best all-rounder, colour exploration v2).
+ * Drop-in replacement for the :root block in src/index.css. Token names are unchanged.
+ * Primary mode is light; the dark counterpart follows prefers-color-scheme.
+ * Note: `green` is the cobalt accent, `blue` the slate blue secondary.
+ * Button text on --green: light (#ffffff) in light, dark (#0e1014) in dark.
+ * The two glow tokens keep their old names so existing gradients keep working;
+ * --glow-violet now holds the accent glow and --glow-rose the secondary glow.
+ * Data viz (light): #2941cc #2f8f5b #8a4fc0 #d0672b #00879e
+ * Data viz (dark): #8c9dff #6fcb8f #c39bf0 #f29a5e #4fc9dc
+ */
+:root {
+  --paper: #f4f5f7;
+  --white: #ffffff;
+  --soft: #ebedf1;
+  --line: #dadde3;
+  --ink: #111318;
+  --muted: #5b616e;
+  --green: #2941cc;
+  --sage: #e8ebfb;
+  --sageDeep: #1c2e99;
+  --coral: #c8322b;
+  --blue: #3e6a8a;
+  --yellow: #8f5f00;
+
+  --glow-violet: rgba(41, 65, 204, 0.12);
+  --glow-rose: rgba(62, 106, 138, 0.06);
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #0e1014;
+    --white: #16181d;
+    --soft: #1f2228;
+    --line: #2b2f37;
+    --ink: #f2f3f5;
+    --muted: #9ca2ae;
+    --green: #8c9dff;
+    --sage: #1b2146;
+    --sageDeep: #c3ccff;
+    --coral: #ff7a70;
+    --blue: #86b8d9;
+    --yellow: #f2be55;
+
+    --glow-violet: rgba(140, 157, 255, 0.16);
+    --glow-rose: rgba(134, 184, 217, 0.07);
+
+    color-scheme: dark;
+  }
+}

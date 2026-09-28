@@ -1,0 +1,52 @@
+/*
+ * Orbit colour tokens: "Nightbloom" scheme (best dark-first, colour exploration v2).
+ * Drop-in replacement for the :root block in src/index.css. Token names are unchanged.
+ * Primary mode is dark; the light counterpart follows prefers-color-scheme.
+ * Note: `green` is the rose accent, `blue` the cyan secondary.
+ * Button text on --green: dark (#060b1c) in dark, light (#ffffff) in light.
+ * The two glow tokens keep their old names so existing gradients keep working;
+ * --glow-violet now holds the accent glow and --glow-rose the secondary glow.
+ * Data viz (dark): #ff4d7a #3dd6f5 #a78bfa #ffc24d #5eead4
+ * Data viz (light): #d11e55 #00799f #6d4ed8 #b7791f #0f8a6e
+ */
+:root {
+  --paper: #060b1c;
+  --white: #0d1530;
+  --soft: #14203f;
+  --line: #1f2d52;
+  --ink: #eef4ff;
+  --muted: #93a3c4;
+  --green: #ff4d7a;
+  --sage: #2a1030;
+  --sageDeep: #ffb1c6;
+  --coral: #ff6b4a;
+  --blue: #3dd6f5;
+  --yellow: #ffc24d;
+
+  --glow-violet: rgba(255, 77, 122, 0.16);
+  --glow-rose: rgba(61, 214, 245, 0.07);
+
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --paper: #f3f6fc;
+    --white: #ffffff;
+    --soft: #e8eef9;
+    --line: #d5deee;
+    --ink: #0a1330;
+    --muted: #52607e;
+    --green: #d11e55;
+    --sage: #fde6ed;
+    --sageDeep: #9b1340;
+    --coral: #c2410c;
+    --blue: #0a7a99;
+    --yellow: #8f5e00;
+
+    --glow-violet: rgba(209, 30, 85, 0.12);
+    --glow-rose: rgba(10, 122, 153, 0.06);
+
+    color-scheme: light;
+  }
+}
