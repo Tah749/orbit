@@ -54,6 +54,9 @@ const palettes = {
     reelB: [0.115, 0.105, 0.095],
     reelSep: 0.05,
     holoTint: "#DDF7F2",
+    studio: ["#2A2724", "#1A1917", "#0D0C0B"],
+    shadow: "#000000",
+    shadowOpacity: 0.7,
   },
   light: {
     rose: "#C8503F",
@@ -78,6 +81,9 @@ const palettes = {
     reelB: [0.95, 0.94, 0.91],
     reelSep: -0.12,
     holoTint: "#5CC9BC",
+    studio: ["#FBFAF7", "#F1EEE8", "#E2DDD3"],
+    shadow: "#3A3226",
+    shadowOpacity: 0.32,
   },
 };
 let pal = palettes.dark;
@@ -165,7 +171,7 @@ function rotAxis(v: THREE.Vector3, axis: THREE.Vector3, a: number) {
 function Rig({ reduce }: { reduce: boolean }) {
   const { camera, size } = useThree();
   const cam = camera as THREE.PerspectiveCamera;
-  const s = useRef({ k: 0, px: 0, py: 0, start: -1, lastDz: 0 });
+  const s = useRef({ k: 0, px: 0, py: 0, start: -1, lastDz: 0, moving: 0 });
   const tmp = useMemo(() => ({ pos: new THREE.Vector3(), look: new THREE.Vector3(), a: new THREE.Vector3(), r: new THREE.Vector3(), u: new THREE.Vector3() }), []);
 
   useFrame((state, delta) => {
@@ -190,7 +196,7 @@ function Rig({ reduce }: { reduce: boolean }) {
     tmp.pos.x *= 1 - dive;
     tmp.look.x *= 1 - dive;
 
-    // Opening approach from the dark.
+    // Opening approach: the camera eases in from a distance.
     const intro = reduce ? 1 : Math.min(1, (t - st.start) / 2.4);
     tmp.pos.z += (1 - (1 - Math.pow(1 - intro, 3))) * 18;
 
@@ -232,7 +238,10 @@ function Rig({ reduce }: { reduce: boolean }) {
     if (crossed(4.8)) sfx.powerUp();
     // Only while actually travelling through the glass, not while parked just behind it.
     const transit = Math.max(ramp(1.2, 1.35, 1.85, 1.97, k), ramp(4.2, 4.35, 4.75, 4.9, k));
-    const cross = transit * Math.exp(-dz * dz * 0.9);
+    // ...and only while the camera is moving, so stopping just behind the glass never leaves a haze.
+    const speed = Math.abs(k - live.prevK) / Math.max(dt, 1e-3);
+    st.moving += (smooth(0.04, 0.35, speed) - st.moving) * (1 - Math.exp(-dt * 6));
+    const cross = transit * Math.exp(-dz * dz * 0.9) * st.moving;
     const flash = Math.max(cross * 0.85, ramp(2.72, 2.8, 2.8, 2.95, k) * 0.5);
     const el = document.getElementById("story-flash");
     if (el) el.style.opacity = flash.toFixed(3);
@@ -249,80 +258,62 @@ function Rig({ reduce }: { reduce: boolean }) {
  * Backdrop
  * ---------------------------------------------------------------------------------------------- */
 
-function Stars() {
-  const { geo, mat } = useMemo(() => {
-    const n = 3500;
-    const pos = new Float32Array(n * 3);
-    const sz = new Float32Array(n);
-    for (let i = 0; i < n; i++) {
-      const r = 200 + Math.random() * 600;
-      const th = Math.random() * Math.PI * 2;
-      const ph = Math.acos(2 * Math.random() - 1);
-      pos.set([r * Math.sin(ph) * Math.cos(th), r * Math.cos(ph), r * Math.sin(ph) * Math.sin(th)], i * 3);
-      sz[i] = Math.random() < 0.05 ? 2.8 : 0.7 + Math.random() * 1.3;
-    }
-    const geo = new THREE.BufferGeometry();
-    geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
-    geo.setAttribute("aSize", new THREE.BufferAttribute(sz, 1));
-    const mat = new THREE.ShaderMaterial({
-      transparent: true,
-      depthWrite: false,
-      blending: THREE.AdditiveBlending,
-      uniforms: { uPR: { value: 1 }, uTime: { value: 0 }, uC: { value: col("#D6ECFF") } },
-      vertexShader: /* glsl */ `
-        attribute float aSize; uniform float uPR, uTime; varying float vT;
-        void main(){ gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.); gl_PointSize = aSize*uPR*1.5; vT = 0.6 + 0.4*sin(uTime*1.3 + position.x); }`,
-      fragmentShader: /* glsl */ `
-        uniform vec3 uC; varying float vT;
-        void main(){ float d = length(gl_PointCoord-0.5); float a = smoothstep(0.5,0.,d); gl_FragColor = vec4(uC*a*a*vT*0.8,1.); ${outro} }`,
-    });
-    return { geo, mat };
-  }, []);
-  const { gl } = useThree();
-  useFrame(() => {
-    mat.uniforms.uPR.value = gl.getPixelRatio();
-    mat.uniforms.uTime.value = live.time;
-  });
-  if (isLight()) return null;
-  return <points geometry={geo} material={mat} frustumCulled={false} />;
+/** A soft studio sweep: lighter behind the subject, falling off to the edges. Fixed to the screen. */
+function Backdrop() {
+  const { scene } = useThree();
+  useEffect(() => {
+    const c = document.createElement("canvas");
+    c.width = 1024;
+    c.height = 1024;
+    const g = c.getContext("2d")!;
+    const grad = g.createRadialGradient(512, 440, 0, 512, 520, 760);
+    grad.addColorStop(0, pal.studio[0]);
+    grad.addColorStop(0.55, pal.studio[1]);
+    grad.addColorStop(1, pal.studio[2]);
+    g.fillStyle = grad;
+    g.fillRect(0, 0, 1024, 1024);
+    const t = new THREE.CanvasTexture(c);
+    t.colorSpace = THREE.SRGBColorSpace;
+    scene.background = t;
+    return () => {
+      scene.background = null;
+      t.dispose();
+    };
+  }, [scene]);
+  return null;
 }
 
-/** A holographic floor grid under the phone. */
-function Floor() {
-  const mat = useMemo(
-    () =>
-      ink(new THREE.ShaderMaterial({
-        transparent: true,
-        depthWrite: false,
-        blending: THREE.AdditiveBlending,
-        uniforms: { uVis: { value: 0 }, uTime: { value: 0 }, uA: { value: col(pal.violet) }, uB: { value: col(pal.rose) } },
-        vertexShader: /* glsl */ `varying vec3 vW; void main(){ vec4 w = modelMatrix*vec4(position,1.); vW = w.xyz; gl_Position = projectionMatrix*viewMatrix*w; }`,
-        fragmentShader: /* glsl */ `
-          uniform float uVis, uTime; uniform vec3 uA, uB; varying vec3 vW;
-          void main(){
-            vec2 g = vW.xz / 2.;
-            vec2 fw = fwidth(g);
-            vec2 l = abs(fract(g - 0.5) - 0.5) / fw;
-            float line = 1. - min(min(l.x, l.y), 1.);
-            float r = length(vW.xz);
-            float fade = exp(-r * 0.045);
-            float pulse = exp(-pow(r - mod(uTime * 6., 60.), 2.) * 0.08);
-            vec3 c = mix(uA, uB, pulse) * line * fade * (0.45 + pulse * 1.2);
-            c += uA * fade * 0.03;
-            gl_FragColor = vec4(c * uVis, 1.);
-            ${outro}
-          }`,
-      }), 2.2),
-    [],
-  );
+/** A soft contact shadow under the phone, like a product shot. */
+function Shadow() {
+  const { mat } = useMemo(() => {
+    const c = document.createElement("canvas");
+    c.width = c.height = 256;
+    const g = c.getContext("2d")!;
+    const grad = g.createRadialGradient(128, 128, 0, 128, 128, 128);
+    grad.addColorStop(0, "rgba(0,0,0,1)");
+    grad.addColorStop(0.35, "rgba(0,0,0,0.55)");
+    grad.addColorStop(1, "rgba(0,0,0,0)");
+    g.fillStyle = grad;
+    g.fillRect(0, 0, 256, 256);
+    const map = new THREE.CanvasTexture(c);
+    const mat = new THREE.MeshBasicMaterial({ map, color: pal.shadow, transparent: true, depthWrite: false, opacity: 0 });
+    return { mat };
+  }, []);
+  const mesh = useRef<THREE.Mesh>(null);
   useFrame(() => {
-    mat.uniforms.uTime.value = live.time;
-    mat.uniforms.uVis.value = (1 - smooth(1.1, 1.4, live.k)) * 0.45 + smooth(4.6, 4.95, live.k) * 0.9;
+    const k = live.k;
+    const vis = (1 - smooth(1.1, 1.4, k)) + smooth(4.6, 4.95, k);
+    // The phone lifts slightly at the end, so the shadow softens and spreads.
+    const lift = smooth(4.65, 4.98, k);
+    mat.opacity = Math.min(1, vis) * (pal.shadowOpacity - lift * pal.shadowOpacity * 0.35);
+    if (mesh.current) {
+      mesh.current.visible = mat.opacity > 0.001;
+      mesh.current.scale.set(1 + lift * 0.4 + Math.sin(live.time * 0.8) * 0.02, 1 + lift * 0.3, 1);
+    }
   });
   return (
-    <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -5.6, 0]}>
-      <planeGeometry args={[240, 240]} />
-      <primitive object={mat} attach="material" />
+    <mesh ref={mesh} rotation={[-Math.PI / 2, 0, 0]} position={[0, -5.2, 0]} material={mat}>
+      <planeGeometry args={[9, 4.2]} />
     </mesh>
   );
 }
@@ -330,7 +321,7 @@ function Floor() {
 function Glow({ glow, color, scale, opacity }: { glow: THREE.Texture; color: string; scale: number; opacity: number }) {
   return (
     <sprite scale={[scale, scale, 1]}>
-      <spriteMaterial map={glow} color={color} transparent opacity={isLight() ? opacity * 0.5 : opacity} blending={glowBlend()} depthWrite={false} />
+      <spriteMaterial map={glow} color={color} transparent opacity={isLight() ? opacity * 0.35 : opacity} blending={glowBlend()} depthWrite={false} />
     </sprite>
   );
 }
@@ -1516,8 +1507,8 @@ function World({ reduce }: { reduce: boolean }) {
       <pointLight position={[0, 3, -5]} color={pal.violet} intensity={70} />
       <pointLight position={[-10, 8, -20]} color={pal.rose} intensity={260} />
       <pointLight position={[10, -4, -22]} color={pal.violet} intensity={260} />
-      <Stars />
-      <Floor />
+      <Backdrop />
+      <Shadow />
       <Phone glow={glow} />
       <Burst />
       <Machine glow={glow} />
