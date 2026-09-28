@@ -3,6 +3,7 @@ import { AnimatePresence, motion, useMotionValueEvent, useReducedMotion, useScro
 import { List, X, SquaresFour } from "@phosphor-icons/react";
 import { Logo } from "./ui/Logo";
 import { ButtonLink } from "./ui/Button";
+import { ThemeToggle } from "./ui/ThemeToggle";
 
 const links = [
   { href: "#product", label: "Product" },
@@ -51,6 +52,7 @@ export function Navbar({ home = true }: { home?: boolean }) {
           ))}
         </ul>
         <div className="flex items-center gap-2">
+          <ThemeToggle />
           <a href="#/sign-in" className="hidden rounded-full px-3 py-2 text-[14px] text-muted transition-colors hover:text-ink lg:inline-flex">
             Sign in
           </a>

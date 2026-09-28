@@ -58,7 +58,7 @@ export function InboxScreen() {
                     markInboxRead(it.id);
                   }}
                   className={`flex w-full items-start gap-3 rounded-2xl border p-3.5 text-left transition-colors ${
-                    selected === it.id ? "border-accent/50 bg-soft" : "border-line bg-surface hover:border-[#433d52]"
+                    selected === it.id ? "border-accent/50 bg-soft" : "border-line bg-surface hover:border-line-strong"
                   }`}
                 >
                   <IconTile icon={icon} tone={tone} />
@@ -73,7 +73,7 @@ export function InboxScreen() {
                       )}
                     </div>
                     <p className="truncate text-[12.5px] text-muted">{it.preview}</p>
-                    <p className="mt-1 text-[11px] text-[#8a8398]">{it.source}</p>
+                    <p className="mt-1 text-[11px] text-faint">{it.source}</p>
                   </div>
                   <span className="shrink-0 font-mono text-[11px] text-muted">{it.date}</span>
                 </button>
@@ -97,7 +97,7 @@ export function InboxScreen() {
               ))}
             </ul>
             <div className="flex flex-wrap gap-2">
-              <button type="button" onClick={() => go(current.action.tab)} className="inline-flex items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-[13px] font-medium text-paper hover:bg-[#ff6690]">
+              <button type="button" onClick={() => go(current.action.tab)} className="inline-flex items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-[13px] font-medium text-paper hover:bg-accent-hover">
                 {current.action.label} <ArrowRight size={13} weight="bold" />
               </button>
               <button

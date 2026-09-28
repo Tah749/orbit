@@ -9,7 +9,7 @@ const principles = [
 
 export function Privacy() {
   return (
-    <section id="privacy" aria-labelledby="privacy-title" className="relative border-y border-line/70 bg-[#0d0c12] py-24 md:py-32">
+    <section id="privacy" aria-labelledby="privacy-title" className="relative border-y border-line/70 bg-deep py-24 md:py-32">
       <div className="mx-auto grid max-w-[1200px] gap-12 px-4 sm:px-6 md:grid-cols-12 md:gap-10">
         <Reveal className="flex flex-col gap-5 md:col-span-5 md:sticky md:top-28 md:self-start">
           <h2 id="privacy-title" className="text-balance text-[34px] font-semibold leading-[1.08] tracking-[-0.035em] text-ink md:text-[44px]">

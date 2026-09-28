@@ -231,6 +231,11 @@ export default function Journey() {
   const [active, setActive] = useState(0);
   const lenis = useRef<Lenis | null>(null);
   const bar = useRef<HTMLDivElement>(null);
+  // The journey is set at night whatever the site theme.
+  useEffect(() => {
+    document.documentElement.classList.add("theme-space");
+    return () => document.documentElement.classList.remove("theme-space");
+  }, []);
   const main = useRef<HTMLElement>(null);
 
   useEffect(() => {

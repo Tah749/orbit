@@ -42,7 +42,7 @@ export function Chip({ on, onClick, children }: { on: boolean; onClick: () => vo
       aria-pressed={on}
       onClick={onClick}
       className={`whitespace-nowrap rounded-full px-3.5 py-1.5 text-[12.5px] transition-colors ${
-        on ? "bg-accent font-medium text-paper" : "border border-line text-muted hover:border-[#433d52] hover:text-ink"
+        on ? "bg-accent font-medium text-paper" : "border border-line text-muted hover:border-line-strong hover:text-ink"
       }`}
     >
       {children}
@@ -99,7 +99,7 @@ export function Modal({ open, onClose, title, children }: { open: boolean; onClo
       ref={ref}
       onClose={onClose}
       onClick={(e) => e.target === ref.current && onClose()}
-      className="m-auto w-[min(92vw,460px)] rounded-3xl border border-line bg-surface p-0 text-ink shadow-[0_40px_100px_-30px_rgba(0,0,0,0.8)] backdrop:bg-black/60 backdrop:backdrop-blur-sm"
+      className="m-auto w-[min(92vw,460px)] rounded-3xl border border-line bg-surface p-0 text-ink shadow-[0_40px_100px_-30px_var(--shade)] backdrop:bg-black/60 backdrop:backdrop-blur-sm"
     >
       <div className="flex flex-col gap-4 p-6">
         <div className="flex items-start justify-between gap-4">

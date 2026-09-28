@@ -12,6 +12,9 @@ export const story = {
   ready: false,
 };
 
+/** Light or dark: the scene sets this before it builds its materials and textures. */
+export const theme = { mode: "dark" as "light" | "dark" };
+
 export const actCount = 11;
 
 /** Scroll progress to an act position (0 to actCount - 1), eased so each act lingers while it's read. */

@@ -125,7 +125,7 @@ export function InboxPreview() {
                   )}
                 </div>
                 <p className="truncate text-[11.5px] text-muted">{it.preview}</p>
-                <p className="mt-1 text-[10.5px] text-[#7d7690]">{it.source}</p>
+                <p className="mt-1 text-[10.5px] text-faint">{it.source}</p>
               </div>
               <span className="shrink-0 font-mono text-[10.5px] text-muted">{it.date}</span>
             </Panel>

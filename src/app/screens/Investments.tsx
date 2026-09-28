@@ -35,13 +35,13 @@ export function InvestmentsScreen() {
         <svg viewBox="0 0 600 180" className="h-44 w-full md:h-56" preserveAspectRatio="none" role="img" aria-label={`Portfolio value over ${range}, rising to ${money(portfolio.value)}`}>
           <defs>
             <linearGradient id="app-inv" x1="0" x2="0" y1="0" y2="1">
-              <stop offset="0" stopColor="#FF4D7A" stopOpacity="0.28" />
-              <stop offset="1" stopColor="#FF4D7A" stopOpacity="0" />
+              <stop offset="0" style={{ stopColor: "var(--green)" }} stopOpacity="0.28" />
+              <stop offset="1" style={{ stopColor: "var(--green)" }} stopOpacity="0" />
             </linearGradient>
           </defs>
           {[45, 90, 135].map((y) => <line key={y} x1="0" x2="600" y1={y} y2={y} stroke="var(--line)" strokeWidth="1" vectorEffect="non-scaling-stroke" strokeDasharray="2 4" />)}
           <path d={area} fill="url(#app-inv)" />
-          <path d={d} fill="none" stroke="#FF4D7A" strokeWidth="2" vectorEffect="non-scaling-stroke" strokeLinejoin="round" />
+          <path d={d} fill="none" stroke="var(--green)" strokeWidth="2" vectorEffect="non-scaling-stroke" strokeLinejoin="round" />
         </svg>
       </Card>
 

@@ -39,7 +39,7 @@ export function HomeScreen() {
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
         <div className="flex flex-col gap-4 xl:col-span-7">
           <Card className="relative overflow-hidden p-5">
-            <div aria-hidden="true" className="pointer-events-none absolute -right-20 -top-24 size-64 rounded-full bg-[radial-gradient(circle,rgba(124,77,255,0.18),transparent_70%)]" />
+            <div aria-hidden="true" className="pointer-events-none absolute -right-20 -top-24 size-64 rounded-full bg-[radial-gradient(circle,var(--glow-violet),transparent_70%)]" />
             <div className="relative flex flex-col gap-3">
               <p className="flex items-center gap-2 text-[12.5px] font-medium text-accent-fg">
                 <Orb className="size-4" /> Your daily briefing
@@ -90,7 +90,7 @@ export function HomeScreen() {
                 {open.slice(0, 4).map((t) => (
                   <li key={t.id}>
                     <button type="button" role="checkbox" aria-checked={t.done} onClick={() => toggleTask(t.id)} className="flex w-full items-center gap-2.5 rounded-xl p-2 text-left hover:bg-soft">
-                      {t.done ? <CheckCircle size={18} weight="fill" className="shrink-0 text-accent" /> : <Circle size={18} className="shrink-0 text-[#5a5368]" />}
+                      {t.done ? <CheckCircle size={18} weight="fill" className="shrink-0 text-accent" /> : <Circle size={18} className="shrink-0 text-faint" />}
                       <span className={`flex-1 truncate text-[13px] ${t.done ? "text-muted line-through" : ""}`}>{t.title}</span>
                     </button>
                   </li>
@@ -101,21 +101,21 @@ export function HomeScreen() {
 
           <div className="grid grid-cols-3 gap-3">
             <button type="button" onClick={() => go("bills")} className="text-left">
-              <Card className="flex h-full flex-col gap-2 p-4 transition-colors hover:border-[#433d52]">
+              <Card className="flex h-full flex-col gap-2 p-4 transition-colors hover:border-line-strong">
                 <div className="flex items-center justify-between"><IconTile icon={Receipt} tone="amber" size="sm" /><Pill tone="amber">3 days</Pill></div>
                 <p className="text-[11.5px] text-muted">Electricity bill</p>
                 <p className="font-mono text-[17px]">£68.32</p>
               </Card>
             </button>
             <button type="button" onClick={() => go("investments")} className="text-left">
-              <Card className="flex h-full flex-col gap-2 p-4 transition-colors hover:border-[#433d52]">
+              <Card className="flex h-full flex-col gap-2 p-4 transition-colors hover:border-line-strong">
                 <div className="flex items-center justify-between"><IconTile icon={ChartLineUp} tone="rose" size="sm" /><span className="font-mono text-[11px] text-accent-fg">+0.8%</span></div>
                 <p className="text-[11.5px] text-muted">Portfolio</p>
                 <p className="font-mono text-[17px]">{money(portfolio.value).split(".")[0]}</p>
               </Card>
             </button>
             <button type="button" onClick={() => go("fitness")} className="text-left">
-              <Card className="flex h-full flex-col gap-2 p-4 transition-colors hover:border-[#433d52]">
+              <Card className="flex h-full flex-col gap-2 p-4 transition-colors hover:border-line-strong">
                 <div className="flex items-center justify-between"><IconTile icon={Footprints} tone="violet" size="sm" /><span className="font-mono text-[11px] text-muted">84%</span></div>
                 <p className="text-[11.5px] text-muted">Steps</p>
                 <p className="font-mono text-[17px]">8,432</p>
@@ -144,7 +144,7 @@ export function HomeScreen() {
             </ul>
           </Card>
           <button type="button" onClick={() => go("bookings")} className="text-left">
-            <Card className="flex flex-col gap-3 p-4 transition-colors hover:border-[#433d52]">
+            <Card className="flex flex-col gap-3 p-4 transition-colors hover:border-line-strong">
               <div className="flex items-center justify-between">
                 <h2 className="text-[14px] font-medium">Upcoming trip</h2>
                 <Pill tone="violet">Tomorrow</Pill>
@@ -178,7 +178,7 @@ export function HomeScreen() {
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="Ask Orbit about your week, a booking, a bill..."
-          className="h-9 flex-1 bg-transparent text-[14px] placeholder:text-[#8a8398] focus:outline-none"
+          className="h-9 flex-1 bg-transparent text-[14px] placeholder:text-faint focus:outline-none"
         />
         <button type="submit" aria-label="Ask" className="grid size-9 place-items-center rounded-full bg-accent text-paper">
           <ArrowUp size={15} weight="bold" />

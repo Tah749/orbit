@@ -53,7 +53,7 @@ const tasks = [
 
 function Sidebar() {
   return (
-    <aside className="hidden w-[200px] shrink-0 flex-col justify-between border-r border-line bg-[#0e0d13] p-3 lg:flex">
+    <aside className="hidden w-[200px] shrink-0 flex-col justify-between border-r border-line bg-deep p-3 lg:flex">
       <div className="flex flex-col gap-4">
         <div className="flex items-center gap-2 px-2 pt-1">
           <Orb className="size-[18px]" />
@@ -75,7 +75,7 @@ function Sidebar() {
         </nav>
       </div>
       <div className="flex items-center gap-2.5 rounded-xl border border-line p-2">
-        <span className="grid size-7 place-items-center rounded-full bg-[#2a2140] text-[11px] font-medium text-info">AR</span>
+        <span className="grid size-7 place-items-center rounded-full bg-tint-info text-[11px] font-medium text-info">AR</span>
         <div className="min-w-0">
           <p className="truncate text-[12px] text-ink">Alex Rowe</p>
           <p className="text-[10.5px] text-muted">5 services connected</p>
@@ -88,7 +88,7 @@ function Sidebar() {
 function Briefing() {
   return (
     <Panel className="relative overflow-hidden p-4">
-      <div className="pointer-events-none absolute -right-16 -top-20 size-56 rounded-full bg-[radial-gradient(circle,rgba(124,77,255,0.18),transparent_70%)]" />
+      <div className="pointer-events-none absolute -right-16 -top-20 size-56 rounded-full bg-[radial-gradient(circle,var(--glow-violet),transparent_70%)]" />
       <div className="relative flex flex-col gap-3">
         <div className="flex items-center gap-2">
           <Orb className="size-4" />
@@ -164,7 +164,7 @@ function Tasks() {
       <ul className="flex flex-col gap-2.5">
         {tasks.map((t) => (
           <li key={t.title} className="flex items-center gap-2.5">
-            {t.done ? <CheckCircle size={16} weight="fill" className="text-accent" /> : <Circle size={16} className="text-[#5a5368]" />}
+            {t.done ? <CheckCircle size={16} weight="fill" className="text-accent" /> : <Circle size={16} className="text-faint" />}
             <span className={`flex-1 truncate text-[12px] ${t.done ? "text-muted line-through" : "text-ink"}`}>{t.title}</span>
             <span className="text-[10.5px] text-muted">{t.due}</span>
           </li>
@@ -242,11 +242,11 @@ export function HeroDashboard() {
     <figure
       role="img"
       aria-label="Preview of the Orbit home screen with illustrative demo data: a daily briefing, today's schedule, important emails, tasks, an upcoming flight to Edinburgh, a bill reminder and a portfolio summary."
-      className="overflow-hidden rounded-[20px] border border-line bg-paper shadow-[0_60px_120px_-40px_rgba(124,77,255,0.35),0_0_0_1px_rgba(255,255,255,0.02)]"
+      className="overflow-hidden rounded-[20px] border border-line bg-paper shadow-[0_60px_120px_-40px_var(--shade)]"
     >
       <div aria-hidden="true">
         {/* Title bar */}
-        <div className="flex items-center gap-4 border-b border-line bg-[#0e0d13] px-4 py-2.5">
+        <div className="flex items-center gap-4 border-b border-line bg-deep px-4 py-2.5">
           <div className="flex gap-1.5">
             {[0, 1, 2].map((i) => (
               <span key={i} className="size-2.5 rounded-full bg-soft" />

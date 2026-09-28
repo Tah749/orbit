@@ -15,9 +15,9 @@ export function PhoneFrame({ children, active = 0, label }: { children: ReactNod
     <figure
       role="img"
       aria-label={label}
-      className="mx-auto w-full max-w-[340px] overflow-hidden rounded-[36px] border border-line bg-paper p-1.5 shadow-[0_50px_100px_-40px_rgba(124,77,255,0.45)]"
+      className="mx-auto w-full max-w-[340px] overflow-hidden rounded-[36px] border border-line bg-paper p-1.5 shadow-[0_50px_100px_-40px_var(--shade)]"
     >
-      <div aria-hidden="true" className="flex flex-col overflow-hidden rounded-[30px] border border-[#1d1a26] bg-[#0d0c12]">
+      <div aria-hidden="true" className="flex flex-col overflow-hidden rounded-[30px] border border-line bg-deep">
         <div className="flex items-center justify-between px-6 pb-1 pt-3 font-mono text-[11px] text-ink">
           <span>9:41</span>
           <span className="h-[18px] w-20 rounded-full bg-black/70" />

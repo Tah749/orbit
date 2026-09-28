@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
-import { story, actAt, actCount, smooth, ramp } from "./state";
+import { story, actAt, actCount, smooth, ramp, theme } from "./state";
 import { noise } from "../journey/glsl";
 import { makeGlowTexture, atlasGrid } from "../journey/textures";
 import { makeDashboard, makeHoloPanels, makeLockScreen, makeMarquee, panelSize } from "./canvas";
@@ -26,17 +26,81 @@ const C = V(0, 0, -30); // the world inside the phone
 const col = (hex: string) => new THREE.Color(hex);
 const outro = "\n#include <colorspace_fragment>\n";
 
-/** Midnight blue and cyan for the world; rose stays the brand accent. */
-const pal = {
-  rose: "#FF4D7A",
-  roseSoft: "#FFB0C4",
-  violet: "#45D4F0",
-  deep: "#0F5E8C",
-  blue: "#3D8BFF",
-  ice: "#D4F6FF",
-  amber: "#FFA24D",
-  hot: "#FFE6EE",
+/**
+ * The Oat scheme, for both modes. Petrol lights the world, coral and honey run the machine.
+ * Names are kept from the scene's first palette: `violet` is the main world colour, `rose` the machine accent.
+ */
+const palettes = {
+  dark: {
+    rose: "#F07A68",
+    roseSoft: "#F6B3A6",
+    violet: "#5CC9BC",
+    deep: "#0C6B66",
+    blue: "#1B8078",
+    ice: "#DDF4EF",
+    heather: "#BBA3DD",
+    gold: "#FFD27A",
+    goldHot: "#FFB84D",
+    spark: "#FFF4E0",
+    flash: "#FFD9A0",
+    clear: "#121110",
+    body: "#2B2926",
+    buttons: "#3A3733",
+    frame: "#221F1C",
+    frameMetal: 0.75,
+    backplate: "#0B0A09",
+    lever: "#BDB6AA",
+    reelA: [0.07, 0.064, 0.058],
+    reelB: [0.115, 0.105, 0.095],
+    reelSep: 0.05,
+    holoTint: "#DDF7F2",
+  },
+  light: {
+    rose: "#C8503F",
+    roseSoft: "#C8503F",
+    violet: "#1A8C84",
+    deep: "#0C6B66",
+    blue: "#0C6B66",
+    ice: "#6CC4B8",
+    heather: "#6B4F8F",
+    gold: "#E0A640",
+    goldHot: "#D08A2A",
+    spark: "#8C5C00",
+    flash: "#E4B458",
+    clear: "#F2EFE9",
+    body: "#2B2926",
+    buttons: "#3A3733",
+    frame: "#E2DBCE",
+    frameMetal: 0.25,
+    backplate: "#D6CFC3",
+    lever: "#9C958A",
+    reelA: [0.8, 0.77, 0.72],
+    reelB: [0.95, 0.94, 0.91],
+    reelSep: -0.12,
+    holoTint: "#5CC9BC",
+  },
 };
+let pal = palettes.dark;
+const isLight = () => theme.mode === "light";
+
+/**
+ * In light mode, additive glow disappears into the paper. This turns an additive shader into ink:
+ * the glow's brightness becomes opacity and its hue is drawn as a deep tone with normal blending.
+ */
+const INK = `
+#ifdef INK
+  { vec3 e = gl_FragColor.rgb * gl_FragColor.a; float m = max(max(e.r, e.g), e.b);
+    gl_FragColor = vec4(e / max(m, 1e-4) * INK_TONE, clamp(m * INK_GAIN, 0., 1.)); }
+#endif
+`;
+function ink<T extends THREE.ShaderMaterial>(m: T, gain = 1.4, tone = 0.12): T {
+  if (!isLight()) return m;
+  m.blending = THREE.NormalBlending;
+  m.defines = { ...m.defines, INK: "", INK_TONE: tone.toFixed(3), INK_GAIN: gain.toFixed(3) };
+  m.fragmentShader = m.fragmentShader.replace("#include <colorspace_fragment>", `${INK}\n#include <colorspace_fragment>`);
+  return m;
+}
+const glowBlend = () => (isLight() ? THREE.NormalBlending : THREE.AdditiveBlending);
 
 type Key = { pos: THREE.Vector3; look: THREE.Vector3; desk: [number, number]; mob: [number, number]; m: number };
 
@@ -219,6 +283,7 @@ function Stars() {
     mat.uniforms.uPR.value = gl.getPixelRatio();
     mat.uniforms.uTime.value = live.time;
   });
+  if (isLight()) return null;
   return <points geometry={geo} material={mat} frustumCulled={false} />;
 }
 
@@ -226,7 +291,7 @@ function Stars() {
 function Floor() {
   const mat = useMemo(
     () =>
-      new THREE.ShaderMaterial({
+      ink(new THREE.ShaderMaterial({
         transparent: true,
         depthWrite: false,
         blending: THREE.AdditiveBlending,
@@ -247,7 +312,7 @@ function Floor() {
             gl_FragColor = vec4(c * uVis, 1.);
             ${outro}
           }`,
-      }),
+      }), 2.2),
     [],
   );
   useFrame(() => {
@@ -265,7 +330,7 @@ function Floor() {
 function Glow({ glow, color, scale, opacity }: { glow: THREE.Texture; color: string; scale: number; opacity: number }) {
   return (
     <sprite scale={[scale, scale, 1]}>
-      <spriteMaterial map={glow} color={color} transparent opacity={opacity} blending={THREE.AdditiveBlending} depthWrite={false} />
+      <spriteMaterial map={glow} color={color} transparent opacity={isLight() ? opacity * 0.5 : opacity} blending={glowBlend()} depthWrite={false} />
     </sprite>
   );
 }
@@ -290,7 +355,7 @@ function Phone({ glow }: { glow: THREE.Texture }) {
     const shape = roundedShape(PH.w - PH.bevel * 2, PH.h - PH.bevel * 2, 0.52);
     const body = new THREE.ExtrudeGeometry(shape, { depth: PH.depth, bevelEnabled: true, bevelThickness: PH.bevel, bevelSize: PH.bevel, bevelSegments: 5, curveSegments: 24 });
     body.translate(0, 0, -PH.depth / 2);
-    const bodyMat = new THREE.MeshPhysicalMaterial({ color: "#2a2633", metalness: 0.92, roughness: 0.26, clearcoat: 1, clearcoatRoughness: 0.2 });
+    const bodyMat = new THREE.MeshPhysicalMaterial({ color: pal.body, metalness: 0.92, roughness: 0.26, clearcoat: 1, clearcoatRoughness: 0.2 });
     const screenGeo = new THREE.ShapeGeometry(roundedShape(PH.screenW, PH.screenH, 0.44), 24);
     const p = screenGeo.getAttribute("position");
     const uv = new Float32Array(p.count * 2);
@@ -328,7 +393,7 @@ function Phone({ glow }: { glow: THREE.Texture }) {
           ${outro}
         }`,
     });
-    const buttons = new THREE.MeshPhysicalMaterial({ color: "#3a3446", metalness: 0.9, roughness: 0.3 });
+    const buttons = new THREE.MeshPhysicalMaterial({ color: pal.buttons, metalness: 0.9, roughness: 0.3 });
     return { body, bodyMat, screenGeo, screenMat, buttons };
   }, []);
 
@@ -527,12 +592,15 @@ function reelMaterial(order: number[]) {
       uOrder: { value: order },
       uWin: { value: 0 },
       uGrid: { value: new THREE.Vector2(brandGrid.cols, brandGrid.rows) },
-      uGold: { value: col("#FFD27A") },
+      uGold: { value: col(pal.gold) },
       uRose: { value: col(pal.rose) },
+      uBgA: { value: new THREE.Vector3(...pal.reelA) },
+      uBgB: { value: new THREE.Vector3(...pal.reelB) },
+      uSep: { value: pal.reelSep },
     },
     vertexShader: /* glsl */ `varying vec3 vP; void main(){ vP = position; gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.); }`,
     fragmentShader: /* glsl */ `
-      uniform sampler2D uMap; uniform float uAngle, uBlur, uOrder[${REEL.cells}], uWin; uniform vec2 uGrid; uniform vec3 uGold, uRose;
+      uniform sampler2D uMap; uniform float uAngle, uBlur, uOrder[${REEL.cells}], uWin; uniform vec2 uGrid; uniform vec3 uGold, uRose, uBgA, uBgB; uniform float uSep;
       varying vec3 vP;
       const float N = ${REEL.cells.toFixed(1)};
       const float CA = 6.2831853 / N;
@@ -556,11 +624,11 @@ function reelMaterial(order: number[]) {
         for (int i = 0; i < 7; i++) acc += icon(ang + (float(i) - 3.) * uBlur * 0.045, lx);
         acc /= 7.;
         float rx = vP.x / ${REEL.len.toFixed(2)} + 0.5;
-        vec3 bg = mix(vec3(0.075, 0.068, 0.1), vec3(0.12, 0.11, 0.16), smoothstep(0.1, 0.9, rx));
+        vec3 bg = mix(uBgA, uBgB, smoothstep(0.1, 0.9, rx));
         // Faint separators between cells.
         float cf = fract(ang / CA + 0.5);
         float sep = smoothstep(0.03, 0., cf) + smoothstep(0.97, 1., cf);
-        bg += vec3(0.05) * sep * (1. - uBlur);
+        bg += vec3(uSep) * sep * (1. - uBlur);
         vec3 c = mix(bg, acc.rgb, acc.a);
         float facing = max(vP.z / ${REEL.r.toFixed(2)}, 0.);
         c *= 0.18 + 0.97 * pow(facing, 1.7);
@@ -604,26 +672,26 @@ function Machine({ glow }: { glow: THREE.Texture }) {
     outer.holes.push(holePath);
     const frame = new THREE.ExtrudeGeometry(outer, { depth: 1.2, bevelEnabled: true, bevelThickness: 0.14, bevelSize: 0.14, bevelSegments: 4, curveSegments: 24 });
     frame.translate(0, 0, -0.6);
-    const frameMat = new THREE.MeshPhysicalMaterial({ color: "#1c1926", metalness: 0.75, roughness: 0.32, clearcoat: 0.8 });
+    const frameMat = new THREE.MeshPhysicalMaterial({ color: pal.frame, metalness: pal.frameMetal, roughness: 0.32, clearcoat: 0.8 });
     const neonA = neonTube(17.95, 6.75, 0.6, -0.6, 0.78, 0.07);
     const neonB = neonTube(21.2, 12.2, 1.5, 0, 0.1, 0.06);
-    const neonMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(pal.rose).multiplyScalar(1.6), toneMapped: false });
-    const neonMatB = new THREE.MeshBasicMaterial({ color: new THREE.Color(pal.violet).multiplyScalar(1.4), toneMapped: false });
-    const haloMat = new THREE.ShaderMaterial({
+    const neonMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(pal.rose).multiplyScalar(isLight() ? 1 : 1.6), toneMapped: false });
+    const neonMatB = new THREE.MeshBasicMaterial({ color: new THREE.Color(pal.violet).multiplyScalar(isLight() ? 1 : 1.4), toneMapped: false });
+    const haloMat = ink(new THREE.ShaderMaterial({
       transparent: true,
       depthWrite: false,
       blending: THREE.AdditiveBlending,
       uniforms: { uC: { value: col(pal.rose) }, uI: { value: 1 } },
       vertexShader: /* glsl */ `varying vec3 vN; void main(){ vN = normalize(normalMatrix*normal); gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.); }`,
       fragmentShader: /* glsl */ `uniform vec3 uC; uniform float uI; varying vec3 vN; void main(){ float i = pow(abs(vN.z), 2.); gl_FragColor = vec4(uC*i*0.35*uI, 1.); ${outro} }`,
-    });
+    }), 1.6, 0.2);
     const haloA = neonTube(17.95, 6.75, 0.6, -0.6, 0.78, 0.4);
     // Gold frame that lights up around the winning line.
     const winTube = neonTube(17.3, cellArc * 1.08, 0.35, -0.6, 0.62, 0.06);
-    const winMat = new THREE.MeshBasicMaterial({ color: new THREE.Color("#FFD27A").multiplyScalar(1.8), toneMapped: false, transparent: true, opacity: 0 });
+    const winMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(pal.gold).multiplyScalar(isLight() ? 1 : 1.8), toneMapped: false, transparent: true, opacity: 0 });
     const winHalo = neonTube(17.3, cellArc * 1.08, 0.35, -0.6, 0.62, 0.34);
     const winHaloMat = haloMat.clone();
-    winHaloMat.uniforms.uC.value = col("#FFB84D");
+    winHaloMat.uniforms.uC.value = col(pal.goldHot);
     const reelGeo = new THREE.CylinderGeometry(REEL.r, REEL.r, REEL.len, 128, 1, true);
     reelGeo.rotateZ(Math.PI / 2);
     const mats = reelOrders.map(reelMaterial);
@@ -754,7 +822,7 @@ function Machine({ glow }: { glow: THREE.Texture }) {
         {/* Backplate behind the reels */}
         <mesh position={[0, -0.6, -REEL.r * 2 + 0.2]}>
           <planeGeometry args={[19, 8]} />
-          <meshBasicMaterial color="#03070b" />
+          <meshBasicMaterial color={pal.backplate} />
         </mesh>
         {atlas &&
           parts.mats.map((m, i) => (
@@ -764,7 +832,7 @@ function Machine({ glow }: { glow: THREE.Texture }) {
         {[-1, 1].map((side) => (
           <mesh key={side} position={[side * 9.25, -0.6, 0.7]} rotation={[0, 0, side > 0 ? Math.PI / 2 : -Math.PI / 2]}>
             <circleGeometry args={[0.32, 3]} />
-            <meshBasicMaterial color={new THREE.Color("#FFD27A").multiplyScalar(1.5)} toneMapped={false} />
+            <meshBasicMaterial color={new THREE.Color(pal.gold).multiplyScalar(isLight() ? 1 : 1.5)} toneMapped={false} />
           </mesh>
         ))}
         {/* Marquee */}
@@ -795,7 +863,7 @@ function Machine({ glow }: { glow: THREE.Texture }) {
           >
             <mesh position={[0.3, 2.4, 0]}>
               <cylinderGeometry args={[0.12, 0.12, 4.8, 16]} />
-              <meshPhysicalMaterial color="#b8b2c8" metalness={1} roughness={0.2} />
+              <meshPhysicalMaterial color={pal.lever} metalness={1} roughness={0.2} />
             </mesh>
             <mesh position={[0.3, 4.9, 0]}>
               <sphereGeometry args={[0.62, 32, 24]} />
@@ -840,11 +908,11 @@ function Jackpot({ glow }: { glow: THREE.Texture }) {
     geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
     geo.setAttribute("aVel", new THREE.BufferAttribute(vel, 3));
     geo.setAttribute("aMisc", new THREE.BufferAttribute(misc, 3));
-    const mat = new THREE.ShaderMaterial({
+    const mat = ink(new THREE.ShaderMaterial({
       transparent: true,
       depthWrite: false,
       blending: THREE.AdditiveBlending,
-      uniforms: { uT: { value: -1 }, uPR: { value: 1 }, uTime: { value: 0 }, uGold: { value: col("#FFD27A") }, uRose: { value: col(pal.rose) }, uWhite: { value: col("#FFF4E0") } },
+      uniforms: { uT: { value: -1 }, uPR: { value: 1 }, uTime: { value: 0 }, uGold: { value: col(pal.gold) }, uRose: { value: col(pal.rose) }, uWhite: { value: col(pal.spark) } },
       vertexShader: /* glsl */ `
         attribute vec3 aVel; attribute vec3 aMisc; uniform float uT, uPR, uTime;
         varying float vA; varying float vKind;
@@ -866,7 +934,7 @@ function Jackpot({ glow }: { glow: THREE.Texture }) {
           gl_FragColor = vec4(c * star * vA * 1.4, 1.);
           ${outro}
         }`,
-    });
+    }), 2, 0.25);
     const coins = Array.from({ length: COINS }, () => ({
       o: V((Math.floor(Math.random() * 5) - 2) * REEL.gap, -0.6, reelZ - C.z + REEL.r + 0.6),
       v: V((Math.random() - 0.5) * 12, 5 + Math.random() * 9, 6 + Math.random() * 10),
@@ -899,7 +967,7 @@ function Jackpot({ glow }: { glow: THREE.Texture }) {
     }
     if (flash.current) {
       const f = t >= 0 ? Math.exp(-t * 4) : 0;
-      flash.current.material.opacity = f * 0.9;
+      flash.current.material.opacity = f * (isLight() ? 0.45 : 0.9);
       flash.current.scale.setScalar(10 + (1 - f) * 30);
     }
     coinRefs.current.forEach((sp, i) => {
@@ -923,7 +991,7 @@ function Jackpot({ glow }: { glow: THREE.Texture }) {
           <sprite key={i} ref={(el) => void (coinRefs.current[i] = el)} material={m} />
         ))}
         <sprite ref={flash} position={[0, -0.6, 2]}>
-          <spriteMaterial map={glow} color="#FFD9A0" transparent opacity={0} blending={THREE.AdditiveBlending} depthWrite={false} />
+          <spriteMaterial map={glow} color={pal.flash} transparent opacity={0} blending={glowBlend()} depthWrite={false} />
         </sprite>
       </group>
     </group>
@@ -971,13 +1039,14 @@ function Sphere({ glow }: { glow: THREE.Texture }) {
           uA: { value: col(pal.blue) },
           uB: { value: col(pal.violet) },
           uIce: { value: col(pal.ice) },
-          uRose: { value: col(pal.rose) },
+          uRose: { value: col(pal.heather) },
+          uLight: { value: isLight() ? 1 : 0 },
         },
         vertexShader: /* glsl */ `
           varying vec3 vObj; varying vec3 vN; varying vec3 vW;
           void main(){ vObj = position; vec4 w = modelMatrix*vec4(position,1.); vW = w.xyz; vN = normalize(mat3(modelMatrix)*normal); gl_Position = projectionMatrix*viewMatrix*w; }`,
         fragmentShader: /* glsl */ `
-          uniform float uTime, uOpen, uVis; uniform vec3 uCam, uA, uB, uIce, uRose;
+          uniform float uTime, uOpen, uVis, uLight; uniform vec3 uCam, uA, uB, uIce, uRose;
           varying vec3 vObj; varying vec3 vN; varying vec3 vW;
           ${noise}
           void main(){
@@ -1013,6 +1082,8 @@ function Sphere({ glow }: { glow: THREE.Texture }) {
             } else {
               // The inside: a dark chamber traced with light.
               c = uA * 0.04 + uB * grid * 0.16 + uRose * grid * 0.06 * sin(n.y * 8. + uTime);
+              // In daylight the chamber is pale paper ruled in petrol, so the ink hologram reads on it.
+              c = mix(c, vec3(0.86, 0.84, 0.8) - vec3(0.5, 0.25, 0.28) * grid * 0.5, uLight);
             }
             float a = gl_FrontFacing ? mix(0.95, 0.9, fres) : 0.9;
             gl_FragColor = vec4(c * uVis, a * uVis);
@@ -1112,11 +1183,11 @@ function Network({ glow }: { glow: THREE.Texture }) {
     geo.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
     geo.setAttribute("aT", new THREE.Float32BufferAttribute(tt, 1));
     geo.setAttribute("aI", new THREE.Float32BufferAttribute(id, 1));
-    const mat = new THREE.ShaderMaterial({
+    const mat = ink(new THREE.ShaderMaterial({
       transparent: true,
       depthWrite: false,
       blending: THREE.AdditiveBlending,
-      uniforms: { uTime: { value: 0 }, uReveal: { value: 0 }, uVis: { value: 0 }, uA: { value: col(pal.violet) }, uB: { value: col(pal.ice) } },
+      uniforms: { uTime: { value: 0 }, uReveal: { value: 0 }, uVis: { value: 0 }, uA: { value: col(pal.violet) }, uB: { value: col(isLight() ? pal.heather : pal.ice) } },
       vertexShader: /* glsl */ `attribute float aT; attribute float aI; varying float vT; varying float vI; void main(){ vT = aT; vI = aI; gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.); }`,
       fragmentShader: /* glsl */ `
         uniform float uTime, uReveal, uVis; uniform vec3 uA, uB; varying float vT; varying float vI;
@@ -1131,7 +1202,7 @@ function Network({ glow }: { glow: THREE.Texture }) {
           gl_FragColor = vec4(c * uVis, 1.);
           ${outro}
         }`,
-    });
+    }), 3, 0.18);
     return { geo, mat };
   }, []);
 
@@ -1228,12 +1299,12 @@ const deskLayout = [
 const mobLayout: Record<number, THREE.Vector3> = { 0: V(0, 1.55, 0), 2: V(0, -1.55, 0) };
 
 function holoMaterial(seed: number) {
-  return new THREE.ShaderMaterial({
+  return ink(new THREE.ShaderMaterial({
     transparent: true,
     depthWrite: false,
     side: THREE.DoubleSide,
     blending: THREE.AdditiveBlending,
-    uniforms: { uMap: { value: null }, uTime: { value: 0 }, uReveal: { value: 0 }, uVis: { value: 0 }, uSeed: { value: seed }, uTint: { value: col("#DDF7FF") }, uEdge: { value: col(pal.violet) } },
+    uniforms: { uMap: { value: null }, uTime: { value: 0 }, uReveal: { value: 0 }, uVis: { value: 0 }, uSeed: { value: seed }, uTint: { value: col(pal.holoTint) }, uEdge: { value: col(pal.violet) } },
     vertexShader: /* glsl */ `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.); }`,
     fragmentShader: /* glsl */ `
       uniform sampler2D uMap; uniform float uTime, uReveal, uVis, uSeed; uniform vec3 uTint, uEdge;
@@ -1256,7 +1327,7 @@ function holoMaterial(seed: number) {
         gl_FragColor = vec4(c * uVis, 1.);
         ${outro}
       }`,
-  });
+  }), 2.2, 0.1);
 }
 
 function Hologram({ glow }: { glow: THREE.Texture }) {
@@ -1323,7 +1394,7 @@ function Projection({ glow }: { glow: THREE.Texture }) {
   const orbRef = useRef<THREE.Mesh>(null);
   const ring = useRef<THREE.Mesh>(null);
   const { beamMat, orbMat, ringMat } = useMemo(() => {
-    const beamMat = new THREE.ShaderMaterial({
+    const beamMat = ink(new THREE.ShaderMaterial({
       transparent: true,
       depthWrite: false,
       side: THREE.DoubleSide,
@@ -1341,13 +1412,13 @@ function Projection({ glow }: { glow: THREE.Texture }) {
           gl_FragColor = vec4(mix(uA, uB, h) * a * uVis, 1.);
           ${outro}
         }`,
-    });
-    const orbMat = new THREE.ShaderMaterial({
+    }), 1.6, 0.16);
+    const orbMat = ink(new THREE.ShaderMaterial({
       transparent: true,
       depthWrite: false,
       blending: THREE.AdditiveBlending,
       side: THREE.DoubleSide,
-      uniforms: { uTime: { value: 0 }, uVis: { value: 0 }, uA: { value: col(pal.violet) }, uB: { value: col(pal.rose) }, uC: { value: col(pal.ice) } },
+      uniforms: { uTime: { value: 0 }, uVis: { value: 0 }, uA: { value: col(pal.violet) }, uB: { value: col(pal.heather) }, uC: { value: col(pal.ice) } },
       vertexShader: /* glsl */ `varying vec3 vObj; varying vec3 vN; varying vec3 vW; void main(){ vObj = position; vN = normalize(mat3(modelMatrix)*normal); vec4 w = modelMatrix*vec4(position,1.); vW = w.xyz; gl_Position = projectionMatrix*viewMatrix*w; }`,
       fragmentShader: /* glsl */ `
         uniform float uTime, uVis; uniform vec3 uA, uB, uC; varying vec3 vObj; varying vec3 vN; varying vec3 vW;
@@ -1364,8 +1435,8 @@ function Projection({ glow }: { glow: THREE.Texture }) {
           gl_FragColor = vec4(c * uVis * (gl_FrontFacing ? 1. : 0.45), 1.);
           ${outro}
         }`,
-    });
-    const ringMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(pal.roseSoft), transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false });
+    }), 1.8, 0.14);
+    const ringMat = new THREE.MeshBasicMaterial({ color: new THREE.Color(pal.roseSoft), transparent: true, opacity: 0, blending: glowBlend(), depthWrite: false, toneMapped: false });
     return { beamMat, orbMat, ringMat };
   }, []);
 
@@ -1402,7 +1473,7 @@ function Projection({ glow }: { glow: THREE.Texture }) {
       </mesh>
       <group position={holoCenter}>
         <Glow glow={glow} color={pal.violet} scale={9} opacity={0.25} />
-        <Glow glow={glow} color={pal.rose} scale={3.4} opacity={0.2} />
+        <Glow glow={glow} color={pal.heather} scale={3.4} opacity={0.2} />
         <mesh ref={orbRef} material={orbMat}>
           <sphereGeometry args={[1.35, 64, 40]} />
         </mesh>
@@ -1422,7 +1493,7 @@ function Env() {
     const pm = new THREE.PMREMGenerator(gl);
     const env = pm.fromScene(new RoomEnvironment(), 0.04).texture;
     scene.environment = env;
-    scene.environmentIntensity = 0.35;
+    scene.environmentIntensity = isLight() ? 0.9 : 0.35;
     return () => {
       env.dispose();
       pm.dispose();
@@ -1438,10 +1509,10 @@ function World({ reduce }: { reduce: boolean }) {
     <>
       <Rig reduce={reduce} />
       <Env />
-      <ambientLight intensity={0.15} />
+      <ambientLight intensity={isLight() ? 0.9 : 0.15} />
       <pointLight position={[-6, 5, 6]} color={pal.rose} intensity={90} />
       <pointLight position={[6, -3, 5]} color={pal.deep} intensity={110} />
-      <pointLight position={[2, 8, 12]} color="#ffffff" intensity={50} />
+      <pointLight position={[2, 8, 12]} color="#ffffff" intensity={isLight() ? 160 : 50} />
       <pointLight position={[0, 3, -5]} color={pal.violet} intensity={70} />
       <pointLight position={[-10, 8, -20]} color={pal.rose} intensity={260} />
       <pointLight position={[10, -4, -22]} color={pal.violet} intensity={260} />
@@ -1459,14 +1530,18 @@ function World({ reduce }: { reduce: boolean }) {
   );
 }
 
-export default function StoryScene({ reduce }: { reduce: boolean }) {
+export default function StoryScene({ reduce, mode }: { reduce: boolean; mode: "light" | "dark" }) {
+  // Materials and textures read the palette as they're built, so a theme change rebuilds the scene.
+  theme.mode = mode;
+  pal = palettes[mode];
   return (
     <Canvas
+      key={mode}
       flat
       dpr={[1, 1.75]}
       gl={{ antialias: true, powerPreference: "high-performance", alpha: false }}
       camera={{ fov: 45, near: 0.05, far: 3000, position: [0, 0, 40] }}
-      onCreated={({ gl }) => gl.setClearColor("#04080D")}
+      onCreated={({ gl }) => gl.setClearColor(pal.clear)}
     >
       <World reduce={reduce} />
     </Canvas>

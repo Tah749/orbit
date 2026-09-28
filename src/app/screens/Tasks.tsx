@@ -33,9 +33,9 @@ export function TasksScreen() {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Add a task, like 'Call the garage'"
-          className="h-11 min-w-0 flex-1 rounded-full border border-line bg-soft px-4 text-[14px] placeholder:text-[#8a8398] focus:border-accent focus:outline-none"
+          className="h-11 min-w-0 flex-1 rounded-full border border-line bg-soft px-4 text-[14px] placeholder:text-faint focus:border-accent focus:outline-none"
         />
-        <button type="submit" className="inline-flex h-11 shrink-0 items-center gap-1.5 rounded-full bg-accent px-4 text-[13.5px] font-medium text-paper hover:bg-[#ff6690]">
+        <button type="submit" className="inline-flex h-11 shrink-0 items-center gap-1.5 rounded-full bg-accent px-4 text-[13.5px] font-medium text-paper hover:bg-accent-hover">
           <Plus size={14} weight="bold" /> Add task
         </button>
       </form>
@@ -48,7 +48,7 @@ export function TasksScreen() {
             {list.map((t) => (
               <li key={t.id}>
                 <button type="button" role="checkbox" aria-checked={t.done} onClick={() => toggleTask(t.id)} className="flex w-full items-center gap-3 px-4 py-3.5 text-left hover:bg-soft/60">
-                  {t.done ? <CheckCircle size={20} weight="fill" className="shrink-0 text-accent" /> : <Circle size={20} className="shrink-0 text-[#5a5368]" />}
+                  {t.done ? <CheckCircle size={20} weight="fill" className="shrink-0 text-accent" /> : <Circle size={20} className="shrink-0 text-faint" />}
                   <div className="min-w-0 flex-1">
                     <p className={`truncate text-[13.5px] ${t.done ? "text-muted line-through" : ""}`}>{t.title}</p>
                     <p className="truncate text-[12px] text-muted">{t.due} · {t.source}</p>

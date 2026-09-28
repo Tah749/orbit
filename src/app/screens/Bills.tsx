@@ -28,7 +28,7 @@ export function BillsScreen() {
           { k: "Due this week", v: sum(thisWeek), n: `${thisWeek.length} bills`, warn: true },
           { k: "Subscriptions a month", v: sum(subs), n: `${subs.length} active` },
         ].map((s) => (
-          <Card key={s.k} className={`p-4 ${s.warn ? "border-[#4a2a1a]" : ""}`}>
+          <Card key={s.k} className={`p-4 ${s.warn ? "border-warn/40" : ""}`}>
             <p className="text-[12px] text-muted">{s.k}</p>
             <p className={`mt-1 font-mono text-[24px] tracking-tight ${s.warn ? "text-warn" : ""}`}>{money(s.v)}</p>
             <p className="text-[11.5px] text-muted">{s.n}</p>

@@ -108,7 +108,7 @@ export function AssistantScreen() {
       <div className="sticky bottom-0 flex flex-col gap-3 bg-paper pb-2 pt-2">
         <div className="no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 md:mx-0 md:flex-wrap md:px-0">
           {convos.map((c) => (
-            <button key={c.prompt} type="button" onClick={() => send(c.ask)} className="shrink-0 rounded-full border border-line bg-soft px-3.5 py-1.5 text-[12.5px] text-muted hover:border-[#433d52] hover:text-ink">
+            <button key={c.prompt} type="button" onClick={() => send(c.ask)} className="shrink-0 rounded-full border border-line bg-soft px-3.5 py-1.5 text-[12.5px] text-muted hover:border-line-strong hover:text-ink">
               {c.prompt}
             </button>
           ))}
@@ -121,7 +121,7 @@ export function AssistantScreen() {
           className="flex items-center gap-3 rounded-2xl border border-line bg-surface px-4 py-2"
         >
           <label htmlFor="ask" className="sr-only">Ask Orbit</label>
-          <input id="ask" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Ask Orbit anything..." autoComplete="off" className="h-10 flex-1 bg-transparent text-[14.5px] placeholder:text-[#8a8398] focus:outline-none" />
+          <input id="ask" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Ask Orbit anything..." autoComplete="off" className="h-10 flex-1 bg-transparent text-[14.5px] placeholder:text-faint focus:outline-none" />
           <button type="submit" aria-label="Send" disabled={thinking} className="grid size-9 place-items-center rounded-full bg-accent text-paper disabled:opacity-60">
             <ArrowUp size={15} weight="bold" />
           </button>

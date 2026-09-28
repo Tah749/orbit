@@ -24,12 +24,12 @@ export function Problem() {
         />
 
         <div className="mt-14 grid gap-4 md:grid-cols-5 md:grid-rows-2">
-          <Reveal className="group relative flex flex-col overflow-hidden rounded-3xl border border-line bg-surface p-7 transition-colors hover:border-[#433d52] md:col-span-3 md:row-span-2">
+          <Reveal className="group relative flex flex-col overflow-hidden rounded-3xl border border-line bg-surface p-7 transition-colors hover:border-line-strong md:col-span-3 md:row-span-2">
             <div aria-hidden="true" className="relative h-56 md:h-auto md:min-h-72 md:flex-1">
               {scattered.map(({ icon: I, label, x, y, r }) => (
                 <span
                   key={label}
-                  className="absolute inline-flex items-center gap-2 whitespace-nowrap rounded-xl border border-line bg-soft px-3 py-2 text-[12.5px] text-muted shadow-[0_12px_30px_-12px_rgba(0,0,0,0.6)] transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:rotate-0"
+                  className="absolute inline-flex items-center gap-2 whitespace-nowrap rounded-xl border border-line bg-soft px-3 py-2 text-[12.5px] text-muted shadow-[0_12px_30px_-12px_var(--shade)] transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:rotate-0"
                   style={{ left: x, top: y, rotate: `${r}deg` }}
                 >
                   <I size={15} className="text-accent-fg" />
@@ -48,7 +48,7 @@ export function Problem() {
             </div>
           </Reveal>
 
-          <Reveal delay={0.08} className="group relative overflow-hidden rounded-3xl border border-line bg-surface p-7 transition-colors hover:border-[#433d52] md:col-span-2">
+          <Reveal delay={0.08} className="group relative overflow-hidden rounded-3xl border border-line bg-surface p-7 transition-colors hover:border-line-strong md:col-span-2">
             <div aria-hidden="true" className="mb-6 flex flex-col gap-1.5">
               {[
                 { i: Bell, t: "3 new notifications" },
@@ -70,11 +70,11 @@ export function Problem() {
             </p>
           </Reveal>
 
-          <Reveal delay={0.16} className="relative flex flex-col justify-end overflow-hidden rounded-3xl border border-[#3a2233] bg-[linear-gradient(160deg,#2a1320_0%,#16141d_70%)] p-7 md:col-span-2">
+          <Reveal delay={0.16} className="relative flex flex-col justify-end overflow-hidden rounded-3xl border border-accent/25 bg-[linear-gradient(160deg,var(--sage)_0%,var(--white)_70%)] p-7 md:col-span-2">
             <div aria-hidden="true" className="mb-6 flex items-center gap-2 text-[12px] text-accent-fg/80">
-              <span className="rounded-lg border border-[#3a2233] px-2.5 py-1.5">07:00</span>
-              <span className="h-px flex-1 bg-[#3a2233]" />
-              <span className="rounded-lg border border-[#3a2233] px-2.5 py-1.5">Check 6 apps</span>
+              <span className="rounded-lg border border-accent/25 px-2.5 py-1.5">07:00</span>
+              <span className="h-px flex-1 bg-accent/25" />
+              <span className="rounded-lg border border-accent/25 px-2.5 py-1.5">Check 6 apps</span>
             </div>
             <PuzzlePiece size={22} className="text-accent" />
             <h3 className="mt-3 text-[19px] font-medium tracking-[-0.02em] text-ink">Too much to manage</h3>

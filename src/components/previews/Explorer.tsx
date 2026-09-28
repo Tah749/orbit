@@ -44,9 +44,9 @@ const events: Ev[] = [
   { day: 4, start: 13, len: 1.5, title: "Train home", tone: "neutral" },
 ];
 const toneCls = {
-  violet: "bg-[#1f1936] text-info",
+  violet: "bg-tint-info text-info",
   rose: "bg-accent-bg text-accent-fg",
-  amber: "bg-[#2b1d12] text-warn",
+  amber: "bg-tint-warn text-warn",
   neutral: "bg-soft text-ink",
 };
 
@@ -70,13 +70,13 @@ export function CalendarPreview() {
             ))}
             <div className="relative" style={{ height: (bottom - top) * h }}>
               {[8, 12, 16, 20].map((hr) => (
-                <span key={hr} className="absolute right-1 font-mono text-[9px] text-[#6e6780]" style={{ top: (hr - top) * h - 5 }}>
+                <span key={hr} className="absolute right-1 font-mono text-[9px] text-faint" style={{ top: (hr - top) * h - 5 }}>
                   {hr}
                 </span>
               ))}
             </div>
             {days.map((d, di) => (
-              <div key={d} className={`relative rounded-md ${di === 1 ? "bg-[#1a1722]" : ""}`} style={{ height: (bottom - top) * h }}>
+              <div key={d} className={`relative rounded-md ${di === 1 ? "bg-soft" : ""}`} style={{ height: (bottom - top) * h }}>
                 {events
                   .filter((e) => e.day === di)
                   .map((e) => (
@@ -109,7 +109,7 @@ export function CalendarPreview() {
               </div>
             ))}
           </Panel>
-          <div className="rounded-2xl border border-[#3a2a55] bg-[#17122a] p-3">
+          <div className="rounded-2xl border border-info/30 bg-tint-info p-3">
             <p className="flex items-center gap-1.5 text-[11px] font-medium text-info">
               <Sparkle size={12} weight="fill" /> Insight
             </p>
@@ -210,7 +210,7 @@ export function BillsPreview() {
           ["Due this week", "£98.31"],
           ["Subscriptions a month", "£75.48"],
         ].map(([k, v], i) => (
-          <Panel key={k} className={`p-3 ${i === 1 ? "border-[#4a2a1a]" : ""}`}>
+          <Panel key={k} className={`p-3 ${i === 1 ? "border-warn/40" : ""}`}>
             <p className="text-[10.5px] text-muted">{k}</p>
             <p className={`mt-1 font-mono text-[16px] tracking-tight sm:text-[18px] ${i === 1 ? "text-warn" : "text-ink"}`}>{v}</p>
           </Panel>
@@ -252,7 +252,7 @@ const allocation = [
   { k: "Global equities", v: 52, c: "var(--green)" },
   { k: "UK equities", v: 21, c: "var(--blue)" },
   { k: "Bonds", v: 15, c: "var(--sageDeep)" },
-  { k: "Cash", v: 12, c: "#5a5368" },
+  { k: "Cash", v: 12, c: "var(--faint)" },
 ];
 
 export function InvestmentsPreview() {
@@ -277,12 +277,12 @@ export function InvestmentsPreview() {
       <svg viewBox="0 0 320 90" className="h-24 w-full" preserveAspectRatio="none">
         <defs>
           <linearGradient id="inv-fill" x1="0" x2="0" y1="0" y2="1">
-            <stop offset="0" stopColor="#FF4D7A" stopOpacity="0.28" />
-            <stop offset="1" stopColor="#FF4D7A" stopOpacity="0" />
+            <stop offset="0" style={{ stopColor: "var(--green)" }} stopOpacity="0.28" />
+            <stop offset="1" style={{ stopColor: "var(--green)" }} stopOpacity="0" />
           </linearGradient>
         </defs>
         <path d={area} fill="url(#inv-fill)" />
-        <path d={d} fill="none" stroke="#FF4D7A" strokeWidth="1.75" vectorEffect="non-scaling-stroke" strokeLinejoin="round" />
+        <path d={d} fill="none" stroke="var(--green)" strokeWidth="1.75" vectorEffect="non-scaling-stroke" strokeLinejoin="round" />
       </svg>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <Panel className="flex items-center gap-4 p-3.5">
@@ -418,7 +418,7 @@ export function FitnessPreview() {
             {week.map((v, i) => (
               <div key={i} className="flex flex-1 flex-col items-center gap-1">
                 <div
-                  className={`w-full rounded-t-[4px] ${i === 3 ? "bg-accent" : "bg-[#3a2233]"}`}
+                  className={`w-full rounded-t-[4px] ${i === 3 ? "bg-accent" : "bg-accent/25"}`}
                   style={{ height: `${Math.max((v / 12) * 64, 3)}px` }}
                 />
                 <span className="text-[9.5px] text-muted">{"MTWTFSS"[i]}</span>
@@ -480,7 +480,7 @@ export function TasksPreview() {
       <ul className="flex flex-col gap-1.5">
         {taskList.map((t) => (
           <li key={t.t} className="flex items-center gap-3 rounded-xl bg-surface px-3 py-2.5">
-            {t.done ? <CheckCircle size={18} weight="fill" className="shrink-0 text-accent" /> : <Circle size={18} className="shrink-0 text-[#5a5368]" />}
+            {t.done ? <CheckCircle size={18} weight="fill" className="shrink-0 text-accent" /> : <Circle size={18} className="shrink-0 text-faint" />}
             <div className="min-w-0 flex-1">
               <p className={`truncate text-[12.5px] ${t.done ? "text-muted line-through" : "text-ink"}`}>{t.t}</p>
               <p className="truncate text-[10.5px] text-muted">{t.due} · {t.src}</p>

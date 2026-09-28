@@ -8,7 +8,7 @@ export function FinalCta() {
       <div aria-hidden="true" className="glow-cta pointer-events-none absolute inset-0 -z-10" />
       <div className="mx-auto flex max-w-[640px] flex-col items-center px-4 text-center sm:px-6">
         <Reveal className="flex flex-col items-center">
-          <Orb className="size-14 shadow-[0_0_80px_-10px_rgba(255,77,122,0.6)]" />
+          <Orb className="size-14 shadow-[0_0_80px_-10px_color-mix(in_srgb,var(--green)_55%,transparent)]" />
           <h2 id="join-title" className="mt-8 text-balance text-[40px] font-semibold leading-[1.04] tracking-[-0.045em] text-ink md:text-[60px]">
             Your life, connected.
             <br />

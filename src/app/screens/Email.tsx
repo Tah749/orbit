@@ -99,7 +99,7 @@ export function EmailScreen() {
             {draft === null ? (
               <div className="flex flex-wrap gap-2">
                 {sel.suggestedReply && (
-                  <button type="button" onClick={() => setDraft(sel.suggestedReply!)} className="inline-flex items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-[13px] font-medium text-paper hover:bg-[#ff6690]">
+                  <button type="button" onClick={() => setDraft(sel.suggestedReply!)} className="inline-flex items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-[13px] font-medium text-paper hover:bg-accent-hover">
                     <Sparkle size={13} weight="fill" /> Suggest a reply
                   </button>
                 )}

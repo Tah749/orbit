@@ -25,7 +25,7 @@ export function Hero() {
         <motion.a
           href="#features"
           {...rise(0)}
-          className="inline-flex items-center gap-2 rounded-full border border-line bg-surface/70 py-1 pl-1 pr-3.5 text-[13px] text-muted transition-colors hover:border-[#433d52] hover:text-ink"
+          className="inline-flex items-center gap-2 rounded-full border border-line bg-surface/70 py-1 pl-1 pr-3.5 text-[13px] text-muted transition-colors hover:border-line-strong hover:text-ink"
         >
           <span className="rounded-full bg-accent-bg px-2.5 py-0.5 text-[12px] font-medium text-accent-fg">Introducing Orbit</span>
           Your personal AI assistant
@@ -64,7 +64,7 @@ export function Hero() {
       </div>
 
       <div id="product" ref={shot} className="relative mx-auto mt-16 max-w-[1240px] px-4 pb-8 sm:px-6 md:mt-20 [perspective:1600px]">
-        <div aria-hidden="true" className="pointer-events-none absolute inset-x-[10%] top-[8%] -z-10 h-[70%] rounded-full bg-[radial-gradient(closest-side,rgba(124,77,255,0.22),rgba(232,51,107,0.08),transparent)] blur-2xl" />
+        <div aria-hidden="true" className="pointer-events-none absolute inset-x-[10%] top-[8%] -z-10 h-[70%] rounded-full bg-[radial-gradient(closest-side,var(--glow-violet),var(--glow-rose),transparent)] blur-2xl" />
         <motion.div
           style={{ rotateX, scale, transformOrigin: "50% 0%" }}
           initial={reduce ? false : { opacity: 0, y: 40 }}

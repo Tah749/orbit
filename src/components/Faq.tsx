@@ -40,7 +40,7 @@ export function Faq() {
         <div className="flex flex-col gap-2 md:col-span-8">
           {faqs.map((f, i) => (
             <Reveal key={f.q} delay={i * 0.04}>
-              <details className="group rounded-2xl border border-line bg-surface transition-colors open:border-[#433d52] hover:border-[#433d52]">
+              <details className="group rounded-2xl border border-line bg-surface transition-colors open:border-line-strong hover:border-line-strong">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-4 rounded-2xl px-5 py-4 text-[16px] font-medium text-ink [&::-webkit-details-marker]:hidden">
                   {f.q}
                   <Plus size={16} className="shrink-0 text-muted transition-transform duration-300 group-open:rotate-45 group-open:text-accent" />

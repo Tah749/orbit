@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import type { Icon } from "@phosphor-icons/react";
+import { ThemeToggle } from "../components/ui/ThemeToggle";
 import {
   House,
   Tray,
@@ -71,7 +72,7 @@ function Sidebar() {
     tasks: tasks.filter((t) => t.group === "today" && !t.done).length,
   };
   return (
-    <aside className="hidden w-[232px] shrink-0 flex-col border-r border-line bg-[#0e0d13] lg:flex">
+    <aside className="hidden w-[232px] shrink-0 flex-col border-r border-line bg-deep lg:flex">
       <a href="#/" className="flex items-center gap-2.5 px-5 pb-4 pt-5" aria-label="Back to the Orbit website">
         <Orb className="size-5" />
         <span className="text-[16px] font-medium tracking-[-0.02em]">Orbit</span>
@@ -99,7 +100,7 @@ function Sidebar() {
         })}
       </nav>
       <div className="m-3 flex items-center gap-2.5 rounded-xl border border-line p-2.5">
-        <span className="grid size-8 place-items-center rounded-full bg-[#2a2140] text-[12px] font-medium text-info">AR</span>
+        <span className="grid size-8 place-items-center rounded-full bg-tint-info text-[12px] font-medium text-info">AR</span>
         <div className="min-w-0">
           <p className="truncate text-[13px] text-ink">Alex Rowe</p>
           <p className="text-[11px] text-muted">Demo account</p>
@@ -157,10 +158,10 @@ function Search({ onDone }: { onDone?: () => void }) {
         }}
         placeholder="Search emails, bookings, bills..."
         autoComplete="off"
-        className="h-10 w-full rounded-full border border-line bg-soft pl-10 pr-4 text-[13.5px] text-ink placeholder:text-[#8a8398] focus:border-accent focus:outline-none"
+        className="h-10 w-full rounded-full border border-line bg-soft pl-10 pr-4 text-[13.5px] text-ink placeholder:text-faint focus:border-accent focus:outline-none"
       />
       {open && q.trim().length > 1 && (
-        <div className="absolute inset-x-0 top-12 z-30 overflow-hidden rounded-2xl border border-line bg-surface shadow-[0_30px_60px_-20px_rgba(0,0,0,0.8)]">
+        <div className="absolute inset-x-0 top-12 z-30 overflow-hidden rounded-2xl border border-line bg-surface shadow-[0_30px_60px_-20px_var(--shade)]">
           {hits.length ? (
             <ul>
               {hits.map((h) => (
@@ -223,10 +224,11 @@ function TopBar({ onMenu }: { onMenu: () => void }) {
             <button
               type="button"
               onClick={() => go("assistant")}
-              className="hidden items-center gap-2 rounded-full border border-line bg-surface px-3.5 py-2 text-[13px] text-ink transition-colors hover:border-[#433d52] sm:inline-flex"
+              className="hidden items-center gap-2 rounded-full border border-line bg-surface px-3.5 py-2 text-[13px] text-ink transition-colors hover:border-line-strong sm:inline-flex"
             >
               <Sparkle size={14} weight="fill" className="text-accent" /> Ask Orbit
             </button>
+            <ThemeToggle />
             <button type="button" aria-label="More sections" onClick={onMenu} className="grid size-10 place-items-center rounded-full text-muted hover:text-ink lg:hidden">
               <DotsNine size={20} />
             </button>
@@ -316,7 +318,7 @@ function Toasts() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 6 }}
-            className="rounded-full border border-line bg-soft px-4 py-2.5 text-[13px] text-ink shadow-[0_20px_40px_-15px_rgba(0,0,0,0.8)]"
+            className="rounded-full border border-line bg-soft px-4 py-2.5 text-[13px] text-ink shadow-[0_20px_40px_-15px_var(--shade)]"
           >
             {t.text}
           </motion.p>

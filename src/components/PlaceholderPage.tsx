@@ -39,7 +39,7 @@ export function PlaceholderPage({ slug }: { slug: string }) {
             ))}
           </div>
           {slug === "sign-in" && (
-            <a href="#/app" className="mt-8 inline-flex h-11 items-center rounded-full bg-accent px-5 text-[14.5px] font-medium text-paper hover:bg-[#ff6690]">
+            <a href="#/app" className="mt-8 inline-flex h-11 items-center rounded-full bg-accent px-5 text-[14.5px] font-medium text-paper hover:bg-accent-hover">
               Open the live demo
             </a>
           )}

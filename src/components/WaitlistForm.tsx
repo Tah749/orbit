@@ -64,7 +64,7 @@ export function WaitlistForm({ source, size = "md" }: { source: string; size?: "
     : { initial: { opacity: 0, y: 8 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: -8 }, transition: { duration: 0.35, ease: [0.16, 1, 0.3, 1] as const } };
 
   const inputCls =
-    "w-full rounded-full border border-line bg-soft px-5 text-[15px] text-ink placeholder:text-[#8a8398] transition-colors hover:border-[#433d52] focus:border-accent focus:outline-none focus-visible:outline-none focus:ring-2 focus:ring-accent/30";
+    "w-full rounded-full border border-line bg-soft px-5 text-[15px] text-ink placeholder:text-faint transition-colors hover:border-line-strong focus:border-accent focus:outline-none focus-visible:outline-none focus:ring-2 focus:ring-accent/30";
 
   return (
     <div className="w-full">

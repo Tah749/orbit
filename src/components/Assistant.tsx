@@ -96,7 +96,7 @@ export function Assistant() {
         />
 
         <Reveal className="mx-auto mt-14 max-w-[880px]">
-          <div className="overflow-hidden rounded-[28px] border border-line bg-[#100e16] shadow-[0_60px_120px_-50px_rgba(124,77,255,0.4)]">
+          <div className="overflow-hidden rounded-[28px] border border-line bg-deep shadow-[0_60px_120px_-50px_var(--shade)]">
             <div className="flex items-center justify-between gap-3 border-b border-line px-5 py-3.5">
               <div className="flex items-center gap-2.5">
                 <Orb className="size-6" />
@@ -156,7 +156,7 @@ export function Assistant() {
                     aria-pressed={i === idx}
                     onClick={() => setIdx(i)}
                     className={`shrink-0 rounded-full border px-3.5 py-1.5 text-[13px] transition-colors ${
-                      i === idx ? "border-accent/60 bg-accent-bg text-accent-fg" : "border-line bg-soft text-muted hover:border-[#433d52] hover:text-ink"
+                      i === idx ? "border-accent/60 bg-accent-bg text-accent-fg" : "border-line bg-soft text-muted hover:border-line-strong hover:text-ink"
                     }`}
                   >
                     {cv.prompt}

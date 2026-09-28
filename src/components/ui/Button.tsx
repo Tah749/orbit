@@ -9,8 +9,8 @@ const base =
 const variants: Record<Variant, string> = {
   // Dark label on the rose accent: 6.2:1 contrast.
   primary:
-    "bg-accent text-paper hover:bg-[#ff6690] hover:shadow-[0_0_0_1px_rgba(255,77,122,0.4),0_8px_32px_-6px_rgba(255,77,122,0.55)]",
-  secondary: "border border-line bg-surface/60 text-ink hover:border-[#433d52] hover:bg-soft",
+    "bg-accent text-paper hover:bg-accent-hover hover:shadow-[0_0_0_1px_color-mix(in_srgb,var(--green)_40%,transparent),0_8px_32px_-6px_color-mix(in_srgb,var(--green)_50%,transparent)]",
+  secondary: "border border-line bg-surface/60 text-ink hover:border-line-strong hover:bg-soft",
   ghost: "text-muted hover:text-ink",
 };
 

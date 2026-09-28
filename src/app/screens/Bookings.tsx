@@ -59,7 +59,7 @@ export function BookingsScreen() {
                 setCheckedIn(true);
                 toast("Demo: check-in opened with Brisa Air. Seat 14A.");
               }}
-              className="w-fit rounded-full bg-accent px-4 py-2 text-[13px] font-medium text-paper hover:bg-[#ff6690]"
+              className="w-fit rounded-full bg-accent px-4 py-2 text-[13px] font-medium text-paper hover:bg-accent-hover"
             >
               Check in for BZ 1452
             </button>

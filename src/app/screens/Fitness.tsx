@@ -14,7 +14,7 @@ function Bars({ values, max, unit, highlight }: { values: number[]; max: number;
       {values.map((v, i) => (
         <div key={i} className="flex flex-1 flex-col items-center gap-1.5">
           <span className="font-mono text-[10.5px] text-muted">{v || ""}</span>
-          <div className={`w-full rounded-t-md ${i === highlight ? "bg-accent" : "bg-[#3a2233]"}`} style={{ height: `${Math.max((v / max) * 128, 3)}px` }} />
+          <div className={`w-full rounded-t-md ${i === highlight ? "bg-accent" : "bg-accent/25"}`} style={{ height: `${Math.max((v / max) * 128, 3)}px` }} />
           <span className="text-[11px] text-muted">{days[i]}</span>
         </div>
       ))}
@@ -73,7 +73,7 @@ export function FitnessScreen() {
                   }}
                   className="flex w-full items-center gap-3 px-5 py-3.5 text-left hover:bg-soft/60"
                 >
-                  {w.done ? <CheckCircle size={20} weight="fill" className="text-accent" /> : <Circle size={20} className="text-[#5a5368]" />}
+                  {w.done ? <CheckCircle size={20} weight="fill" className="text-accent" /> : <Circle size={20} className="text-faint" />}
                   <div className="min-w-0 flex-1">
                     <p className={`truncate text-[13.5px] ${w.done ? "text-muted line-through" : ""}`}>{w.title}</p>
                     <p className="text-[12px] text-muted">{w.when} · {w.len}</p>

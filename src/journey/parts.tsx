@@ -8,15 +8,16 @@ import { Orb } from "../components/ui/Logo";
 const ease = [0.16, 1, 0.3, 1] as const;
 
 const glowFor = {
-  violet: "shadow-[0_40px_120px_-40px_rgba(124,77,255,0.35),inset_0_1px_0_rgba(255,255,255,0.05)] bg-[#100e16]/55",
-  cyan: "shadow-[0_40px_120px_-40px_rgba(69,212,240,0.3),inset_0_1px_0_rgba(255,255,255,0.06)] bg-[#0a121a]/60",
+  violet: "border-white/[0.07] shadow-[0_40px_120px_-40px_rgba(124,77,255,0.35),inset_0_1px_0_rgba(255,255,255,0.05)] bg-[#100e16]/55",
+  /** The story, in the site theme. */
+  oat: "border-line/80 shadow-[0_40px_100px_-40px_var(--shade),inset_0_1px_0_color-mix(in_srgb,var(--ink)_5%,transparent)] bg-story-chip",
 };
 type Tone = keyof typeof glowFor;
 
 export function Glass({ children, className = "", tone = "violet" }: { children: ReactNode; className?: string; tone?: Tone }) {
   return (
     <div
-      className={`rounded-[26px] border border-white/[0.07] p-2 backdrop-blur-xl ${glowFor[tone]} ${className}`}
+      className={`rounded-[26px] border p-2 backdrop-blur-xl ${glowFor[tone]} ${className}`}
     >
       {children}
     </div>
@@ -38,7 +39,7 @@ export function Chips({ items }: { items: string[] }) {
   return (
     <ul className="mt-5 flex flex-wrap gap-2">
       {items.map((t) => (
-        <li key={t} className="rounded-full border border-white/10 bg-[#16141d]/70 px-3 py-1.5 text-[12.5px] text-ink backdrop-blur">
+        <li key={t} className="rounded-full border border-line bg-surface/70 px-3 py-1.5 text-[12.5px] text-ink backdrop-blur">
           {t}
         </li>
       ))}
@@ -55,7 +56,7 @@ export function AskCard({ tone }: { tone?: Tone }) {
   ];
   return (
     <Glass className="mt-8 max-w-[30rem]" tone={tone}>
-      <div className="rounded-[20px] border border-line/80 bg-[#0d0c12]/80 p-4" aria-label="Example question and answer with demo data" role="img">
+      <div className="rounded-[20px] border border-line/80 bg-deep/80 p-4" aria-label="Example question and answer with demo data" role="img">
         <div className="flex items-center justify-between">
           <span className="flex items-center gap-2 text-[12px] text-muted">
             <Orb className="size-3.5" /> Ask Orbit

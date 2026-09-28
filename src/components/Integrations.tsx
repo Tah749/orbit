@@ -4,7 +4,7 @@ import { SectionHeading } from "./ui/Section";
 
 const statusCls: Record<IntegrationStatus, string> = {
   "In development": "bg-accent-bg text-accent-fg",
-  "Coming soon": "bg-[#1f1936] text-info",
+  "Coming soon": "bg-tint-info text-info",
   Planned: "bg-soft text-muted",
 };
 
@@ -23,7 +23,7 @@ export function Integrations() {
               as="li"
               key={name}
               delay={(i % 4) * 0.05}
-              className="group flex flex-col gap-6 rounded-3xl border border-line bg-surface p-5 transition-[border-color,transform] duration-300 hover:-translate-y-0.5 hover:border-[#433d52] md:p-6"
+              className="group flex flex-col gap-6 rounded-3xl border border-line bg-surface p-5 transition-[border-color,transform] duration-300 hover:-translate-y-0.5 hover:border-line-strong md:p-6"
             >
               <div className="flex items-start justify-between gap-2">
                 <span className="grid size-11 place-items-center rounded-2xl bg-soft text-ink transition-colors group-hover:text-accent">

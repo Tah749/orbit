@@ -5,9 +5,9 @@ import type { ReactNode } from "react";
 
 export const tones = {
   rose: "bg-accent-bg text-accent-fg",
-  violet: "bg-[#1f1936] text-info",
-  amber: "bg-[#2b1d12] text-warn",
-  coral: "bg-[#2b1414] text-coral",
+  violet: "bg-tint-info text-info",
+  amber: "bg-tint-warn text-warn",
+  coral: "bg-tint-coral text-coral",
   neutral: "bg-soft text-muted",
 } as const;
 export type Tone = keyof typeof tones;
@@ -85,7 +85,7 @@ export function PreviewFrame({
     <figure
       role="img"
       aria-label={label}
-      className={`relative overflow-hidden rounded-[22px] border border-line bg-[#100e16] p-4 shadow-[0_40px_80px_-40px_rgba(124,77,255,0.25)] sm:p-5 ${className}`}
+      className={`relative overflow-hidden rounded-[22px] border border-line bg-deep p-4 shadow-[0_40px_80px_-40px_var(--shade)] sm:p-5 ${className}`}
     >
       <div aria-hidden="true" className="flex flex-col gap-4">
         <div className="flex items-start justify-between gap-3">

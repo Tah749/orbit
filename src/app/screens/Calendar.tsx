@@ -5,9 +5,9 @@ import { calEvents, weekDays, type CalEvent } from "../data";
 import { Card, Modal, PageHeader } from "../ui";
 
 const tone = {
-  violet: "bg-[#1f1936] text-info",
+  violet: "bg-tint-info text-info",
   rose: "bg-accent-bg text-accent-fg",
-  amber: "bg-[#2b1d12] text-warn",
+  amber: "bg-tint-warn text-warn",
   neutral: "bg-soft text-ink",
 };
 const fmt = (h: number) => `${String(Math.floor(h)).padStart(2, "0")}:${String(Math.round((h % 1) * 60)).padStart(2, "0")}`;
@@ -33,7 +33,7 @@ export function CalendarScreen() {
               <span className="px-1 text-[13px]">This week</span>
               <button type="button" aria-label="Next week" onClick={() => toast("The demo only has this week.")} className="grid size-9 place-items-center text-muted hover:text-ink"><CaretRight size={14} /></button>
             </div>
-            <button type="button" onClick={() => setAdding(true)} className="inline-flex items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-[13px] font-medium text-paper hover:bg-[#ff6690]">
+            <button type="button" onClick={() => setAdding(true)} className="inline-flex items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-[13px] font-medium text-paper hover:bg-accent-hover">
               <Plus size={13} weight="bold" /> New event
             </button>
           </>
@@ -69,14 +69,14 @@ export function CalendarScreen() {
             ))}
             <div className="relative" style={{ height: (END - START) * H }}>
               {Array.from({ length: END - START }, (_, i) => START + i).filter((h) => h % 2 === 0).map((h) => (
-                <span key={h} className="absolute right-1 font-mono text-[10px] text-[#6e6780]" style={{ top: (h - START) * H - 6 }}>{fmt(h)}</span>
+                <span key={h} className="absolute right-1 font-mono text-[10px] text-faint" style={{ top: (h - START) * H - 6 }}>{fmt(h)}</span>
               ))}
             </div>
             {weekDays.map((d, di) => (
               <div
                 key={d}
-                className={`relative rounded-lg ${di === day ? "bg-[#1a1722]" : ""}`}
-                style={{ height: (END - START) * H, backgroundImage: `repeating-linear-gradient(to bottom, transparent 0, transparent ${H * 2 - 1}px, rgba(46,42,58,0.6) ${H * 2 - 1}px, rgba(46,42,58,0.6) ${H * 2}px)` }}
+                className={`relative rounded-lg ${di === day ? "bg-soft" : ""}`}
+                style={{ height: (END - START) * H, backgroundImage: `repeating-linear-gradient(to bottom, transparent 0, transparent ${H * 2 - 1}px, var(--line) ${H * 2 - 1}px, var(--line) ${H * 2}px)` }}
               >
                 {calEvents.filter((e) => e.day === di).map((e) => (
                   <button
@@ -110,7 +110,7 @@ export function CalendarScreen() {
               </button>
             ))}
           </Card>
-          <div className="rounded-2xl border border-[#3a2a55] bg-[#17122a] p-4">
+          <div className="rounded-2xl border border-info/30 bg-tint-info p-4">
             <p className="flex items-center gap-1.5 text-[12px] font-medium text-info"><Sparkle size={13} weight="fill" /> Insight</p>
             <p className="mt-1.5 text-[13.5px] leading-snug">
               You have 45 minutes between your Friday wrap-up call and your train. Waverley is a 10 minute walk from the hotel.
@@ -157,7 +157,7 @@ export function CalendarScreen() {
           }}
         >
           <label htmlFor="ev-title" className="text-[13px] font-medium">Event name</label>
-          <input id="ev-title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Coffee with Tomás" className="h-11 rounded-xl border border-line bg-soft px-4 text-[14px] placeholder:text-[#8a8398] focus:border-accent focus:outline-none" />
+          <input id="ev-title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Coffee with Tomás" className="h-11 rounded-xl border border-line bg-soft px-4 text-[14px] placeholder:text-faint focus:border-accent focus:outline-none" />
           <button type="submit" className="mt-1 rounded-full bg-accent py-2.5 text-[14px] font-medium text-paper">Add to calendar</button>
         </form>
       </Modal>

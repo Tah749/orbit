@@ -158,7 +158,7 @@ export const portfolio = {
     { k: "Global equities", v: 52, c: "var(--green)" },
     { k: "UK equities", v: 21, c: "var(--blue)" },
     { k: "Bonds", v: 15, c: "var(--sageDeep)" },
-    { k: "Cash", v: 12, c: "#5a5368" },
+    { k: "Cash", v: 12, c: "var(--faint)" },
   ],
   holdings: [
     { name: "Global Index Fund", account: "Stocks & Shares ISA", value: 12910.44, day: 0.9 },

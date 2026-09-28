@@ -3,6 +3,7 @@ import { Navbar } from "./components/Navbar";
 import { Hero } from "./components/Hero";
 import { Footer } from "./components/Footer";
 import { PlaceholderPage } from "./components/PlaceholderPage";
+import { Orb } from "./components/ui/Logo";
 import type { TabKey } from "./app/data";
 
 const BelowFold = lazy(() => import("./components/BelowFold"));
@@ -42,7 +43,9 @@ function useRoute() {
 function AppFallback() {
   return (
     <div className="grid min-h-[100dvh] place-items-center bg-paper">
-      <span className="orb size-10 animate-pulse" aria-label="Loading the Orbit demo" />
+      <span role="status" aria-label="Loading the Orbit demo" className="text-ink">
+        <Orb className="size-10 animate-pulse" />
+      </span>
     </div>
   );
 }
@@ -86,7 +89,7 @@ export default function App() {
   }
   if (route === "story") {
     return (
-      <Suspense fallback={<div className="min-h-[100dvh] bg-[#07060a]" />}>
+      <Suspense fallback={<div className="min-h-[100dvh] bg-paper" />}>
         <Story />
       </Suspense>
     );

@@ -5,8 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Orbit - Your AI Assistant for Everything That Matters</title>
     <meta name="description" content="Orbit brings your email, calendar, bills, bookings, investments, fitness and tasks together in one AI assistant that helps you see what matters and stay on top of life. Join the waitlist." />
-    <meta name="theme-color" content="#0B0A10" />
-    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#F5F3EF" />
+    <meta name="color-scheme" content="light dark" />
+    <script>
+      try {
+        var t = localStorage.getItem("orbit-theme");
+        if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
+      } catch (e) {}
+    </script>
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <link rel="apple-touch-icon" href="./og-image.png" />
 

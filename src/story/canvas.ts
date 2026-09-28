@@ -17,6 +17,7 @@ import {
 } from "@phosphor-icons/react";
 import { iconImage, roundRect } from "../journey/textures";
 import { brandIndex, drawBrandTile, drawOrbitIcon } from "./brands";
+import { theme } from "./state";
 
 /* Everything drawn here is illustrative demo content, labelled as such where it's legible. */
 
@@ -116,15 +117,16 @@ export function appTile(g: CanvasRenderingContext2D, x: number, y: number, s: nu
   if (glyph) g.drawImage(glyph, x + s * 0.24, y + s * 0.24, s * 0.52, s * 0.52);
 }
 
-function orb(g: CanvasRenderingContext2D, cx: number, cy: number, r: number) {
-  const grad = g.createRadialGradient(cx - r * 0.32, cy - r * 0.44, 0, cx, cy, r);
-  grad.addColorStop(0, "#ffd3e0");
-  grad.addColorStop(0.32, "#ff4d7a");
-  grad.addColorStop(0.72, "#7c4dff");
-  grad.addColorStop(1, "#2a1a55");
+function mark(g: CanvasRenderingContext2D, cx: number, cy: number, r: number, ink: string, accent: string) {
+  const u = r / 40;
   g.beginPath();
-  g.arc(cx, cy, r, 0, Math.PI * 2);
-  g.fillStyle = grad;
+  g.arc(cx - 6 * u, cy + 6 * u, 29 * u, 0, Math.PI * 2);
+  g.strokeStyle = ink;
+  g.lineWidth = 11 * u;
+  g.stroke();
+  g.beginPath();
+  g.arc(cx + 34 * u, cy - 28 * u, 10 * u, 0, Math.PI * 2);
+  g.fillStyle = accent;
   g.fill();
 }
 
@@ -179,14 +181,14 @@ export async function makeLockScreen() {
     if (n === last) return;
     last = n;
     const bg = g.createRadialGradient(w * 0.5, h * 0.32, 0, w * 0.5, h * 0.4, h * 0.75);
-    bg.addColorStop(0, "#44122f");
-    bg.addColorStop(0.42, "#0d2233");
-    bg.addColorStop(1, "#03070b");
+    bg.addColorStop(0, "#3a2c47");
+    bg.addColorStop(0.42, "#0f2a28");
+    bg.addColorStop(1, "#0b0a09");
     g.fillStyle = bg;
     g.fillRect(0, 0, w, h);
     const blob = g.createRadialGradient(w * 0.85, h * 0.78, 0, w * 0.85, h * 0.78, w * 0.8);
-    blob.addColorStop(0, "rgba(69,212,240,0.28)");
-    blob.addColorStop(1, "rgba(69,212,240,0)");
+    blob.addColorStop(0, "rgba(92,201,188,0.24)");
+    blob.addColorStop(1, "rgba(92,201,188,0)");
     g.fillStyle = blob;
     g.fillRect(0, 0, w, h);
 
@@ -213,7 +215,7 @@ export async function makeLockScreen() {
     for (let i = 0; i < visible; i++) {
       const note = lockNotes[(n - 1 - i) % lockNotes.length];
       roundRect(g, 22, y, w - 44, 104, 30);
-      g.fillStyle = "rgba(34,30,46,0.78)";
+      g.fillStyle = "rgba(40,37,34,0.8)";
       g.fill();
       g.strokeStyle = "rgba(255,255,255,0.07)";
       g.stroke();
@@ -226,13 +228,13 @@ export async function makeLockScreen() {
     if (n > 7) {
       for (let k = 0; k < 2; k++) {
         roundRect(g, 40 + k * 18, y - 8 + k * 14, w - 80 - k * 36, 26, 13);
-        g.fillStyle = `rgba(34,30,46,${0.6 - k * 0.2})`;
+        g.fillStyle = `rgba(40,37,34,${0.6 - k * 0.2})`;
         g.fill();
       }
       roundRect(g, w / 2 - 150, y + 44, 300, 50, 25);
-      g.fillStyle = "rgba(255,77,122,0.9)";
+      g.fillStyle = "rgba(240,122,104,0.95)";
       g.fill();
-      text(g, `+${(n - 7) * 4} more notifications`, w / 2, y + 77, 22, "#0B0A10", 600, sans, "center");
+      text(g, `+${(n - 7) * 4} more notifications`, w / 2, y + 77, 22, "#151412", 600, sans, "center");
     }
     // Lock-screen buttons and home indicator
     for (const x of [86, w - 86]) {
@@ -250,69 +252,89 @@ export async function makeLockScreen() {
   return { texture, draw };
 }
 
+/** The Orbit app itself, in the Oat scheme. */
+const dashPal = {
+  light: {
+    bg: "#F5F3EF", glowA: "rgba(12,107,102,0.1)", glowB: "rgba(107,79,143,0.05)", glowEnd: "rgba(245,243,239,0)",
+    ink: "#1D1B18", muted: "#67625A", soft: "#ECE8E1", card: "#FFFFFF", line: "#E4DFD6",
+    sage: "#E1EFEC", sageLine: "#C9E0DB", sageInk: "#084B47",
+    accent: "#0C6B66", info: "#6B4F8F", warn: "#8C5C00", tabs: "rgba(29,27,24,0.94)",
+  },
+  dark: {
+    bg: "#151412", glowA: "rgba(92,201,188,0.14)", glowB: "rgba(187,163,221,0.06)", glowEnd: "rgba(21,20,18,0)",
+    ink: "#F2EFEA", muted: "#A9A399", soft: "#272522", card: "#1D1B19", line: "#2B2926",
+    sage: "#12302D", sageLine: "#1E4642", sageInk: "#A8E3DA",
+    accent: "#5CC9BC", info: "#BBA3DD", warn: "#E4B458", tabs: "rgba(39,37,34,0.94)",
+  },
+};
+
 export async function makeDashboard() {
   const gl = await loadGlyphs();
   const { w, h } = screenSize;
   const [c, g] = canvas(w, h);
-  g.fillStyle = "#0B0A10";
+  const D = dashPal[theme.mode];
+  g.fillStyle = D.bg;
   g.fillRect(0, 0, w, h);
   const glow = g.createRadialGradient(w * 0.5, 0, 0, w * 0.5, 0, h * 0.55);
-  glow.addColorStop(0, "rgba(40,160,210,0.3)");
-  glow.addColorStop(0.5, "rgba(232,51,107,0.1)");
-  glow.addColorStop(1, "rgba(0,0,0,0)");
+  glow.addColorStop(0, D.glowA);
+  glow.addColorStop(0.5, D.glowB);
+  glow.addColorStop(1, D.glowEnd);
   g.fillStyle = glow;
   g.fillRect(0, 0, w, h);
 
   roundRect(g, w / 2 - 72, 22, 144, 40, 20);
   g.fillStyle = "#000";
   g.fill();
-  text(g, "9:41", 48, 54, 24, "#fff", 600);
+  text(g, "9:41", 48, 54, 24, D.ink, 600);
 
   drawOrbitIcon(g, 30, 102, 44);
-  text(g, "Orbit", 82, 133, 28, "#F8F6FB", 500);
+  text(g, "orbit", 84, 133, 28, D.ink, 500);
   g.beginPath();
   g.arc(w - 52, 124, 22, 0, Math.PI * 2);
-  g.fillStyle = "#221F2B";
+  g.fillStyle = D.soft;
   g.fill();
-  text(g, "A", w - 52, 132, 22, "#FFB0C4", 600, sans, "center");
+  text(g, "A", w - 52, 132, 22, D.info, 600, sans, "center");
 
-  text(g, "Good morning, Alex.", 32, 222, 42, "#F8F6FB", 600);
-  text(g, "Tuesday 14 October", 32, 260, 23, "#A39DB0");
+  text(g, "Good morning, Alex.", 32, 222, 42, D.ink, 600);
+  text(g, "Tuesday 14 October", 32, 260, 23, D.muted);
 
   // Briefing
   roundRect(g, 24, 290, w - 48, 200, 28);
   const bb = g.createLinearGradient(0, 290, 0, 490);
-  bb.addColorStop(0, "#2A1320");
-  bb.addColorStop(1, "#16141D");
+  bb.addColorStop(0, D.sage);
+  bb.addColorStop(1, D.card);
   g.fillStyle = bb;
   g.fill();
-  g.strokeStyle = "#3a2233";
+  g.strokeStyle = D.sageLine;
   g.lineWidth = 2;
   g.stroke();
-  orb(g, 56, 330, 11);
-  text(g, "Your briefing", 76, 338, 21, "#FFB0C4", 600);
-  wrap(g, "A lighter day than usual. Stand-up at 09:30, the review moved to 15:00, and you fly to Edinburgh tomorrow.", 48, 380, w - 96, 34, 24, "#F8F6FB");
+  mark(g, 56, 330, 11, D.sageInk, D.accent);
+  text(g, "Your briefing", 76, 338, 21, D.sageInk, 600);
+  wrap(g, "A lighter day than usual. Stand-up at 09:30, the review moved to 15:00, and you fly to Edinburgh tomorrow.", 48, 380, w - 96, 34, 24, D.ink);
 
   // Today
-  text(g, "Today", 32, 540, 25, "#F8F6FB", 600);
+  text(g, "Today", 32, 540, 25, D.ink, 600);
   [
-    ["09:30", "Team stand-up", "#FF4D7A"],
-    ["12:30", "Lunch with Tomás", "#A78BFA"],
-    ["15:00", "Q4 project review", "#FFA24D"],
+    ["09:30", "Team stand-up", D.accent],
+    ["12:30", "Lunch with Tomás", D.info],
+    ["15:00", "Q4 project review", D.warn],
   ].forEach(([t, e, col], i) => {
     const y = 566 + i * 76;
     roundRect(g, 24, y, w - 48, 64, 18);
-    g.fillStyle = "#16141D";
+    g.fillStyle = D.card;
     g.fill();
+    g.strokeStyle = D.line;
+    g.lineWidth = 2;
+    g.stroke();
     roundRect(g, 40, y + 16, 5, 32, 3);
     g.fillStyle = col;
     g.fill();
-    text(g, t, 62, y + 41, 21, "#A39DB0", 500, mono);
-    text(g, e, 150, y + 41, 23, "#F8F6FB", 500);
+    text(g, t, 62, y + 41, 21, D.muted, 500, mono);
+    text(g, e, 150, y + 41, 23, D.ink, 500);
   });
 
   // Coming up: two tiles
-  text(g, "Coming up", 32, 830, 25, "#F8F6FB", 600);
+  text(g, "Coming up", 32, 830, 25, D.ink, 600);
   const tiles = [
     { app: 9, t: "Electricity", s: "£68.32 · due Friday" },
     { app: 5, t: "LHR to EDI", s: "Tomorrow · 16:20" },
@@ -321,29 +343,35 @@ export async function makeDashboard() {
     const x = 24 + i * ((w - 48) / 2 + 8);
     const tw = (w - 48) / 2 - 8;
     roundRect(g, x, 852, tw, 150, 22);
-    g.fillStyle = "#16141D";
+    g.fillStyle = D.card;
     g.fill();
+    g.strokeStyle = D.line;
+    g.lineWidth = 2;
+    g.stroke();
     appTile(g, x + 18, 870, 48, it.app, gl[it.app]);
-    text(g, it.t, x + 18, 954, 23, "#F8F6FB", 600);
-    text(g, it.s, x + 18, 984, 19, "#A39DB0");
+    text(g, it.t, x + 18, 954, 23, D.ink, 600);
+    text(g, it.s, x + 18, 984, 19, D.muted);
   });
 
   // Needs attention
-  text(g, "Needs a reply", 32, 1054, 25, "#F8F6FB", 600);
+  text(g, "Needs a reply", 32, 1054, 25, D.ink, 600);
   roundRect(g, 24, 1074, w - 48, 90, 20);
-  g.fillStyle = "#16141D";
+  g.fillStyle = D.card;
   g.fill();
+  g.strokeStyle = D.line;
+  g.lineWidth = 2;
+  g.stroke();
   drawBrandTile(g, 40, 1092, 54, brandIndex("Gmail"));
-  text(g, "Priya Shah", 112, 1112, 22, "#F8F6FB", 600);
-  text(g, "Numbers for the Q4 review", 112, 1144, 20, "#A39DB0");
+  text(g, "Priya Shah", 112, 1112, 22, D.ink, 600);
+  text(g, "Numbers for the Q4 review", 112, 1144, 20, D.muted);
   roundRect(g, w - 144, 1102, 100, 34, 17);
-  g.fillStyle = "#2A1320";
+  g.fillStyle = D.sage;
   g.fill();
-  text(g, "Draft", w - 94, 1126, 19, "#FFB0C4", 600, sans, "center");
+  text(g, "Draft", w - 94, 1126, 19, D.sageInk, 600, sans, "center");
 
   // Tab bar
   roundRect(g, 24, h - 118, w - 48, 84, 42);
-  g.fillStyle = "rgba(34,31,43,0.92)";
+  g.fillStyle = D.tabs;
   g.fill();
   const tabs = [10, 0, 11, 1, 12];
   tabs.forEach((gi, i) => {
@@ -352,7 +380,7 @@ export async function makeDashboard() {
     if (i === 0) {
       g.beginPath();
       g.arc(x, h - 76, 30, 0, Math.PI * 2);
-      g.fillStyle = "#FF4D7A";
+      g.fillStyle = D.accent;
       g.fill();
     }
     if (img) {
@@ -368,19 +396,19 @@ export async function makeDashboard() {
  * Hologram panels (light on transparent, lit up additively in the scene)
  * ---------------------------------------------------------------------------------------------- */
 
-const holo = { ink: "#EFFBFF", muted: "#9FC7D8", rose: "#FF86A8", amber: "#FFBE7A", violet: "#8EE8FF", line: "rgba(142,232,255,0.55)" };
+const holo = { ink: "#EFFBF8", muted: "#A8CFC9", rose: "#F4A393", amber: "#EFC77A", violet: "#8FE0D5", line: "rgba(143,224,213,0.55)" };
 export const panelSize = { w: 800, h: 500 };
 
 function frame(g: CanvasRenderingContext2D, title: string, glyph: HTMLImageElement | null) {
   const { w, h } = panelSize;
   roundRect(g, 6, 6, w - 12, h - 12, 30);
-  g.fillStyle = "rgba(80,200,255,0.08)";
+  g.fillStyle = "rgba(92,201,188,0.08)";
   g.fill();
   g.lineWidth = 2.5;
   g.strokeStyle = holo.line;
   g.stroke();
   // Corner brackets
-  g.strokeStyle = "rgba(235,250,255,0.95)";
+  g.strokeStyle = "rgba(236,251,248,0.95)";
   g.lineWidth = 4;
   const b = 34;
   for (const [x, y, dx, dy] of [
@@ -399,11 +427,11 @@ function frame(g: CanvasRenderingContext2D, title: string, glyph: HTMLImageEleme
   if (glyph) g.drawImage(glyph, 34, 30, 34, 34);
   text(g, title, 80, 58, 30, holo.ink, 600);
   roundRect(g, w - 170, 30, 136, 30, 15);
-  g.strokeStyle = "rgba(142,232,255,0.5)";
+  g.strokeStyle = "rgba(143,224,213,0.5)";
   g.lineWidth = 1.5;
   g.stroke();
   text(g, "DEMO DATA", w - 102, 51, 15, holo.muted, 500, mono, "center");
-  g.fillStyle = "rgba(142,232,255,0.25)";
+  g.fillStyle = "rgba(143,224,213,0.25)";
   g.fillRect(34, 84, w - 68, 1.5);
 }
 
@@ -434,7 +462,7 @@ export async function makeHoloPanels() {
       ["16:20", "Flight to Edinburgh", "Tomorrow"],
     ].forEach(([t, e, r], i) => {
       const y = 150 + i * 82;
-      g.fillStyle = i === 2 ? "rgba(255,134,168,0.12)" : "rgba(142,232,255,0.06)";
+      g.fillStyle = i === 2 ? "rgba(244,163,147,0.12)" : "rgba(143,224,213,0.06)";
       roundRect(g, 24, y - 44, W - 48, 64, 16);
       g.fill();
       row(g, y, t, e, r, i === 2 ? holo.rose : holo.muted);
@@ -449,7 +477,7 @@ export async function makeHoloPanels() {
       const y = 330 + i * 50;
       g.beginPath();
       g.arc(50, y + 12, 15, 0, Math.PI * 2);
-      g.fillStyle = "rgba(255,134,168,0.25)";
+      g.fillStyle = "rgba(244,163,147,0.25)";
       g.fill();
       text(g, String(i + 1), 50, y + 19, 18, holo.rose, 600, mono, "center");
       text(g, p, 80, y + 21, 24, holo.ink, 500);
@@ -468,7 +496,7 @@ export async function makeHoloPanels() {
       ["Music streaming", "£10.99", "in 10 days"],
     ].forEach(([n, a, d], i) => {
       const y = 262 + i * 70;
-      g.fillStyle = "rgba(142,232,255,0.06)";
+      g.fillStyle = "rgba(143,224,213,0.06)";
       roundRect(g, 24, y - 40, W - 48, 58, 14);
       g.fill();
       text(g, n, 44, y, 24, holo.ink, 500);
@@ -485,12 +513,12 @@ export async function makeHoloPanels() {
       ["Hotel Calder", "Your booking is confirmed", "Travel", holo.violet],
     ].forEach(([f, s, tag, col], i) => {
       const y = 108 + i * 118;
-      g.fillStyle = "rgba(142,232,255,0.06)";
+      g.fillStyle = "rgba(143,224,213,0.06)";
       roundRect(g, 24, y, W - 48, 100, 18);
       g.fill();
       g.beginPath();
       g.arc(74, y + 50, 26, 0, Math.PI * 2);
-      g.fillStyle = "rgba(142,232,255,0.16)";
+      g.fillStyle = "rgba(143,224,213,0.16)";
       g.fill();
       text(g, f[0], 74, y + 59, 24, holo.ink, 600, sans, "center");
       text(g, f, 118, y + 42, 25, holo.ink, 600);
@@ -515,8 +543,8 @@ export async function makeHoloPanels() {
     const mn = Math.min(...s), mx = Math.max(...s);
     const pts = s.map((v, i) => [x0 + ((x1 - x0) * i) / (s.length - 1), y0 - ((v - mn) / (mx - mn)) * (y0 - y1)]);
     const fill = g.createLinearGradient(0, y1, 0, y0);
-    fill.addColorStop(0, "rgba(255,134,168,0.35)");
-    fill.addColorStop(1, "rgba(255,134,168,0)");
+    fill.addColorStop(0, "rgba(244,163,147,0.35)");
+    fill.addColorStop(1, "rgba(244,163,147,0)");
     g.beginPath();
     pts.forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y)));
     g.lineTo(x1, y0);
@@ -546,7 +574,7 @@ export async function makeHoloPanels() {
       [1, "Dinner at The Kitchin", "Thu · 19:30"],
     ].forEach(([a, t, r], i) => {
       const y = 214 + i * 82;
-      g.fillStyle = "rgba(142,232,255,0.06)";
+      g.fillStyle = "rgba(143,224,213,0.06)";
       roundRect(g, 24, y, W - 48, 68, 16);
       g.fill();
       appTile(g, 38, y + 12, 44, a as number, gl[a as number]);
@@ -563,9 +591,9 @@ export async function makeHoloPanels() {
 export function makeMarquee(label: string, phase: 0 | 1, win = false) {
   const [c, g] = canvas(1024, 176);
   roundRect(g, 4, 4, 1016, 168, 36);
-  g.fillStyle = win ? "#1c1024" : "#120f19";
+  g.fillStyle = win ? "#1f1810" : "#161412";
   g.fill();
-  g.strokeStyle = win ? "rgba(255,210,122,0.8)" : "rgba(255,77,122,0.5)";
+  g.strokeStyle = win ? "rgba(255,210,122,0.8)" : "rgba(240,122,104,0.5)";
   g.lineWidth = 3;
   g.stroke();
   for (let i = 0; i < 26; i++) {
@@ -573,21 +601,21 @@ export function makeMarquee(label: string, phase: 0 | 1, win = false) {
       const lit = (i + (y > 100 ? 1 : 0) + phase) % 2 === 0;
       g.beginPath();
       g.arc(40 + i * 37.6, y, 5.5, 0, Math.PI * 2);
-      g.fillStyle = lit ? (win ? "#FFE6A8" : "#FFD6E1") : win ? "#7a5a2a" : "#4a2a38";
+      g.fillStyle = lit ? (win ? "#FFE6A8" : "#FFE0D9") : win ? "#7a5a2a" : "#4a2d27";
       if (lit) {
-        g.shadowColor = win ? "#FFD27A" : "#FF4D7A";
+        g.shadowColor = win ? "#FFD27A" : "#F07A68";
         g.shadowBlur = 14;
       }
       g.fill();
       g.shadowBlur = 0;
     }
   }
-  const glow = win ? "#FFB84D" : "#FF4D7A";
-  const fill = win ? "#FFD98A" : "#FF6B93";
+  const glow = win ? "#FFB84D" : "#F07A68";
+  const fill = win ? "#FFD98A" : "#F58B7A";
   g.shadowColor = glow;
   g.shadowBlur = 30;
   for (let k = 0; k < 2; k++) text(g, label, 512, 116, win ? 92 : 78, fill, 600, mono, "center");
   g.shadowBlur = 0;
-  text(g, label, 512, 116, win ? 92 : 78, win ? "#FFF6DC" : "#FFE6EE", 600, mono, "center");
+  text(g, label, 512, 116, win ? 92 : 78, win ? "#FFF6DC" : "#FFEDE8", 600, mono, "center");
   return tex(c);
 }

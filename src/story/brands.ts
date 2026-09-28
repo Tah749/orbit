@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { theme } from "./state";
 import {
   siGmail,
   siGooglecalendar,
@@ -93,66 +94,26 @@ export const networkApps = [...aboveApps, ...belowApps];
 export function drawOrbitIcon(g: CanvasRenderingContext2D, x: number, y: number, s: number) {
   g.save();
   roundRect(g, x, y, s, s, s * 0.225);
-  g.clip();
-  const bg = g.createLinearGradient(x, y, x + s, y + s);
-  bg.addColorStop(0, "#2B1646");
-  bg.addColorStop(0.55, "#140E22");
-  bg.addColorStop(1, "#0B0A10");
+  const bg = g.createLinearGradient(x, y, x, y + s);
+  bg.addColorStop(0, "#2A2723");
+  bg.addColorStop(1, "#151412");
   g.fillStyle = bg;
-  g.fillRect(x, y, s, s);
-  const glow = g.createRadialGradient(x + s * 0.5, y + s * 0.52, 0, x + s * 0.5, y + s * 0.52, s * 0.62);
-  glow.addColorStop(0, "rgba(255,77,122,0.42)");
-  glow.addColorStop(0.45, "rgba(124,77,255,0.18)");
-  glow.addColorStop(1, "rgba(124,77,255,0)");
-  g.fillStyle = glow;
-  g.fillRect(x, y, s, s);
-
-  const cx = x + s * 0.5, cy = y + s * 0.5;
-  const rx = s * 0.4, ry = s * 0.14, rot = -0.42;
-  const ring = (from: number, to: number, alpha: number, width: number) => {
-    const grad = g.createLinearGradient(cx - rx, cy, cx + rx, cy);
-    grad.addColorStop(0, `rgba(201,184,255,${alpha})`);
-    grad.addColorStop(0.5, `rgba(255,255,255,${alpha})`);
-    grad.addColorStop(1, `rgba(255,140,170,${alpha})`);
-    g.beginPath();
-    g.ellipse(cx, cy, rx, ry, rot, from, to);
-    g.strokeStyle = grad;
-    g.lineWidth = width;
-    g.lineCap = "round";
-    g.stroke();
-  };
-  ring(Math.PI, Math.PI * 2, 0.45, s * 0.03);
-
-  const r = s * 0.205;
-  g.shadowColor = "rgba(255,77,122,0.7)";
-  g.shadowBlur = s * 0.12;
-  const orb = g.createRadialGradient(cx - r * 0.34, cy - r * 0.44, 0, cx, cy, r);
-  orb.addColorStop(0, "#FFE0EA");
-  orb.addColorStop(0.32, "#FF4D7A");
-  orb.addColorStop(0.72, "#7C4DFF");
-  orb.addColorStop(1, "#2A1A55");
-  g.beginPath();
-  g.arc(cx, cy, r, 0, Math.PI * 2);
-  g.fillStyle = orb;
   g.fill();
-  g.shadowBlur = 0;
-
-  ring(0, Math.PI, 1, s * 0.036);
-  // Satellite on the near arc.
-  const t = 0.62;
-  const px = rx * Math.cos(t), py = ry * Math.sin(t);
-  const sx = cx + px * Math.cos(rot) - py * Math.sin(rot);
-  const sy = cy + px * Math.sin(rot) + py * Math.cos(rot);
-  g.shadowColor = "rgba(255,255,255,0.9)";
-  g.shadowBlur = s * 0.05;
+  // The Tracked mark: a monoline o and an accent tittle.
+  const u = s * 0.00566;
+  const ox = x + s * 0.217, oy = y + s * 0.217;
   g.beginPath();
-  g.arc(sx, sy, s * 0.045, 0, Math.PI * 2);
-  g.fillStyle = "#FFFFFF";
+  g.arc(ox + 44 * u, oy + 56 * u, 29 * u, 0, Math.PI * 2);
+  g.strokeStyle = "#F5F3EF";
+  g.lineWidth = 11 * u;
+  g.stroke();
+  g.beginPath();
+  g.arc(ox + 84 * u, oy + 22 * u, 10 * u, 0, Math.PI * 2);
+  g.fillStyle = "#5CC9BC";
   g.fill();
   g.restore();
-
   roundRect(g, x + 1, y + 1, s - 2, s - 2, s * 0.225);
-  g.strokeStyle = "rgba(255,255,255,0.1)";
+  g.strokeStyle = "rgba(255,255,255,0.08)";
   g.lineWidth = Math.max(1, s * 0.01);
   g.stroke();
 }
@@ -238,6 +199,7 @@ export const burstNotes: { app: string; title: string; meta: string }[] = [
 ];
 
 export async function makeBrandCardAtlas() {
+  const light = theme.mode === "light";
   try {
     await Promise.all([document.fonts.load(`600 34px ${sans}`), document.fonts.load(`400 26px ${sans}`)]);
   } catch {
@@ -252,20 +214,20 @@ export async function makeBrandCardAtlas() {
     const x = (i % 2) * W, y = Math.floor(i / 2) * H;
     roundRect(g, x + 8, y + 8, W - 16, H - 16, 34);
     const body = g.createLinearGradient(x, y, x, y + H);
-    body.addColorStop(0, "rgba(40,36,50,0.97)");
-    body.addColorStop(1, "rgba(24,21,32,0.97)");
+    body.addColorStop(0, light ? "rgba(255,255,255,0.98)" : "rgba(42,39,35,0.97)");
+    body.addColorStop(1, light ? "rgba(245,243,239,0.98)" : "rgba(27,25,23,0.97)");
     g.fillStyle = body;
     g.fill();
     g.lineWidth = 3;
-    g.strokeStyle = "rgba(90,82,112,0.9)";
+    g.strokeStyle = light ? "rgba(199,191,178,0.95)" : "rgba(84,79,71,0.9)";
     g.stroke();
     drawBrandTile(g, x + 30, y + 34, 92, brandIndex(n.app));
-    g.fillStyle = "#F8F6FB";
+    g.fillStyle = light ? "#1D1B18" : "#F2EFEA";
     g.font = `600 33px ${sans}`;
     g.textBaseline = "alphabetic";
     g.textAlign = "left";
     g.fillText(n.title, x + 146, y + 76, W - 146 - 36);
-    g.fillStyle = "#A39DB0";
+    g.fillStyle = light ? "#67625A" : "#A9A399";
     g.font = `400 26px ${sans}`;
     g.fillText(n.meta, x + 146, y + 114, W - 146 - 36);
   });
