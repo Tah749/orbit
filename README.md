@@ -34,14 +34,14 @@ src/
     Navbar, Hero, Problem, Features, Assistant, Privacy, Integrations, Faq, FinalCta, Footer
     WaitlistForm.tsx        two-step signup form (email, then optional name + interest)
     PlaceholderPage.tsx     #/privacy, #/terms, #/sign-in placeholders
-    ui/                     Button, Logo (orb mark), Reveal (scroll fade-in), SectionHeading
+    ui/                     Button, Logo (Tracked wordmark + mark), OrbitAppIcon, ThemeToggle, Reveal, Section
     previews/               product UI previews (all content is illustrative demo data)
 ```
 
 Colour tokens use the product names (`--paper`, `--white`, `--soft`, `--line`, `--ink`, `--muted`,
 `--green`, `--sage`, `--sageDeep`, `--coral`, `--blue`, `--yellow`). In Tailwind they are exposed as
 `paper`, `surface`, `soft`, `line`, `ink`, `muted`, `accent`, `accent-bg`, `accent-fg`, `coral`, `info`, `warn`.
-`--green` is the rose-pink accent `#FF4D7A` on purpose.
+`--green` is the petrol accent (Oat scheme, light and dark); see `CLAUDE.md` for the full token table.
 
 ## Waitlist backend
 
