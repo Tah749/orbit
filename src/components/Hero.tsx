@@ -56,6 +56,9 @@ export function Hero() {
             <a href="#/journey" className="inline-flex items-center gap-1.5 text-[13px] font-medium text-accent-fg transition-colors hover:text-ink">
               Take the 3D journey <ArrowRight size={13} />
             </a>
+            <a href="#/story" className="inline-flex items-center gap-1.5 text-[13px] font-medium text-accent-fg transition-colors hover:text-ink">
+              Watch the story <ArrowRight size={13} />
+            </a>
           </div>
         </motion.div>
       </div>

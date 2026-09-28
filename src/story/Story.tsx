@@ -1,0 +1,434 @@
+import { Suspense, lazy, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import { motion, useReducedMotion } from "motion/react";
+import Lenis from "lenis";
+import { ArrowRight, SquaresFour } from "@phosphor-icons/react";
+import { Logo, Orb } from "../components/ui/Logo";
+import { ButtonLink } from "../components/ui/Button";
+import { WaitlistForm } from "../components/WaitlistForm";
+import { story, actAt, actCount } from "./state";
+import { apps } from "./canvas";
+
+const StoryScene = lazy(() => import("./StoryScene"));
+
+const acts = [
+  { id: "open", label: "Prologue" },
+  { id: "phone", label: "I · The phone" },
+  { id: "problem", label: "II · The problem" },
+  { id: "connection", label: "III · The connection" },
+  { id: "product", label: "IV · The product" },
+  { id: "return", label: "V · The return" },
+];
+
+/** Network node order in the scene: payline apps first, then their neighbours. */
+const nodeApps = [0, 1, 4, 5, 2, 3, 6, 7, 8, 9];
+
+const ease = [0.16, 1, 0.3, 1] as const;
+const shadow = "[text-shadow:0_2px_30px_rgba(7,6,10,0.95)]";
+
+function hasWebGL() {
+  try {
+    const c = document.createElement("canvas");
+    return !!(c.getContext("webgl2") || c.getContext("webgl"));
+  } catch {
+    return false;
+  }
+}
+
+function Act({
+  id,
+  place,
+  mobile,
+  height,
+  children,
+}: {
+  id: string;
+  place: "left" | "right" | "top" | "bottom";
+  mobile: "top" | "bottom";
+  height: string;
+  children: ReactNode;
+}) {
+  const reduce = useReducedMotion();
+  const desk =
+    place === "left"
+      ? "md:items-center md:justify-start"
+      : place === "right"
+        ? "md:items-center md:justify-end"
+        : place === "top"
+          ? "md:items-start md:justify-center md:pt-28 md:text-center"
+          : "md:items-end md:justify-center md:pb-16 md:text-center";
+  return (
+    <section
+      id={`s-${id}`}
+      data-act
+      aria-labelledby={`s-${id}-title`}
+      className={`relative ${height}`}
+    >
+      {/* The copy holds on screen while its scene plays out behind it. */}
+      <div
+        className={`sticky top-0 mx-auto flex h-[100svh] w-full max-w-[1240px] px-4 sm:px-6 ${mobile === "top" ? "items-start pt-24" : "items-end pb-14"} ${desk} ${
+          place === "right" ? "md:justify-end" : place === "left" ? "" : "md:justify-center"
+        }`}
+      >
+        <motion.div
+          initial={reduce ? false : { opacity: 0, y: 36, filter: "blur(10px)" }}
+          whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          viewport={{ amount: 0.6, margin: "-15% 0px -15% 0px" }}
+          transition={{ duration: 1.1, ease }}
+          className={`flex min-w-0 max-w-[34rem] flex-col ${place === "top" || place === "bottom" ? "md:max-w-[46rem] md:items-center" : ""}`}
+        >
+          {children}
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
+function Kicker({ children }: { children: ReactNode }) {
+  return (
+    <p className="flex items-center gap-3 font-mono text-[11.5px] uppercase tracking-[0.22em] text-[#c9b8ff]">
+      <span className="h-px w-8 bg-gradient-to-r from-transparent to-[#c9b8ff]" />
+      {children}
+    </p>
+  );
+}
+
+function Line({ id, children, className = "" }: { id: string; children: ReactNode; className?: string }) {
+  return (
+    <h2 id={id} className={`mt-5 text-balance text-[38px] font-semibold leading-[1.02] tracking-[-0.045em] text-ink sm:text-[50px] lg:text-[62px] ${shadow} ${className}`}>
+      {children}
+    </h2>
+  );
+}
+
+function Sub({ children }: { children: ReactNode }) {
+  return <p className={`mt-5 max-w-[42ch] text-pretty text-[16px] leading-relaxed text-[#d4cee0] md:text-[17.5px] ${shadow}`}>{children}</p>;
+}
+
+/** App names the scene pins beside the network nodes. */
+function NodeLabels() {
+  return (
+    <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-[5] hidden overflow-hidden md:block">
+      {nodeApps.map((a, i) => (
+        <span
+          key={a}
+          ref={(el) => void (story.labels[i] = el)}
+          className="absolute left-0 top-0 whitespace-nowrap rounded-full border border-[#c9b8ff]/25 bg-[#0d0b16]/70 px-2.5 py-0.5 font-mono text-[10.5px] uppercase tracking-[0.14em] text-[#e6e0ff] opacity-0 backdrop-blur will-change-transform"
+        >
+          {apps[a].name}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function Rail({ active, go }: { active: number; go: (i: number) => void }) {
+  return (
+    <nav aria-label="Story acts" className="fixed left-5 top-1/2 z-30 hidden -translate-y-1/2 xl:block">
+      <ol className="flex flex-col gap-1">
+        {acts.map((a, i) => {
+          const on = i === active;
+          return (
+            <li key={a.id}>
+              <button type="button" onClick={() => go(i)} aria-current={on ? "step" : undefined} className="group flex items-center gap-3 py-1.5">
+                <span className={`block h-px transition-all duration-500 ${on ? "w-8 bg-[#c9b8ff]" : "w-4 bg-[#4a4458] group-hover:w-6 group-hover:bg-muted"}`} />
+                <span
+                  className={`font-mono text-[10.5px] uppercase tracking-[0.16em] transition-all duration-500 ${
+                    on ? "text-ink opacity-100" : "-translate-x-1 text-muted opacity-0 group-hover:translate-x-0 group-hover:opacity-100"
+                  }`}
+                >
+                  {a.label}
+                </span>
+              </button>
+            </li>
+          );
+        })}
+      </ol>
+    </nav>
+  );
+}
+
+export default function Story() {
+  const reduce = !!useReducedMotion();
+  const [gl] = useState(hasWebGL);
+  const [ready, setReady] = useState(story.ready);
+  const [active, setActive] = useState(0);
+  const lenis = useRef<Lenis | null>(null);
+  const bar = useRef<HTMLDivElement>(null);
+  const main = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const prev = document.title;
+    document.title = "Orbit - One phone. Too many moving parts.";
+    window.scrollTo(0, 0);
+    return () => {
+      document.title = prev;
+      story.ready = false;
+      story.progress = 0;
+      story.labels = [];
+    };
+  }, []);
+
+  useEffect(() => {
+    let last = -1;
+    const onProgress = (p: number) => {
+      story.progress = p;
+      if (bar.current) bar.current.style.transform = `scaleX(${p})`;
+      const i = Math.round(actAt(p));
+      if (i !== last) {
+        last = i;
+        setActive(i);
+      }
+    };
+    if (reduce) {
+      const onScroll = () => {
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        onProgress(max > 0 ? window.scrollY / max : 0);
+      };
+      onScroll();
+      window.addEventListener("scroll", onScroll, { passive: true });
+      return () => window.removeEventListener("scroll", onScroll);
+    }
+    const l = new Lenis({ lerp: 0.07, wheelMultiplier: 0.85, touchMultiplier: 1.4 });
+    lenis.current = l;
+    l.on("scroll", (e: Lenis) => onProgress(e.limit > 0 ? e.scroll / e.limit : 0));
+    let raf = requestAnimationFrame(function loop(t) {
+      l.raf(t);
+      raf = requestAnimationFrame(loop);
+    });
+    return () => {
+      cancelAnimationFrame(raf);
+      l.destroy();
+      lenis.current = null;
+    };
+  }, [reduce]);
+
+  useEffect(() => {
+    const measure = () => {
+      const els = Array.from(document.querySelectorAll<HTMLElement>("[data-act]"));
+      const vh = window.innerHeight;
+      const max = Math.max(1, document.documentElement.scrollHeight - vh);
+      story.stops = els.map((el, i) => {
+        if (i === 0) return 0;
+        if (i === els.length - 1) return 1;
+        const r = el.getBoundingClientRect();
+        return Math.min(1, Math.max(0, (r.top + window.scrollY + r.height / 2 - vh / 2) / max));
+      });
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    if (main.current) ro.observe(main.current);
+    window.addEventListener("resize", measure);
+    const onMove = (e: PointerEvent) => {
+      if (e.pointerType !== "mouse") return;
+      story.pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
+      story.pointer.y = -((e.clientY / window.innerHeight) * 2 - 1);
+    };
+    const onReady = () => setReady(true);
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("story:ready", onReady);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", measure);
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("story:ready", onReady);
+    };
+  }, []);
+
+  const go = useCallback((i: number) => {
+    const el = document.getElementById(`s-${acts[i].id}`);
+    if (!el) return;
+    const last = i === acts.length - 1;
+    const top = i === 0 ? 0 : el.getBoundingClientRect().top + window.scrollY + el.offsetHeight / 2 - window.innerHeight / 2;
+    if (lenis.current) lenis.current.scrollTo(last ? "bottom" : top, { duration: last ? 4 : 2.4 });
+    else window.scrollTo({ top: last ? document.documentElement.scrollHeight : top });
+  }, []);
+
+  return (
+    <div className="relative bg-[#07060a] text-ink">
+      <div aria-hidden="true" className="fixed inset-0 z-0">
+        {gl ? (
+          <div className={`absolute inset-0 transition-opacity duration-[1600ms] ${ready ? "opacity-100" : "opacity-0"}`}>
+            <Suspense fallback={null}>
+              <StoryScene reduce={reduce} />
+            </Suspense>
+          </div>
+        ) : (
+          <div className="glow-top absolute inset-0" />
+        )}
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(120%_90%_at_50%_45%,transparent_55%,rgba(7,6,10,0.8)_100%)]" />
+        {/* Scanlines and a crossing flash, for the screen dives */}
+        <div className="holo-scan pointer-events-none absolute inset-0 opacity-[0.07]" />
+        <div id="story-flash" className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,#ffffff,#c9b8ff_40%,#7c4dff_75%)] opacity-0 mix-blend-screen" />
+      </div>
+
+      {gl && <NodeLabels />}
+
+      <div className="fixed inset-x-0 top-0 z-50 h-[2px]">
+        <div ref={bar} className="h-full origin-left scale-x-0 bg-gradient-to-r from-accent via-[#c9b8ff] to-info" />
+      </div>
+
+      <header className="fixed inset-x-0 top-0 z-40">
+        <div className="pointer-events-none absolute inset-0 h-24 bg-gradient-to-b from-[#07060a]/85 to-transparent" />
+        <nav aria-label="Main" className="relative mx-auto flex h-16 max-w-[1240px] items-center justify-between px-4 sm:px-6">
+          <button type="button" onClick={() => go(0)} aria-label="Back to the start" className="rounded-md">
+            <Logo />
+          </button>
+          <div className="flex items-center gap-2">
+            <a href="#/" className="hidden rounded-full px-3 py-2 text-[14px] text-muted transition-colors hover:text-ink md:inline-flex">
+              Classic site
+            </a>
+            <span className="hidden sm:inline-flex">
+              <ButtonLink href="#/app" variant="secondary" size="sm" className="backdrop-blur">
+                <SquaresFour size={15} weight="fill" className="text-accent" /> Open app
+              </ButtonLink>
+            </span>
+            <ButtonLink
+              href="#s-return"
+              size="sm"
+              onClick={(e) => {
+                e.preventDefault();
+                go(acts.length - 1);
+              }}
+            >
+              Join the waitlist
+            </ButtonLink>
+          </div>
+        </nav>
+      </header>
+
+      <Rail active={active} go={go} />
+
+      <main id="main" ref={main} className="relative z-10">
+        {/* Prologue */}
+        <section id="s-open" data-act aria-labelledby="s-open-title" className="relative flex min-h-[100svh] items-start pt-28 md:items-center md:pt-0">
+          <div className="mx-auto w-full max-w-[1240px] px-4 sm:px-6">
+            <div className="max-w-[36rem]">
+              <motion.p
+                initial={reduce ? false : { opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 1, delay: 1.2 }}
+                className="flex items-center gap-3 font-mono text-[11.5px] uppercase tracking-[0.22em] text-[#c9b8ff]"
+              >
+                <Orb className="size-3.5" /> Orbit presents
+              </motion.p>
+              <h1 id="s-open-title" className={`mt-6 text-[48px] font-semibold leading-[0.98] tracking-[-0.05em] sm:text-[66px] lg:text-[86px] ${shadow}`}>
+                {["One phone.", "Too many", "moving parts."].map((w, i) => (
+                  <motion.span
+                    key={w}
+                    className={`block ${i === 2 ? "bg-gradient-to-r from-accent via-[#ff9bb8] to-[#c9b8ff] bg-clip-text text-transparent" : ""}`}
+                    initial={reduce ? false : { opacity: 0, y: 28, filter: "blur(14px)" }}
+                    animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                    transition={{ duration: 1.3, delay: 1.35 + i * 0.14, ease }}
+                  >
+                    {w}
+                  </motion.span>
+                ))}
+              </h1>
+              <motion.div
+                initial={reduce ? false : { opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1, delay: 1.9, ease }}
+                className="mt-8 flex flex-wrap items-center gap-3"
+              >
+                <ButtonLink href="#s-phone" size="lg" onClick={(e) => (e.preventDefault(), go(1))}>
+                  Start the story
+                </ButtonLink>
+                <ButtonLink href="#s-return" variant="secondary" size="lg" className="backdrop-blur" onClick={(e) => (e.preventDefault(), go(acts.length - 1))}>
+                  Skip to the waitlist
+                </ButtonLink>
+              </motion.div>
+            </div>
+          </div>
+          <motion.div
+            initial={reduce ? false : { opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 2.6, duration: 1 }}
+            className="absolute bottom-6 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-3 font-mono text-[11px] uppercase tracking-[0.2em] text-muted md:flex"
+          >
+            Scroll
+            <span className="relative block h-10 w-px overflow-hidden bg-white/10">
+              <span className="absolute inset-x-0 top-0 h-4 animate-[scrollcue_1.8s_ease-in-out_infinite] bg-[#c9b8ff]" />
+            </span>
+          </motion.div>
+        </section>
+
+        <Act id="phone" place="left" mobile="top" height="min-h-[170svh]">
+          <Kicker>Act I · The phone</Kicker>
+          <Line id="s-phone-title">Your life is on your phone.</Line>
+          <Sub>Email, calendar invites, bills, bookings, workouts, group chats. Every one of them wants a moment of your attention.</Sub>
+        </Act>
+
+        <Act id="problem" place="left" mobile="top" height="min-h-[210svh]">
+          <Kicker>Act II · The problem</Kicker>
+          <Line id="s-problem-title">But keeping it all together is another story.</Line>
+          <Sub>Every morning you spin through the same apps, hoping the thing that matters lands in front of you before it's too late.</Sub>
+        </Act>
+
+        <Act id="connection" place="right" mobile="bottom" height="min-h-[190svh]">
+          <Kicker>Act III · The connection</Kicker>
+          <Line id="s-connection-title">What if everything worked together?</Line>
+          <Sub>Orbit is designed to connect the services you already use, so your email, calendar, money and plans finally share one picture.</Sub>
+        </Act>
+
+        <Act id="product" place="top" mobile="top" height="min-h-[200svh]">
+          <Kicker>Act IV · The product</Kicker>
+          <Line id="s-product-title">
+            Meet Orbit. <span className="text-[#c9b8ff]">Your personal AI assistant.</span>
+          </Line>
+          <Sub>Calendar events, important emails, upcoming bills, investments and bookings, together in one coherent view.</Sub>
+        </Act>
+
+        {/* Act V: the return and the call to action */}
+        <section id="s-return" data-act aria-labelledby="s-return-title" className="relative flex min-h-[190svh] flex-col items-center justify-end pb-8">
+          <motion.div
+            initial={reduce ? false : { opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ amount: 0.5 }}
+            transition={{ duration: 1.2, ease }}
+            className="mx-auto flex w-full max-w-[600px] flex-col items-center px-4 text-center sm:px-6"
+          >
+            <p className="holo-text text-[64px] font-semibold leading-none tracking-[-0.05em] sm:text-[84px]" aria-hidden="true">
+              Orbit
+            </p>
+            <h2 id="s-return-title" className={`mt-4 text-balance text-[24px] font-medium tracking-[-0.02em] text-ink sm:text-[30px] ${shadow}`}>
+              Orbit. Join the waitlist now.
+            </h2>
+            <p className={`mt-3 max-w-[44ch] text-[15px] leading-relaxed text-[#d4cee0] ${shadow}`}>
+              The same phone. Everything that matters, finally in one place. Be among the first to try it.
+            </p>
+            <div className="mt-7 w-full max-w-[30rem] text-left">
+              <WaitlistForm source="story-final" size="lg" />
+            </div>
+            <a href="#/app" className="mt-1 inline-flex items-center gap-1.5 text-[14px] font-medium text-ink transition-colors hover:text-accent-fg">
+              Or explore the live demo <ArrowRight size={14} />
+            </a>
+          </motion.div>
+          <footer className="mx-auto mt-16 flex w-full max-w-[1240px] flex-col items-center justify-between gap-4 border-t border-white/[0.06] px-4 pt-6 text-[12.5px] text-muted sm:flex-row sm:px-6">
+            <span className="flex items-center gap-2">
+              <Orb className="size-3.5" /> © {new Date().getFullYear()} Orbit · Scenes use illustrative demo data
+            </span>
+            <span className="flex gap-5">
+              <a href="#/privacy" className="hover:text-ink">Privacy</a>
+              <a href="#/terms" className="hover:text-ink">Terms</a>
+              <a href="#/journey" className="hover:text-ink">3D journey</a>
+              <a href="#/" className="hover:text-ink">Classic site</a>
+            </span>
+          </footer>
+        </section>
+      </main>
+
+      {!reduce && (
+        <button
+          type="button"
+          onClick={() => go(Math.min(actCount - 1, active + 1))}
+          aria-label="Next act"
+          className={`fixed bottom-5 right-5 z-30 grid size-11 place-items-center rounded-full border border-white/10 bg-[#16141d]/70 text-ink backdrop-blur transition-opacity duration-500 hover:border-[#c9b8ff]/50 ${
+            active < actCount - 1 ? "opacity-100" : "pointer-events-none opacity-0"
+          }`}
+        >
+          <ArrowRight size={16} className="rotate-90" />
+        </button>
+      )}
+    </div>
+  );
+}

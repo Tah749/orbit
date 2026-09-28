@@ -56,7 +56,7 @@ export const atlasGrid = { cols: 2, rows: 6 };
 const tileW = 640;
 const tileH = 160;
 
-function iconImage(icon: Icon, color: string): Promise<HTMLImageElement> {
+export function iconImage(icon: Icon, color: string): Promise<HTMLImageElement> {
   const host = document.createElement("div");
   const root = createRoot(host);
   flushSync(() => root.render(createElement(icon, { size: 64, color, weight: "bold" })));
@@ -70,7 +70,7 @@ function iconImage(icon: Icon, color: string): Promise<HTMLImageElement> {
   });
 }
 
-function roundRect(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
+export function roundRect(g: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number) {
   g.beginPath();
   g.moveTo(x + r, y);
   g.arcTo(x + w, y, x + w, y + h, r);
