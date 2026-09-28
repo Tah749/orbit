@@ -51,6 +51,7 @@ compliance work, and the main risks.
 | **Health and fitness** | Activity, sleep and workout summaries in the briefing | Health platforms, fitness apps | Phase 3 |
 | **Documents and renewals** | Key dates: passport, driving licence, insurance, MOT, TV licence, warranties | Email, manual entry, uploads | Phase 3 |
 | **Smart notifications** | One digest instead of many pings; quiet hours; only urgent items interrupt | Everything above | Phase 1 onwards |
+| **Your business** | For people who run a shop or side business: revenue today, this week and this month, orders to fulfil, payouts on the way, low stock, all alongside the rest of their life. Read-only | Shopify, Stripe, Etsy, Square, eBay, Amazon, accounting apps | Phase 2 |
 | **Shared spaces** | Optional household view for shared bills, plans and deliveries | Opt-in per item | Phase 4 |
 
 ## 4. Integration catalogue
@@ -134,7 +135,7 @@ cancellation page.
 | --- | --- | --- | --- |
 | Shopify stores, Amazon, eBay, ASOS, Etsy, supermarkets and other retailers | Email (order confirmations, dispatch and delivery emails) | There is **no consumer-side, cross-store Shopify API**: the Customer Account API is scoped to each store's own storefront. Email covers every retailer at once. | Phase 2 |
 | Carrier tracking: Royal Mail, Evri, DPD, DHL, UPS, Parcelforce, Yodel, InPost | Tracking aggregator API (e.g. AfterShip, 17TRACK) | Takes tracking numbers found in emails and returns live status. | Phase 2 |
-| Shopify Admin API | API (merchant installs an app) | Only relevant to a possible later "Orbit for sellers": orders, payouts and stock for small shop owners. Not part of the consumer product. | Later |
+| Your own Shopify store | Shopify Admin API | That's the seller view, covered in 4.13. | Phase 2 |
 
 ### 4.7 Travel and bookings
 
@@ -192,7 +193,32 @@ TripIt does, then enriches them with live data.
 | Dropbox | API | Same | Later |
 | Upload (PDF, photo) | In-app | Scan a letter or policy; Orbit extracts key dates | Phase 3 |
 
-### 4.12 Everything else
+### 4.12 Your business (shop owners and side hustles)
+
+The "Your business" feature: a seller connects their store and Orbit shows sales, orders to fulfil,
+payouts and stock in the briefing and in Ask Orbit ("How did the shop do this week?"). Read-only:
+Orbit never edits products, refunds or fulfils orders.
+
+| Service | Route | What Orbit reads | Gating and effort | Priority |
+| --- | --- | --- | --- | --- |
+| **Shopify** | Admin GraphQL API via a **public Shopify app** that the merchant installs (OAuth) | Orders and totals (revenue, refunds, AOV), products and inventory levels, payouts (Shopify Payments), analytics via ShopifyQL where the scope allows | Register as a Shopify Partner and pass **App Store review**. `read_orders` returns the **last 60 days** by default; older history needs the protected `read_all_orders` scope, which Shopify must approve. Customer names, emails and addresses are **protected customer data** needing separate approval, so request only order totals and dates, not customer fields, and the review is simpler. New public apps must use the GraphQL Admin API (REST is legacy). | Phase 2 |
+| **Stripe** (people selling via their own site, SaaS, Gumroad-style) | Stripe Connect OAuth with the `read_only` scope, or a Stripe App | Charges, balance, payouts, subscriptions (MRR) | Straightforward OAuth; read-only is the default scope. | Phase 2 |
+| **Etsy** | Etsy Open API v3 (OAuth, `transactions_r`, `shops_r`) | Receipts (orders), revenue, listings | App keys are reviewed manually (usually days). **Commercial access** is needed to serve many sellers; buyer email needs a separate request, which Orbit doesn't need. | Phase 2 |
+| **Square** | Square API (OAuth) | Payments, orders, payouts, inventory | Easy OAuth; good for market stalls, cafés, salons. | Phase 3 |
+| **eBay** | eBay Sell APIs (Fulfillment, Finances) with user OAuth | Orders, payouts, fees | Developer account and production keys; straightforward. | Phase 3 |
+| **Amazon (sellers)** | Selling Partner API | Orders, sales, settlements | Heavier: SP-API developer registration and Amazon's data protection requirements; restricted data (buyer PII) needs extra approval, which Orbit doesn't need. | Later |
+| **WooCommerce** | REST API with keys the store owner generates | Orders, revenue | Per-store setup; easy but manual. | Later |
+| **PayPal (business)** | Transaction Search API | Sales and payouts | Third-party access is limited; often simpler via CSV upload or the bank feed. | Later |
+| **TikTok Shop** | TikTok Shop Partner API | Orders, settlements | Partner application; UK available. | Later |
+| **Gumroad, Lemon Squeezy, Ko-fi** | APIs / webhooks | Sales | Small but loved by creators. | Later |
+| **Xero, QuickBooks, FreeAgent** | OAuth APIs | Profit and loss, invoices due, VAT and Self Assessment dates | Easy OAuth; FreeAgent is popular with UK sole traders. Gives the "what do I owe HMRC and when" view. | Phase 3 |
+
+Design notes:
+- Business numbers stay separate from personal money by default, with an optional combined view.
+- Headline figures are simple (sales, orders, payouts, refunds) and always say which source and
+  period they cover. No forecasting or tax advice.
+
+### 4.13 Everything else
 
 | Service | Plan |
 | --- | --- |
@@ -200,6 +226,32 @@ TripIt does, then enriches them with live data.
 | Spotify, Netflix, Disney+ and other streaming | Treated as subscriptions (bank + email). No content integration. |
 | Council services, DVLA, HMRC | Dates from emails and letters (uploads), plus manual reminders. |
 | Smart home (Google Home, Alexa, HomeKit) | Not planned. |
+
+## 4b. Quick reference: easy, gated and workarounds
+
+**Easy** (self-serve OAuth or API keys, light review): Google Calendar, Outlook/Microsoft 365 mail and
+calendar, Todoist, Microsoft To Do, Google Tasks, Notion, Slack, Strava, Stripe, Square, Xero,
+QuickBooks, FreeAgent, Dropbox, Trading 212 (API key), carrier tracking via AfterShip.
+
+**Doable with a review or partnership** (plan weeks, sometimes costs): Gmail (restricted scope,
+annual CASA assessment), Shopify (App Store review; 60-day order limit without `read_all_orders`),
+Etsy (manual key approval, commercial access), eBay, banks via TrueLayer/Yapily/Enable Banking (plus
+FCA route), SnapTrade, Garmin (partner programme), Amazon SP-API, TikTok Shop, flight data APIs.
+
+**No usable API, and the workaround:**
+
+| App | Workaround |
+| --- | --- |
+| WhatsApp, iMessage, Instagram/Facebook DMs | Share sheet: forward a message or screenshot to Orbit. Orbit reads confirmations these apps send by email where they exist. |
+| Airbnb, Booking.com, Expedia, airlines, Trainline, OpenTable | Confirmation emails (schema.org markup + templates), calendar invites, Wallet passes, forwarding address. |
+| Amazon (as a shopper), ASOS, supermarkets, any Shopify store you *buy* from | Order and dispatch emails, then carrier tracking. |
+| Uber, Bolt, Deliveroo, Just Eat | Receipt emails for spend; bank feed for recurring use. |
+| Netflix, Spotify, Disney+, gyms | Treated as subscriptions from bank transactions and billing emails. |
+| Vanguard (direct), most pension providers | SnapTrade where covered; otherwise statement upload or manual balance with a reminder to update. |
+| Utilities, council tax, HMRC, DVLA | Billing emails, bank direct debits, uploads of letters, manual key dates. |
+| Monzo's own API (personal only) | Standard open banking through an aggregator. |
+| Google Fit (shutting down) | Health Connect, Apple HealthKit, Google Health API. |
+| Any service without email or API | Manual entry, CSV import, or photo/PDF upload with extraction. |
 
 ## 5. Data sources beyond APIs
 
@@ -240,13 +292,15 @@ waitlist, and interview them about which apps they would connect first.
   licensing route. UK first.
 - **Money features:** bills and subscriptions (bank + email), balances and spending.
 - **Investments:** SnapTrade, plus Trading 212 direct if needed.
+- **Your business:** Shopify (public app review started early in the phase), Stripe and Etsy.
 - **Orders and deliveries:** from email plus carrier tracking.
 - **Exit criteria:** bills list matches reality for most testers; re-consent flow works; no incorrect
   balances shown.
 
 ### Phase 3: Everyday life
 - **Integrations:** iCloud mail and calendar; health and fitness (HealthKit, Health Connect, Google
-  Health API, Strava); task sync (Todoist, Microsoft To Do, Google Tasks, Apple Reminders).
+  Health API, Strava); task sync (Todoist, Microsoft To Do, Google Tasks, Apple Reminders); business
+  add-ons (Square, eBay, Xero, QuickBooks, FreeAgent).
 - **Features:** documents and renewals, uploads.
 - **Platforms:** Android app.
 
@@ -255,7 +309,7 @@ waitlist, and interview them about which apps they would connect first.
 - **Household:** optional shared spaces.
 - **US expansion:** via Plaid and Plaid Investments.
 - **Work tools:** Slack and Teams.
-- **Evaluate:** "Orbit for sellers" (Shopify Admin), Garmin, Oura, Whoop.
+- **Evaluate:** Amazon SP-API, TikTok Shop, WooCommerce, Garmin, Oura, Whoop.
 
 ## 7. Architecture outline (future product, not this repo)
 
@@ -350,3 +404,7 @@ Research done in September 2026. Re-check before relying on any of it, since pro
 - Google Fit migration FAQ (Health Connect, Google Health API): https://developer.android.com/health-and-fitness/health-connect/migration/fit/faq
 - Shopify Customer Account API: https://shopify.dev/docs/storefronts/headless/building-with-the-customer-account-api
 - Shopify API access scopes: https://shopify.dev/docs/api/usage/access-scopes
+- Shopify protected customer data: https://shopify.dev/docs/apps/launch/protected-customer-data
+- Shopify approval for orders older than 60 days: https://www.cleverence.com/articles/shopify-dev-documentation/apps-now-need-shopify-approval-to-read-orders-older-than-60-3815/
+- Stripe Connect OAuth reference: https://docs.stripe.com/connect/oauth-reference
+- Etsy Open API v3 authentication: https://developer.etsy.com/documentation/essentials/authentication/
