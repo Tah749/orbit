@@ -11,23 +11,23 @@ import { sfx } from "./sound";
 import { OrbitAppIcon } from "../components/ui/OrbitAppIcon";
 import { ThemeToggle } from "../components/ui/ThemeToggle";
 import { useMode } from "../lib/theme";
-import { AskCard, Chips, Preview } from "../journey/parts";
+import { AskCard, Preview } from "../journey/parts";
 import { TodayPreview } from "../components/previews/TodayInbox";
 import { BillsPreview, TravelPreview } from "../components/previews/Explorer";
 
 const StoryScene = lazy(() => import("./StoryScene"));
 
 const acts = [
-  { id: "open", label: "Prologue" },
-  { id: "phone", label: "I · The phone" },
-  { id: "problem", label: "II · The problem" },
-  { id: "connection", label: "III · The connection" },
-  { id: "product", label: "IV · The product" },
-  { id: "return", label: "V · The return" },
-  { id: "ask", label: "Inside · Ask Orbit" },
-  { id: "day", label: "Inside · Your day" },
-  { id: "money", label: "Inside · Your money" },
-  { id: "world", label: "Inside · Your world" },
+  { id: "open", label: "Start" },
+  { id: "phone", label: "Phone" },
+  { id: "problem", label: "Problem" },
+  { id: "connection", label: "Connect" },
+  { id: "product", label: "Orbit" },
+  { id: "return", label: "Return" },
+  { id: "ask", label: "Ask" },
+  { id: "day", label: "Day" },
+  { id: "money", label: "Money" },
+  { id: "world", label: "Plans" },
   { id: "join", label: "Join" },
 ];
 
@@ -154,14 +154,10 @@ function Kicker({ children }: { children: ReactNode }) {
 
 function Line({ id, children, className = "" }: { id: string; children: ReactNode; className?: string }) {
   return (
-    <h2 id={id} className={`mt-5 text-balance text-[38px] font-semibold leading-[1.02] tracking-[-0.045em] text-ink sm:text-[50px] lg:text-[62px] ${shadow} ${className}`}>
+    <h2 id={id} className={`mt-3 text-balance text-[38px] font-semibold leading-[1.02] tracking-[-0.045em] text-ink sm:text-[50px] lg:text-[62px] ${shadow} ${className}`}>
       {children}
     </h2>
   );
-}
-
-function Sub({ children }: { children: ReactNode }) {
-  return <p className={`mt-5 max-w-[42ch] text-pretty text-[16px] leading-relaxed text-story-text md:text-[17.5px] ${shadow}`}>{children}</p>;
 }
 
 /** App names the scene pins beside the network nodes. */
@@ -426,77 +422,61 @@ export default function Story() {
             transition={{ delay: 2.6, duration: 1 }}
             className="absolute bottom-6 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-3 font-mono text-[11px] uppercase tracking-[0.2em] text-muted md:flex"
           >
-            Scroll
+            <span className="sr-only">Scroll</span>
             <span className="relative block h-10 w-px overflow-hidden bg-line">
               <span className="absolute inset-x-0 top-0 h-4 animate-[scrollcue_1.8s_ease-in-out_infinite] bg-accent" />
             </span>
           </motion.div>
         </section>
 
+        {/* The scene tells the story; each act gets one line. */}
         <Act id="phone" place="left" mobile="top" height="min-h-[170svh]">
-          <Kicker>Act I · The phone</Kicker>
-          <Line id="s-phone-title">Your life is on your phone.</Line>
-          <Sub>Email, calendar invites, bills, bookings, workouts, group chats. Every one of them wants a moment of your attention.</Sub>
+          <Line id="s-phone-title">Your whole life. One phone.</Line>
         </Act>
 
         <Act id="problem" place="left" mobile="top" height="min-h-[210svh]">
-          <Kicker>Act II · The problem</Kicker>
-          <Line id="s-problem-title">But keeping it all together is another story.</Line>
-          <Sub>Gmail, WhatsApp, your bank, your calendar, the group chat. Every morning you pull the lever again and hope the thing that matters lands in front of you in time.</Sub>
+          <Line id="s-problem-title">Every day, a gamble.</Line>
         </Act>
 
         <Act id="connection" place="right" mobile="bottom" height="min-h-[190svh]">
-          <Kicker>Act III · The connection</Kicker>
-          <Line id="s-connection-title">What if everything worked together?</Line>
-          <Sub>Orbit is designed to connect the services you already use, so your email, calendar, money and plans finally share one picture.</Sub>
+          <Line id="s-connection-title">What if it all connected?</Line>
         </Act>
 
         <Act id="product" place="top" mobile="top" height="min-h-[200svh]">
-          <Kicker>Act IV · The product</Kicker>
           <Line id="s-product-title">
-            Meet Orbit. <span className="text-story-kicker">Your personal AI assistant.</span>
+            Meet <span className="text-story-kicker">Orbit.</span>
           </Line>
-          <Sub>Calendar events, important emails, upcoming bills, investments and bookings, together in one coherent view.</Sub>
         </Act>
 
         <Act id="return" place="bottom" mobile="bottom" height="min-h-[170svh]">
-          <Kicker>Act V · The return</Kicker>
-          <Line id="s-return-title">The same phone. Now it runs Orbit.</Line>
-          <Sub>Everything that was scattered across your apps, finally in one place. Here's what that looks like.</Sub>
+          <Line id="s-return-title">Same phone. Calmer life.</Line>
         </Act>
 
         <Act id="ask" place="right" mobile="bottom" height="min-h-[160svh]" flow>
-          <Kicker>Inside Orbit · 01 · Ask anything</Kicker>
-          <Line id="s-ask-title">Ask about your life in plain English.</Line>
-          <Sub>Orbit brings together the information you've connected to give you a useful, contextual answer.</Sub>
+          <Kicker>01 · Ask</Kicker>
+          <Line id="s-ask-title">Just ask.</Line>
           <AskCard tone="oat" />
         </Act>
 
         <Act id="day" place="left" mobile="bottom" height="min-h-[170svh]" flow>
-          <Kicker>Inside Orbit · 02 · Your day</Kicker>
-          <Line id="s-day-title">Know what matters today.</Line>
-          <Sub>Your schedule, important emails, reminders and upcoming commitments, turned into a personalised daily briefing.</Sub>
-          <Chips items={["Daily briefing", "Calendar", "Email", "Tasks"]} />
+          <Kicker>02 · Your day</Kicker>
+          <Line id="s-day-title">Today, sorted.</Line>
           <Preview tone="oat">
             <TodayPreview />
           </Preview>
         </Act>
 
         <Act id="money" place="right" mobile="bottom" height="min-h-[170svh]" flow>
-          <Kicker>Inside Orbit · 03 · Your money</Kicker>
-          <Line id="s-money-title">Know what's coming out.</Line>
-          <Sub>Upcoming bills, recurring payments and subscriptions in one clear view, with your investments in the bigger picture.</Sub>
-          <Chips items={["Bills", "Subscriptions", "Investments"]} />
+          <Kicker>03 · Your money</Kicker>
+          <Line id="s-money-title">Bills, before they’re due.</Line>
           <Preview tone="oat">
             <BillsPreview />
           </Preview>
         </Act>
 
         <Act id="world" place="left" mobile="bottom" height="min-h-[170svh]" flow>
-          <Kicker>Inside Orbit · 04 · Your world</Kicker>
-          <Line id="s-world-title">Every booking, in one place.</Line>
-          <Sub>Flights, hotels, restaurants and reservations without searching through old emails, alongside the rest of your day.</Sub>
-          <Chips items={["Travel", "Bookings", "Fitness"]} />
+          <Kicker>04 · Your plans</Kicker>
+          <Line id="s-world-title">Every booking, one place.</Line>
           <Preview tone="oat">
             <TravelPreview />
           </Preview>
@@ -519,11 +499,8 @@ export default function Story() {
               <p className="holo-text text-[56px] font-semibold leading-none tracking-[-0.05em] sm:text-[72px]">Orbit</p>
             </div>
             <h2 id="s-join-title" className={`mt-4 text-balance text-[24px] font-medium tracking-[-0.02em] text-ink sm:text-[30px] ${shadow}`}>
-              Orbit. Join the waitlist now.
+              Join the waitlist.
             </h2>
-            <p className={`mt-3 max-w-[44ch] text-[15px] leading-relaxed text-story-text ${shadow}`}>
-              The same phone. Everything that matters, finally in one place. Be among the first to try it.
-            </p>
             <div className="mt-7 w-full max-w-[30rem] text-left">
               <WaitlistForm source="story-final" size="lg" />
             </div>
