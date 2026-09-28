@@ -472,7 +472,7 @@ function Burst() {
     for (let i = 0; i < n; i++) {
       const sx = (Math.random() - 0.5) * 2.8, sy = (Math.random() - 0.5) * 6;
       start.set([sx, sy, 0.3], i * 3);
-      const d = new THREE.Vector3(sx * 0.9 + (Math.random() - 0.5) * 2.4, sy * 0.45 + (Math.random() - 0.5) * 2, 0.9 + Math.random() * 1.2).normalize();
+      const d = new THREE.Vector3(sx * 0.9 + (Math.random() - 0.5) * 2.4, sy * 0.45 + (Math.random() - 0.5) * 2, 0.35 + Math.random() * 0.6).normalize();
       dir.set([d.x, d.y, d.z, 4 + Math.random() * 9], i * 4);
       const ax = new THREE.Vector3(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).normalize();
       axis.set([ax.x, ax.y, ax.z], i * 3);
@@ -485,7 +485,15 @@ function Burst() {
     const mat = new THREE.ShaderMaterial({
       transparent: true,
       side: THREE.DoubleSide,
-      uniforms: { uK: { value: 0 }, uTime: { value: 0 }, uMap: { value: null }, uGrid: { value: new THREE.Vector2(atlasGrid.cols, atlasGrid.rows) } },
+      // Cards never hide each other's edges; the phone still hides any card behind it.
+      depthWrite: false,
+      uniforms: {
+        uK: { value: 0 },
+        uTime: { value: 0 },
+        uMap: { value: null },
+        uGrid: { value: new THREE.Vector2(atlasGrid.cols, atlasGrid.rows) },
+        uBack: { value: col(isLight() ? "#E6E0D6" : "#2A2723") },
+      },
       vertexShader: /* glsl */ `
         attribute vec3 aStart; attribute vec4 aDir; attribute vec3 aAxis; attribute vec3 aMisc;
         uniform float uK, uTime;
@@ -495,22 +503,28 @@ function Burst() {
           float q = smoothstep(aMisc.x, aMisc.x + 0.55, uK);
           float out_ = q + max(0., uK - aMisc.x - 0.55) * 0.35;
           vec3 c = aStart + aDir.xyz * aDir.w * out_;
+          // Lift off the glass first, then tilt, so a new card never cuts into the screen.
+          c.z += 0.15 + q * 0.6;
           c += vec3(sin(uTime*0.5 + aMisc.z), cos(uTime*0.4 + aMisc.z), 0.) * 0.35 * q;
           vec2 corner = position.xy * vec2(2.3, 0.575) * mix(0.35, 1., q);
-          vec3 off = rotAxis(vec3(corner, 0.), aAxis, (0.9*q + uTime*0.15*q) * (aMisc.z - 3.));
+          float tilt = smoothstep(0.15, 0.7, q) * (aMisc.z - 3.) * (0.3 + 0.06 * sin(uTime * 0.6 + aMisc.z * 4.));
+          vec3 off = rotAxis(vec3(corner, 0.), aAxis, tilt);
           vec4 mv = modelViewMatrix * vec4(c + off, 1.);
           gl_Position = projectionMatrix * mv;
           vUv = uv; vTile = aMisc.y;
-          vA = smoothstep(aMisc.x, aMisc.x + 0.06, uK) * (1. - smoothstep(1.85, 2.05, uK)) * smoothstep(0.4, 2., -mv.z);
+          // Fade a card as it turns side-on, where squashed text would read as noise.
+          vec3 nv = normalize((modelViewMatrix * vec4(rotAxis(vec3(0., 0., 1.), aAxis, tilt), 0.)).xyz);
+          float facing = abs(dot(nv, normalize(-mv.xyz)));
+          vA = smoothstep(aMisc.x, aMisc.x + 0.06, uK) * (1. - smoothstep(1.85, 2.05, uK)) * smoothstep(2.5, 5., -mv.z) * smoothstep(0.3, 0.6, facing);
         }`,
       fragmentShader: /* glsl */ `
-        uniform sampler2D uMap; uniform vec2 uGrid; varying vec2 vUv; varying float vTile; varying float vA;
+        uniform sampler2D uMap; uniform vec2 uGrid; uniform vec3 uBack; varying vec2 vUv; varying float vTile; varying float vA;
         void main(){
           vec2 uv = vUv;
           vec3 rgb;
-          float c = mod(vTile, uGrid.x); float r = floor(vTile / uGrid.x);
+          float tile = floor(vTile + 0.5); float c = mod(tile, uGrid.x); float r = floor(tile / uGrid.x);
           vec4 t = texture2D(uMap, vec2((c + uv.x) / uGrid.x, 1. - (r + 1. - uv.y) / uGrid.y));
-          rgb = gl_FrontFacing ? t.rgb : vec3(0.08, 0.07, 0.1);
+          rgb = gl_FrontFacing ? t.rgb : uBack;
           float a = t.a * vA;
           if (a < 0.04) discard;
           gl_FragColor = vec4(rgb, a);
@@ -527,7 +541,7 @@ function Burst() {
     mat.uniforms.uTime.value = live.time;
   });
   if (!atlas) return null;
-  return <mesh geometry={geo} material={mat} frustumCulled={false} />;
+  return <mesh geometry={geo} material={mat} frustumCulled={false} renderOrder={1} />;
 }
 
 /* ------------------------------------------------------------------------------------------------

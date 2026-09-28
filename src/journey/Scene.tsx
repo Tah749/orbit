@@ -574,7 +574,7 @@ function Debris() {
         varying vec2 vUv; varying float vTile; varying float vFade; varying float vOrder;
         void main(){
           vec2 uv = vUv;
-          float c = mod(vTile, uGrid.x); float r = floor(vTile / uGrid.x);
+          float tile = floor(vTile + 0.5); float c = mod(tile, uGrid.x); float r = floor(tile / uGrid.x);
           vec2 auv = vec2((c + uv.x) / uGrid.x, 1. - (r + 1. - uv.y) / uGrid.y);
           vec4 t = texture2D(uMap, auv);
           float a = t.a * vFade * uReveal;
