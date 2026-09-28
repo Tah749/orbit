@@ -16,6 +16,13 @@ To view the site without a server, run `npm run build:standalone` and open
 `dist-standalone/index.html` (JS, CSS and fonts are all inlined). The normal `dist/` build uses
 relative asset paths, so it can be hosted from any folder or subpath, such as GitHub Pages.
 
+## Deploying to GitHub Pages
+
+`.github/workflows/deploy.yml` builds the site and publishes it on every push.
+One-time setup: repository **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+The site is then served at `https://<user>.github.io/orbit/`. To save real signups there, add
+`VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` under **Settings → Secrets and variables → Actions**.
+
 ## Structure
 
 ```
