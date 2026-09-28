@@ -17,7 +17,7 @@ const pages: Record<string, { title: string; body: string[] }> = {
   },
   "sign-in": {
     title: "Sign in",
-    body: ["Orbit isn't open yet, so there's nothing to sign in to. Join the waitlist and we'll let you know when early access is ready."],
+    body: ["Orbit isn't open yet, so there's nothing to sign in to. Join the waitlist and we'll let you know when early access is ready. In the meantime, you can try the live demo with sample data."],
   },
 };
 
@@ -38,6 +38,11 @@ export function PlaceholderPage({ slug }: { slug: string }) {
               <p key={p}>{p}</p>
             ))}
           </div>
+          {slug === "sign-in" && (
+            <a href="#/app" className="mt-8 inline-flex h-11 items-center rounded-full bg-accent px-5 text-[14.5px] font-medium text-paper hover:bg-[#ff6690]">
+              Open the live demo
+            </a>
+          )}
         </article>
       </main>
       <Footer home={false} />

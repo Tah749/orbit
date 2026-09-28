@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { motion, useReducedMotion, useScroll, useTransform } from "motion/react";
-import { ArrowDown } from "@phosphor-icons/react";
+import { ArrowDown, ArrowRight } from "@phosphor-icons/react";
 import { WaitlistForm } from "./WaitlistForm";
 import { HeroDashboard } from "./previews/HeroDashboard";
 import { HeroMobile } from "./previews/HeroMobile";
@@ -78,6 +78,14 @@ export function Hero() {
         </motion.div>
         {/* Fade the bottom of the window into the page. */}
         <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-paper to-transparent" />
+        <div className="relative -mt-16 flex justify-center">
+          <a
+            href="#/app"
+            className="inline-flex items-center gap-2 rounded-full border border-line bg-surface/90 px-5 py-2.5 text-[14px] font-medium text-ink backdrop-blur transition-colors hover:border-accent/50 hover:text-accent-fg"
+          >
+            Try the live demo <ArrowRight size={14} />
+          </a>
+        </div>
       </div>
     </section>
   );

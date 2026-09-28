@@ -18,10 +18,10 @@ import { Reveal } from "./ui/Reveal";
 import { SectionHeading } from "./ui/Section";
 import { IconTile, type Tone } from "./previews/primitives";
 
-type Source = { icon: Icon; tone: Tone; title: string; detail: string; source: string };
+export type Source = { icon: Icon; tone: Tone; title: string; detail: string; source: string };
 type Convo = { prompt: string; ask: string; answer: string; sources: Source[] };
 
-const convos: Convo[] = [
+export const convos: Convo[] = [
   {
     prompt: "What do I need to know about tomorrow?",
     ask: "What do I need to know about tomorrow?",

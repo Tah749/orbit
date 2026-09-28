@@ -9,6 +9,7 @@ const links = [
   { href: "#features", label: "Features" },
   { href: "#privacy", label: "Privacy" },
   { href: "#faq", label: "FAQ" },
+  { href: "#/app", label: "Live demo" },
 ];
 
 export function Navbar({ home = true }: { home?: boolean }) {
@@ -44,7 +45,7 @@ export function Navbar({ home = true }: { home?: boolean }) {
         <ul className="hidden items-center gap-1 md:flex">
           {links.map((l) => (
             <li key={l.href}>
-              <a href={home ? l.href : `${prefix}`} className="rounded-full px-3.5 py-2 text-[14px] text-muted transition-colors hover:text-ink">
+              <a href={l.href.startsWith("#/") || home ? l.href : prefix} className="rounded-full px-3.5 py-2 text-[14px] text-muted transition-colors hover:text-ink">
                 {l.label}
               </a>
             </li>
@@ -83,7 +84,7 @@ export function Navbar({ home = true }: { home?: boolean }) {
               {links.map((l) => (
                 <li key={l.href}>
                   <a
-                    href={home ? l.href : "#/"}
+                    href={l.href.startsWith("#/") || home ? l.href : "#/"}
                     onClick={() => setOpen(false)}
                     className="block border-b border-line/60 py-3.5 text-[17px] text-ink"
                   >

@@ -1,20 +1,33 @@
-import { Suspense, lazy, useEffect, useState } from "react";
+import { Suspense, lazy, useCallback, useEffect, useState } from "react";
 import { Navbar } from "./components/Navbar";
 import { Hero } from "./components/Hero";
 import { Footer } from "./components/Footer";
 import { PlaceholderPage } from "./components/PlaceholderPage";
+import type { TabKey } from "./app/data";
 
 const BelowFold = lazy(() => import("./components/BelowFold"));
+const OrbitApp = lazy(() => import("./app/OrbitApp"));
 
-/** Tiny hash router: "#/privacy" style routes are pages, plain "#anchor" hashes are in-page links. */
+const appTabs: TabKey[] = ["home", "inbox", "calendar", "email", "bills", "investments", "bookings", "fitness", "tasks", "assistant", "settings"];
+
+/**
+ * Tiny hash router. "#/privacy" style routes are pages, "#/app/<tab>" is the interactive demo
+ * ("#app" is a short alias), and plain "#anchor" hashes are in-page links.
+ */
+function readRoute() {
+  const h = window.location.hash;
+  if (h === "#app") return "app";
+  return h.startsWith("#/") ? h.slice(2) : "";
+}
+
 function useRoute() {
-  const read = () => (window.location.hash.startsWith("#/") ? window.location.hash.slice(2) : "");
-  const [route, setRoute] = useState(read);
+  const [route, setRoute] = useState(readRoute);
   useEffect(() => {
     const onHash = () => {
-      const next = read();
+      const next = readRoute();
       setRoute((prev) => {
-        if (prev !== next) window.scrollTo(0, 0);
+        const wasApp = prev.startsWith("app"), isApp = next.startsWith("app");
+        if (prev !== next && !(wasApp && isApp)) window.scrollTo(0, 0);
         return next;
       });
     };
@@ -24,8 +37,19 @@ function useRoute() {
   return route;
 }
 
+function AppFallback() {
+  return (
+    <div className="grid min-h-[100dvh] place-items-center bg-paper">
+      <span className="orb size-10 animate-pulse" aria-label="Loading the Orbit demo" />
+    </div>
+  );
+}
+
 export default function App() {
   const route = useRoute();
+  const go = useCallback((tab: TabKey) => {
+    window.location.hash = `#/app/${tab}`;
+  }, []);
 
   // A deep link like /#faq targets content in the lazy chunk; scroll once it has rendered.
   useEffect(() => {
@@ -41,6 +65,16 @@ export default function App() {
     }, 50);
     return () => window.clearInterval(id);
   }, [route]);
+
+  if (route === "app" || route.startsWith("app/")) {
+    const t = route.split("/")[1] as TabKey | undefined;
+    const tab = t && appTabs.includes(t) ? t : "home";
+    return (
+      <Suspense fallback={<AppFallback />}>
+        <OrbitApp tab={tab} go={go} />
+      </Suspense>
+    );
+  }
   if (route) return <PlaceholderPage slug={route} />;
 
   return (
