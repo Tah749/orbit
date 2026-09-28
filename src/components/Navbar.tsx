@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useMotionValueEvent, useReducedMotion, useScroll } from "motion/react";
-import { List, X } from "@phosphor-icons/react";
+import { List, X, SquaresFour } from "@phosphor-icons/react";
 import { Logo } from "./ui/Logo";
 import { ButtonLink } from "./ui/Button";
 
@@ -9,7 +9,6 @@ const links = [
   { href: "#features", label: "Features" },
   { href: "#privacy", label: "Privacy" },
   { href: "#faq", label: "FAQ" },
-  { href: "#/app", label: "Live demo" },
 ];
 
 export function Navbar({ home = true }: { home?: boolean }) {
@@ -52,9 +51,14 @@ export function Navbar({ home = true }: { home?: boolean }) {
           ))}
         </ul>
         <div className="flex items-center gap-2">
-          <a href="#/sign-in" className="hidden rounded-full px-3 py-2 text-[14px] text-muted transition-colors hover:text-ink sm:inline-flex">
+          <a href="#/sign-in" className="hidden rounded-full px-3 py-2 text-[14px] text-muted transition-colors hover:text-ink lg:inline-flex">
             Sign in
           </a>
+          <span className="hidden sm:inline-flex">
+            <ButtonLink href="#/app" variant="secondary" size="sm">
+              <SquaresFour size={15} weight="fill" className="text-accent" /> Open app
+            </ButtonLink>
+          </span>
           <ButtonLink href={home ? "#join" : "#/"} size="sm" className={open ? "invisible" : ""}>
             Join the waitlist
           </ButtonLink>
@@ -96,6 +100,9 @@ export function Navbar({ home = true }: { home?: boolean }) {
             <div className="mt-5 flex flex-col gap-2">
               <ButtonLink href={home ? "#join" : "#/"} onClick={() => setOpen(false)} size="lg">
                 Join the waitlist
+              </ButtonLink>
+              <ButtonLink href="#/app" variant="secondary" onClick={() => setOpen(false)} size="lg">
+                <SquaresFour size={17} weight="fill" className="text-accent" /> Open app
               </ButtonLink>
               <a href="#/sign-in" onClick={() => setOpen(false)} className="py-2 text-center text-[15px] text-muted">
                 Sign in
