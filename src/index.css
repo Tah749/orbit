@@ -192,6 +192,7 @@
 
   --font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "Geist Mono Variable", ui-monospace, monospace;
+  --font-serif: "Newsreader Variable", "Iowan Old Style", Georgia, serif;
 }
 
 @layer base {
@@ -306,4 +307,26 @@ html.lenis body {
   49% { opacity: 1; }
   82% { opacity: 0.85; }
   83% { opacity: 1; }
+}
+
+/* Orbit app: sheets slide in from the side (or up on phones). */
+.orbit-sheet[open] {
+  animation: sheet-in 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes sheet-in {
+  from {
+    transform: translateX(24px);
+    opacity: 0;
+  }
+}
+@media (max-width: 639px) {
+  @keyframes sheet-in {
+    from {
+      transform: translateY(32px);
+      opacity: 0;
+    }
+  }
+}
+.orbit-app {
+  font-feature-settings: "ss01", "cv11";
 }

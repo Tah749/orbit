@@ -35,7 +35,8 @@ accounts, and no user data is processed.
 It is:
 - A marketing site whose job is to explain Orbit and collect waitlist signups.
 - Two scroll-driven 3D experiences (`#/story`, `#/journey`) meant to make visitors want the product.
-- A clickable demo of the Orbit app (`#/app`) running entirely on sample data in the browser.
+- The Orbit app front end (`#/app`, `src/orbit/`): a full, working app running entirely on sample data
+  held in the browser. No server, no database, no real connections.
 - A folder of brand explorations (`brand/`): names, logos and colour schemes.
 
 It is not:
@@ -49,8 +50,8 @@ These come from the project owner and apply to every change.
 1. **No backend.** The only network call is the waitlist insert in `src/lib/waitlist.ts`.
 2. **No secrets in the client.** Only the Supabase *anon* key may appear, in a `VITE_` variable.
    Never a service-role key, never any other secret.
-3. **Never store emails in `localStorage`/`sessionStorage`.** (Browser storage is used only for the
-   light/dark preference, key `orbit-theme`.)
+3. **Never store waitlist emails in `localStorage`/`sessionStorage`.** Browser storage holds only the
+   light/dark preference (`orbit-theme`) and the app's own sample data (`orbit.app.v1`, see `src/orbit/store.ts`).
 4. **No invented facts.** No fake customers, testimonials, partnerships, press logos, user counts,
    ratings or "live" integrations. Integration statuses live in `src/data/integrations.ts` and are
    only "In development", "Planned" or "Coming soon".
@@ -97,7 +98,7 @@ relative (`base: "./"`) so the build works from any subpath.
 | `#/` (or none) | Classic marketing site | `Navbar`, `Hero`, lazy `BelowFold` |
 | `#/story` | Phone story: the main 3D scroll narrative | `src/story/Story.tsx` |
 | `#/journey` | 3D flight through space | `src/journey/Journey.tsx` |
-| `#/app`, `#/app/<tab>` | Interactive product demo | `src/app/OrbitApp.tsx` |
+| `#/app`, `#/app/<section>/<id>` | The Orbit app (sample data) | `src/orbit/App.tsx` |
 | `#/privacy`, `#/terms`, `#/sign-in`, other | Placeholder pages | `PlaceholderPage.tsx` |
 | `#anchor` | In-page links on the classic site | |
 
@@ -119,9 +120,12 @@ src/
                            Privacy, Integrations, Faq, FinalCta, Footer, WaitlistForm, PlaceholderPage
     ui/                    Button, Logo (Orb + Wordmark), OrbitAppIcon, ThemeToggle, Reveal, Section
     previews/              product UI mockups used on the site and in the story (demo data)
-  app/                     the demo app: OrbitApp shell, store.tsx (React context), data.ts, ui.tsx
-    screens/               Home, Inbox, Assistant, Calendar, Email, Bills, Investments,
-                           Bookings, Fitness, Tasks, Settings
+  orbit/                   the Orbit app (see "The Orbit app" below and src/orbit/DESIGN.md)
+    App.tsx, CommandPalette.tsx, router.ts, sections.ts, store.ts, time.ts
+    data/                  types + sample data per domain (mail, calendar, tasks, money, plans, life, business)
+    ui/                    the app's design kit
+    sections/<key>/        one folder per section (today, ask, inbox, calendar, tasks, money, business,
+                           plans, deliveries, health, people, admin, settings)
   story/                   the phone story (see below)
   journey/                 the space journey (see below)
 brand/                     brand explorations, each with an index.html gallery
@@ -240,12 +244,19 @@ story's. `glsl.ts` has simplex noise/fbm; `textures.ts` has glow and card-atlas 
 reuses. `parts.tsx` holds `Glass`, `Preview`, `Chips`, `AskCard`, shared with the story (tone `violet`
 for the journey, `oat` for the story). The journey keeps its space look by design.
 
-## The demo app (`src/app/`)
+## The Orbit app (`src/orbit/`)
 
-A self-contained fake Orbit: sidebar, search, mobile tab bar, and screens for each area. State lives
-in `store.tsx` (React context: tasks, connections, inbox read state, toasts, an "ask" queue). All data
-is in `data.ts` and is illustrative. The banner says it's an interactive demo with sample data where
-nothing is connected or sent. Keep it that way.
+A full front end for the product, on sample data (persona: Alex Rowe in London, with a small shop,
+Fern & Thread, on Shopify and Etsy). **Read `src/orbit/DESIGN.md` before touching it**: it sets the
+look (editorial, hairline rules, serif titles, ink buttons, no AI-looking patterns) and the kit.
+
+- `store.ts`: all data in one local store (`useDB`, `db.patch/insert/remove/set/reset`), saved to
+  `localStorage["orbit.app.v1"]`. On load, saved dates are shifted forward so sample data stays current.
+- `data/*.ts`: types and sample data per domain, written relative to today with `at()` / `on()`.
+- `sections.ts`: the section registry (nav, icons, lazy pages). Each section owns its folder.
+- `router.ts`: `useRoute()` gives `{ section, rest }` for `#/app/<section>/<...rest>`; `go(path)`, `href(path)`.
+- Every surfaced item shows its source (`<Source />`). The sidebar says "Sample data. Nothing is connected."
+- Newsreader (`font-serif`) is loaded only by the app.
 
 ## Waitlist
 
