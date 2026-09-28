@@ -221,8 +221,8 @@ export const holdings: Holding[] = [
   { id: "h-msft", broker: "trading212", account: "GIA", name: "Microsoft", ticker: "MSFT", units: 3, price: 331.2, cost: 890 },
 ];
 
-/** Portfolio value at the end of each of the last 12 weeks, oldest first. */
-export const portfolioHistory: number[] = [21240, 21410, 21180, 21690, 21960, 21820, 22310, 22550, 22410, 22980, 23320, 23870];
+/** Portfolio value at the end of each of the last 11 weeks, oldest first. Today's value comes from the holdings. */
+export const portfolioHistory: number[] = [20880, 21050, 20830, 21310, 21590, 21460, 21940, 22170, 22040, 22610, 23050];
 
 /** Monthly spending budgets by category. */
 export const budgets: Partial<Record<Category, number>> = {
