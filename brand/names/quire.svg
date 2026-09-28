@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" width="480" height="160" role="img" aria-label="Quire logo">
+<rect width="480" height="160" fill="#0a0a0c"/>
+<g transform="translate(44 36) scale(1.375)"><path d="M5 12 29 18v38L5 50Z" fill="#f5f5f7"/>
+<path d="M59 12 35 18v38l24-6Z" fill="#fb7185"/>
+<path d="M9 8l20 5M55 8l-20 5" stroke="#f5f5f7" stroke-width="3" stroke-linecap="round" opacity=".55"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#f5f5f7">Quire</text>
+</svg>

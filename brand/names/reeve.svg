@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" width="480" height="160" role="img" aria-label="Reeve logo">
+<rect width="480" height="160" fill="#0a0a0c"/>
+<g transform="translate(44 36) scale(1.375)"><path fill-rule="evenodd" fill="#f5f5f7" d="M32 4 60 25v35H4V25Z M27.8 39.6A7 7 0 1 1 36.2 39.6L38 51H26Z"/>
+<path fill="#fb7185" d="M27.8 39.6A7 7 0 1 1 36.2 39.6L38 51H26Z"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#f5f5f7">Reeve</text>
+</svg>

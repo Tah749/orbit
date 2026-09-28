@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" width="480" height="160" role="img" aria-label="Muster logo">
+<rect width="480" height="160" fill="#0a0a0c"/>
+<g transform="translate(44 36) scale(1.375)"><rect x="24" y="6" width="16" height="12" rx="3" fill="#fb7185"/>
+<g fill="#f5f5f7"><rect x="13" y="26" width="16" height="12" rx="3"/><rect x="35" y="26" width="16" height="12" rx="3"/>
+<rect x="2" y="46" width="16" height="12" rx="3"/><rect x="24" y="46" width="16" height="12" rx="3"/><rect x="46" y="46" width="16" height="12" rx="3"/></g></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#f5f5f7">Muster</text>
+</svg>

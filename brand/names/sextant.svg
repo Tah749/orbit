@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" width="480" height="160" role="img" aria-label="Sextant logo">
+<rect width="480" height="160" fill="#0a0a0c"/>
+<g transform="translate(44 36) scale(1.375)"><path fill-rule="evenodd" fill="#f5f5f7" d="M32 5 6 50a52 52 0 0 0 52 0Z M13.5 46.5a42 42 0 0 0 37 0L48 42.2a37 37 0 0 1-32 0Z M27 17a5 5 0 1 0 10 0a5 5 0 1 0 -10 0Z"/>
+<circle cx="32" cy="17" r="5" fill="#fb7185"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#f5f5f7">Sextant</text>
+</svg>

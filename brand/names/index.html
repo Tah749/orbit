@@ -1,0 +1,958 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Name Candidates</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0a0a0c;--panel:#111114;--panel2:#16161a;--line:#24242b;--text:#f5f5f7;--muted:#9a9aa6;--faint:#6b6b76;--rose:#fb7185;--violet:#a78bfa;}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Geist,Inter,system-ui,sans-serif;line-height:1.5;
+  background-image:radial-gradient(900px 500px at 85% -10%,rgba(167,139,250,.10),transparent 60%),radial-gradient(700px 400px at -10% 0%,rgba(251,113,133,.08),transparent 60%);background-repeat:no-repeat}
+a{color:inherit}
+.wrap{max-width:1200px;margin:0 auto;padding:56px 24px 96px}
+.eyebrow{font-family:"Geist Mono",ui-monospace,monospace;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--rose)}
+h1{font-size:clamp(32px,5vw,52px);letter-spacing:-.03em;line-height:1.05;margin:10px 0 14px;font-weight:600}
+.lede{color:var(--muted);max-width:680px;margin:0;font-size:17px}
+h2{font-size:14px;font-family:"Geist Mono",ui-monospace,monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:500;margin:56px 0 18px}
+.tops{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+.top{position:relative;display:block;text-decoration:none;background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:16px;padding:18px 20px 20px;transition:border-color .2s}
+.top:hover{border-color:#3a3a44}
+.top .rank{position:absolute;top:14px;right:16px;font-family:"Geist Mono",monospace;font-size:12px;color:var(--rose)}
+.top-logo svg{display:block;width:100%;height:auto;margin:-6px 0 4px}
+.top p{margin:0;color:var(--muted);font-size:14px}
+.note{color:var(--faint);font-size:13px;margin-top:14px;max-width:820px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
+.card.is-top{border-color:rgba(251,113,133,.45)}
+.stage{background:#0a0a0c;border-bottom:1px solid var(--line)}
+.stage svg{display:block;width:100%;height:auto}
+.body{padding:18px 20px 20px;display:flex;flex-direction:column;gap:12px;flex:1}
+.body header{display:flex;align-items:baseline;gap:10px}
+.num{font-family:"Geist Mono",monospace;font-size:12px;color:var(--faint)}
+h3{margin:0;font-size:22px;letter-spacing:-.02em;font-weight:600}
+.pick{margin-left:auto;font-size:11px;font-family:"Geist Mono",monospace;text-transform:uppercase;letter-spacing:.08em;color:var(--rose);border:1px solid rgba(251,113,133,.4);border-radius:999px;padding:2px 8px}
+.why{margin:0;color:#d4d4da;font-size:15px}
+.tags{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.tags li{font-size:12px;color:var(--violet);background:rgba(167,139,250,.1);border:1px solid rgba(167,139,250,.22);border-radius:999px;padding:2px 9px}
+dl{margin:0;display:grid;gap:6px;font-size:13px}
+dl div{display:grid;grid-template-columns:92px 1fr;gap:8px}
+dt{color:var(--faint)}
+dd{margin:0;color:#d4d4da;min-width:0;overflow-wrap:anywhere}
+dd.conflict{color:var(--muted)}
+code{font-family:"Geist Mono",ui-monospace,monospace;font-size:12.5px}
+.muted{color:var(--faint)}
+.variants{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:auto}
+.v{margin:0;border-radius:10px;border:1px solid var(--line);overflow:hidden}
+.v svg{display:block;width:100%;height:auto}
+.v.mono{background:#000}
+.v.light{background:#fafafa;border-color:#e5e5ea}
+.v figcaption{font-size:11px;font-family:"Geist Mono",monospace;padding:4px 8px;color:var(--faint);border-top:1px solid var(--line)}
+.v.light figcaption{color:#6b6b76;border-top-color:#e5e5ea}
+.favs{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.favs .lbl{font-size:11px;font-family:"Geist Mono",monospace;color:var(--faint);text-transform:uppercase;letter-spacing:.08em;margin-right:2px}
+.fav{display:inline-grid;place-items:center;width:44px;height:44px;border-radius:8px;border:1px solid var(--line)}
+.fav.d{background:#000}
+.fav.l{background:#fafafa;border-color:#e5e5ea}
+.fav svg{display:block}
+.file{margin-left:auto;font-family:"Geist Mono",monospace;font-size:12px;color:var(--faint);text-decoration:none}
+.file:hover{color:var(--text)}
+footer{margin-top:56px;color:var(--faint);font-size:13px}
+@media (max-width:860px){.tops{grid-template-columns:1fr}}
+@media (max-width:420px){.wrap{padding:36px 16px 72px}.grid{grid-template-columns:1fr}dl div{grid-template-columns:80px 1fr}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="eyebrow">Orbit · naming exploration</div>
+  <h1>16 names for a calmer life assistant</h1>
+  <p class="lede">These are alternative names for Orbit, the privacy-first assistant that pulls email, calendar, bills, investments, travel, fitness and tasks into one daily view. The list mixes invented words, Latin, nautical and old-trade words, and a few bolder picks. Each name has a geometric mark, shown in colour, mono and light versions, and at favicon size.</p>
+
+  <h2>Top 3 picks</h2>
+  <div class="tops">
+<a class="top" href="#oriel">
+  <span class="rank">1</span>
+  <div class="top-logo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Oriel logo">
+
+<g transform="translate(44 36) scale(1.375)"><path d="M12 58V30a20 20 0 0 1 40 0v28Z" fill="none" stroke="#f5f5f7" stroke-width="5" stroke-linejoin="round"/>
+<path d="M32 11v47M12 36h40" stroke="#f5f5f7" stroke-width="4"/>
+<rect x="34" y="38" width="15.5" height="17.5" fill="#fb7185"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#f5f5f7">Oriel</text>
+</svg></div>
+  <p>The meaning is the product: a window that shows your whole life at once. It is a real word that sounds premium and is easy to say, and a quick search found no software using it. The arched-window mark stays readable at 16px and belongs to no one else.</p>
+</a>
+<a class="top" href="#tuvo">
+  <span class="rank">2</span>
+  <div class="top-logo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Tuvo logo">
+
+<g transform="translate(44 36) scale(1.375)"><rect x="6" y="6" width="52" height="9" rx="2" fill="#fb7185"/>
+<path d="M11 20h12.5L32 45.5 40.5 20H53L37.5 58h-11Z" fill="#f5f5f7"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#f5f5f7">Tuvo</text>
+</svg></div>
+  <p>The most ownable name here. It is invented, two syllables, warm rather than techy, and works for families as well as professionals. A search found no products using it. The T-over-V monogram is the strongest favicon in the set.</p>
+</a>
+<a class="top" href="#halcy">
+  <span class="rank">3</span>
+  <div class="top-logo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Halcy logo">
+
+<g transform="translate(44 36) scale(1.375)"><g fill="none" stroke-linecap="round" stroke-width="5">
+<path d="M8 17c8-9 16-9 24 0s16 9 24 0" stroke="#f5f5f7"/>
+<path d="M8 32c8-5 16-5 24 0s16 5 24 0" stroke="#f5f5f7"/>
+<path d="M8 47h48" stroke="#fb7185"/></g></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#f5f5f7">Halcy</text>
+</svg></div>
+  <p>It names the feeling rather than the feature: calm after the chaos of too many apps. It is an invented word but you can still tell it comes from "halcyon". The wave-to-flat-line mark tells the story on its own. There are a few small users of the name (a travel app, a healthcare marketing site), so check the name early.</p>
+</a>
+  </div>
+  <p class="note">Reeve has the best meaning of the lot (a steward who runs the household's affairs), but several AI startups already use the name, so it is ranked lower. None of these names has been trademark-cleared. The "Noticed" notes come from a quick web search only.</p>
+
+  <h2>All candidates</h2>
+  <div class="grid">
+<article class="card is-top" id="oriel">
+  <div class="stage dark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Oriel logo">
+
+<g transform="translate(44 36) scale(1.375)"><path d="M12 58V30a20 20 0 0 1 40 0v28Z" fill="none" stroke="#f5f5f7" stroke-width="5" stroke-linejoin="round"/>
+<path d="M32 11v47M12 36h40" stroke="#f5f5f7" stroke-width="4"/>
+<rect x="34" y="38" width="15.5" height="17.5" fill="#fb7185"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#f5f5f7">Oriel</text>
+</svg></div>
+  <div class="body">
+    <header>
+      <span class="num">01</span>
+      <h3>Oriel</h3>
+      <span class="pick">Top pick</span>
+    </header>
+    <p class="why">A projecting bay window that gives a clear view on three sides: your whole life, seen at once.</p>
+    <ul class="tags"><li>architecture</li><li>real word</li></ul>
+    <dl>
+      <div><dt>Say it</dt><dd>OR-ee-el</dd></div>
+      <div><dt>Domain idea</dt><dd><code>oriel.ai / getoriel.com</code></dd></div>
+      <div><dt>Mark</dt><dd>Arched window, one lit pane</dd></div>
+      <div><dt>Noticed</dt><dd class="conflict">No obvious software conflict found in a quick search.</dd></div>
+    </dl>
+    <div class="variants">
+      <figure class="v mono"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Oriel logo">
+
+<g transform="translate(44 36) scale(1.375)"><path d="M12 58V30a20 20 0 0 1 40 0v28Z" fill="none" stroke="#f5f5f7" stroke-width="5" stroke-linejoin="round"/>
+<path d="M32 11v47M12 36h40" stroke="#f5f5f7" stroke-width="4"/>
+<rect x="34" y="38" width="15.5" height="17.5" fill="#f5f5f7"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#f5f5f7">Oriel</text>
+</svg><figcaption>Mono, dark</figcaption></figure>
+      <figure class="v light"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Oriel logo">
+
+<g transform="translate(44 36) scale(1.375)"><path d="M12 58V30a20 20 0 0 1 40 0v28Z" fill="none" stroke="#0b0b10" stroke-width="5" stroke-linejoin="round"/>
+<path d="M32 11v47M12 36h40" stroke="#0b0b10" stroke-width="4"/>
+<rect x="34" y="38" width="15.5" height="17.5" fill="#e11d48"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#0b0b10">Oriel</text>
+</svg><figcaption>Light</figcaption></figure>
+    </div>
+    <div class="favs">
+      <span class="lbl">Favicon</span>
+      <span class="fav d"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true"><path d="M12 58V30a20 20 0 0 1 40 0v28Z" fill="none" stroke="#f5f5f7" stroke-width="5" stroke-linejoin="round"/>
+<path d="M32 11v47M12 36h40" stroke="#f5f5f7" stroke-width="4"/>
+<rect x="34" y="38" width="15.5" height="17.5" fill="#fb7185"/></svg></span>
+      <span class="fav d"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="16" height="16" aria-hidden="true"><path d="M12 58V30a20 20 0 0 1 40 0v28Z" fill="none" stroke="#f5f5f7" stroke-width="5" stroke-linejoin="round"/>
+<path d="M32 11v47M12 36h40" stroke="#f5f5f7" stroke-width="4"/>
+<rect x="34" y="38" width="15.5" height="17.5" fill="#fb7185"/></svg></span>
+      <span class="fav l"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true"><path d="M12 58V30a20 20 0 0 1 40 0v28Z" fill="none" stroke="#0b0b10" stroke-width="5" stroke-linejoin="round"/>
+<path d="M32 11v47M12 36h40" stroke="#0b0b10" stroke-width="4"/>
+<rect x="34" y="38" width="15.5" height="17.5" fill="#e11d48"/></svg></span>
+      <span class="fav l"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="16" height="16" aria-hidden="true"><path d="M12 58V30a20 20 0 0 1 40 0v28Z" fill="none" stroke="#0b0b10" stroke-width="5" stroke-linejoin="round"/>
+<path d="M32 11v47M12 36h40" stroke="#0b0b10" stroke-width="4"/>
+<rect x="34" y="38" width="15.5" height="17.5" fill="#e11d48"/></svg></span>
+      <a class="file" href="oriel.svg">oriel.svg</a>
+    </div>
+  </div>
+</article>
+<article class="card is-top" id="tuvo">
+  <div class="stage dark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Tuvo logo">
+
+<g transform="translate(44 36) scale(1.375)"><rect x="6" y="6" width="52" height="9" rx="2" fill="#fb7185"/>
+<path d="M11 20h12.5L32 45.5 40.5 20H53L37.5 58h-11Z" fill="#f5f5f7"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#f5f5f7">Tuvo</text>
+</svg></div>
+  <div class="body">
+    <header>
+      <span class="num">02</span>
+      <h3>Tuvo</h3>
+      <span class="pick">Top pick</span>
+    </header>
+    <p class="why">A soft, two-syllable coinage ("tu" as in you): friendly enough for families, short enough to own.</p>
+    <ul class="tags"><li>invented</li></ul>
+    <dl>
+      <div><dt>Say it</dt><dd>TOO-voh</dd></div>
+      <div><dt>Domain idea</dt><dd><code>tuvo.ai / tuvo.app</code></dd></div>
+      <div><dt>Mark</dt><dd>T and V monogram</dd></div>
+      <div><dt>Noticed</dt><dd class="conflict">No software conflict found. "Tuvo" is ordinary Spanish ("he/she had"), which is harmless.</dd></div>
+    </dl>
+    <div class="variants">
+      <figure class="v mono"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Tuvo logo">
+
+<g transform="translate(44 36) scale(1.375)"><rect x="6" y="6" width="52" height="9" rx="2" fill="#f5f5f7"/>
+<path d="M11 20h12.5L32 45.5 40.5 20H53L37.5 58h-11Z" fill="#f5f5f7"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#f5f5f7">Tuvo</text>
+</svg><figcaption>Mono, dark</figcaption></figure>
+      <figure class="v light"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Tuvo logo">
+
+<g transform="translate(44 36) scale(1.375)"><rect x="6" y="6" width="52" height="9" rx="2" fill="#e11d48"/>
+<path d="M11 20h12.5L32 45.5 40.5 20H53L37.5 58h-11Z" fill="#0b0b10"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#0b0b10">Tuvo</text>
+</svg><figcaption>Light</figcaption></figure>
+    </div>
+    <div class="favs">
+      <span class="lbl">Favicon</span>
+      <span class="fav d"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true"><rect x="6" y="6" width="52" height="9" rx="2" fill="#fb7185"/>
+<path d="M11 20h12.5L32 45.5 40.5 20H53L37.5 58h-11Z" fill="#f5f5f7"/></svg></span>
+      <span class="fav d"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="16" height="16" aria-hidden="true"><rect x="6" y="6" width="52" height="9" rx="2" fill="#fb7185"/>
+<path d="M11 20h12.5L32 45.5 40.5 20H53L37.5 58h-11Z" fill="#f5f5f7"/></svg></span>
+      <span class="fav l"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true"><rect x="6" y="6" width="52" height="9" rx="2" fill="#e11d48"/>
+<path d="M11 20h12.5L32 45.5 40.5 20H53L37.5 58h-11Z" fill="#0b0b10"/></svg></span>
+      <span class="fav l"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="16" height="16" aria-hidden="true"><rect x="6" y="6" width="52" height="9" rx="2" fill="#e11d48"/>
+<path d="M11 20h12.5L32 45.5 40.5 20H53L37.5 58h-11Z" fill="#0b0b10"/></svg></span>
+      <a class="file" href="tuvo.svg">tuvo.svg</a>
+    </div>
+  </div>
+</article>
+<article class="card is-top" id="halcy">
+  <div class="stage dark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Halcy logo">
+
+<g transform="translate(44 36) scale(1.375)"><g fill="none" stroke-linecap="round" stroke-width="5">
+<path d="M8 17c8-9 16-9 24 0s16 9 24 0" stroke="#f5f5f7"/>
+<path d="M8 32c8-5 16-5 24 0s16 5 24 0" stroke="#f5f5f7"/>
+<path d="M8 47h48" stroke="#fb7185"/></g></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#f5f5f7">Halcy</text>
+</svg></div>
+  <div class="body">
+    <header>
+      <span class="num">03</span>
+      <h3>Halcy</h3>
+      <span class="pick">Top pick</span>
+    </header>
+    <p class="why">Cut from "halcyon" (calm, settled days), the feeling you want after the scattered apps are gone.</p>
+    <ul class="tags"><li>invented</li><li>calm</li></ul>
+    <dl>
+      <div><dt>Say it</dt><dd>HAL-see</dd></div>
+      <div><dt>Domain idea</dt><dd><code>halcy.app / usehalcy.com</code></dd></div>
+      <div><dt>Mark</dt><dd>Waves settling into a flat line</dd></div>
+      <div><dt>Noticed</dt><dd class="conflict">Several small users: a Stockholm travel-planning app (halcy.site), halcy.ai (healthcare marketing) and a product-scanner app.</dd></div>
+    </dl>
+    <div class="variants">
+      <figure class="v mono"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Halcy logo">
+
+<g transform="translate(44 36) scale(1.375)"><g fill="none" stroke-linecap="round" stroke-width="5">
+<path d="M8 17c8-9 16-9 24 0s16 9 24 0" stroke="#f5f5f7"/>
+<path d="M8 32c8-5 16-5 24 0s16 5 24 0" stroke="#f5f5f7"/>
+<path d="M8 47h48" stroke="#f5f5f7"/></g></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#f5f5f7">Halcy</text>
+</svg><figcaption>Mono, dark</figcaption></figure>
+      <figure class="v light"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Halcy logo">
+
+<g transform="translate(44 36) scale(1.375)"><g fill="none" stroke-linecap="round" stroke-width="5">
+<path d="M8 17c8-9 16-9 24 0s16 9 24 0" stroke="#0b0b10"/>
+<path d="M8 32c8-5 16-5 24 0s16 5 24 0" stroke="#0b0b10"/>
+<path d="M8 47h48" stroke="#e11d48"/></g></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#0b0b10">Halcy</text>
+</svg><figcaption>Light</figcaption></figure>
+    </div>
+    <div class="favs">
+      <span class="lbl">Favicon</span>
+      <span class="fav d"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true"><g fill="none" stroke-linecap="round" stroke-width="5">
+<path d="M8 17c8-9 16-9 24 0s16 9 24 0" stroke="#f5f5f7"/>
+<path d="M8 32c8-5 16-5 24 0s16 5 24 0" stroke="#f5f5f7"/>
+<path d="M8 47h48" stroke="#fb7185"/></g></svg></span>
+      <span class="fav d"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="16" height="16" aria-hidden="true"><g fill="none" stroke-linecap="round" stroke-width="5">
+<path d="M8 17c8-9 16-9 24 0s16 9 24 0" stroke="#f5f5f7"/>
+<path d="M8 32c8-5 16-5 24 0s16 5 24 0" stroke="#f5f5f7"/>
+<path d="M8 47h48" stroke="#fb7185"/></g></svg></span>
+      <span class="fav l"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true"><g fill="none" stroke-linecap="round" stroke-width="5">
+<path d="M8 17c8-9 16-9 24 0s16 9 24 0" stroke="#0b0b10"/>
+<path d="M8 32c8-5 16-5 24 0s16 5 24 0" stroke="#0b0b10"/>
+<path d="M8 47h48" stroke="#e11d48"/></g></svg></span>
+      <span class="fav l"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="16" height="16" aria-hidden="true"><g fill="none" stroke-linecap="round" stroke-width="5">
+<path d="M8 17c8-9 16-9 24 0s16 9 24 0" stroke="#0b0b10"/>
+<path d="M8 32c8-5 16-5 24 0s16 5 24 0" stroke="#0b0b10"/>
+<path d="M8 47h48" stroke="#e11d48"/></g></svg></span>
+      <a class="file" href="halcy.svg">halcy.svg</a>
+    </div>
+  </div>
+</article>
+<article class="card" id="reeve">
+  <div class="stage dark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Reeve logo">
+
+<g transform="translate(44 36) scale(1.375)"><path fill-rule="evenodd" fill="#f5f5f7" d="M32 4 60 25v35H4V25Z M27.8 39.6A7 7 0 1 1 36.2 39.6L38 51H26Z"/>
+<path fill="#fb7185" d="M27.8 39.6A7 7 0 1 1 36.2 39.6L38 51H26Z"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#f5f5f7">Reeve</text>
+</svg></div>
+  <div class="body">
+    <header>
+      <span class="num">04</span>
+      <h3>Reeve</h3>
+      
+    </header>
+    <p class="why">The medieval steward who kept a household's accounts and affairs in order on its behalf.</p>
+    <ul class="tags"><li>old trade</li><li>steward</li></ul>
+    <dl>
+      <div><dt>Say it</dt><dd>REEV</dd></div>
+      <div><dt>Domain idea</dt><dd><code>reeve.life / hireyourreeve.com</code></dd></div>
+      <div><dt>Mark</dt><dd>House with a keyhole cut out</dd></div>
+      <div><dt>Noticed</dt><dd class="conflict">Crowded: several AI startups already use it (meetreeve.com, reeve.sh, reeveai.app, a "chief of staff" MCP tool).</dd></div>
+    </dl>
+    <div class="variants">
+      <figure class="v mono"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Reeve logo">
+
+<g transform="translate(44 36) scale(1.375)"><path fill-rule="evenodd" fill="#f5f5f7" d="M32 4 60 25v35H4V25Z M27.8 39.6A7 7 0 1 1 36.2 39.6L38 51H26Z"/>
+</g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#f5f5f7">Reeve</text>
+</svg><figcaption>Mono, dark</figcaption></figure>
+      <figure class="v light"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Reeve logo">
+
+<g transform="translate(44 36) scale(1.375)"><path fill-rule="evenodd" fill="#0b0b10" d="M32 4 60 25v35H4V25Z M27.8 39.6A7 7 0 1 1 36.2 39.6L38 51H26Z"/>
+<path fill="#e11d48" d="M27.8 39.6A7 7 0 1 1 36.2 39.6L38 51H26Z"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#0b0b10">Reeve</text>
+</svg><figcaption>Light</figcaption></figure>
+    </div>
+    <div class="favs">
+      <span class="lbl">Favicon</span>
+      <span class="fav d"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true"><path fill-rule="evenodd" fill="#f5f5f7" d="M32 4 60 25v35H4V25Z M27.8 39.6A7 7 0 1 1 36.2 39.6L38 51H26Z"/>
+<path fill="#fb7185" d="M27.8 39.6A7 7 0 1 1 36.2 39.6L38 51H26Z"/></svg></span>
+      <span class="fav d"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" fill="#f5f5f7" d="M32 4 60 25v35H4V25Z M27.8 39.6A7 7 0 1 1 36.2 39.6L38 51H26Z"/>
+<path fill="#fb7185" d="M27.8 39.6A7 7 0 1 1 36.2 39.6L38 51H26Z"/></svg></span>
+      <span class="fav l"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true"><path fill-rule="evenodd" fill="#0b0b10" d="M32 4 60 25v35H4V25Z M27.8 39.6A7 7 0 1 1 36.2 39.6L38 51H26Z"/>
+<path fill="#e11d48" d="M27.8 39.6A7 7 0 1 1 36.2 39.6L38 51H26Z"/></svg></span>
+      <span class="fav l"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" fill="#0b0b10" d="M32 4 60 25v35H4V25Z M27.8 39.6A7 7 0 1 1 36.2 39.6L38 51H26Z"/>
+<path fill="#e11d48" d="M27.8 39.6A7 7 0 1 1 36.2 39.6L38 51H26Z"/></svg></span>
+      <a class="file" href="reeve.svg">reeve.svg</a>
+    </div>
+  </div>
+</article>
+<article class="card" id="tiro">
+  <div class="stage dark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Tiro logo">
+
+<g transform="translate(44 36) scale(1.375)"><path fill-rule="evenodd" fill="#fb7185" d="M13 4h38a9 9 0 0 1 9 9v38a9 9 0 0 1-9 9H13a9 9 0 0 1-9-9V13a9 9 0 0 1 9-9Z M15 16h34v9H36.5v24h-9V25H15Z"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#f5f5f7">Tiro</text>
+</svg></div>
+  <div class="body">
+    <header>
+      <span class="num">05</span>
+      <h3>Tiro</h3>
+      
+    </header>
+    <p class="why">Cicero's secretary, who invented shorthand: arguably history's first personal assistant.</p>
+    <ul class="tags"><li>Latin</li><li>historical</li></ul>
+    <dl>
+      <div><dt>Say it</dt><dd>TEE-roh</dd></div>
+      <div><dt>Domain idea</dt><dd><code>tiro.life / hellotiro.com</code></dd></div>
+      <div><dt>Mark</dt><dd>Negative-space T in a tile</dd></div>
+      <div><dt>Noticed</dt><dd class="conflict">Tiro is an existing AI meeting-notes app (tiro.ooo, ThePlato Inc.), close to this space.</dd></div>
+    </dl>
+    <div class="variants">
+      <figure class="v mono"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Tiro logo">
+
+<g transform="translate(44 36) scale(1.375)"><path fill-rule="evenodd" fill="#f5f5f7" d="M13 4h38a9 9 0 0 1 9 9v38a9 9 0 0 1-9 9H13a9 9 0 0 1-9-9V13a9 9 0 0 1 9-9Z M15 16h34v9H36.5v24h-9V25H15Z"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#f5f5f7">Tiro</text>
+</svg><figcaption>Mono, dark</figcaption></figure>
+      <figure class="v light"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Tiro logo">
+
+<g transform="translate(44 36) scale(1.375)"><path fill-rule="evenodd" fill="#e11d48" d="M13 4h38a9 9 0 0 1 9 9v38a9 9 0 0 1-9 9H13a9 9 0 0 1-9-9V13a9 9 0 0 1 9-9Z M15 16h34v9H36.5v24h-9V25H15Z"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#0b0b10">Tiro</text>
+</svg><figcaption>Light</figcaption></figure>
+    </div>
+    <div class="favs">
+      <span class="lbl">Favicon</span>
+      <span class="fav d"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true"><path fill-rule="evenodd" fill="#fb7185" d="M13 4h38a9 9 0 0 1 9 9v38a9 9 0 0 1-9 9H13a9 9 0 0 1-9-9V13a9 9 0 0 1 9-9Z M15 16h34v9H36.5v24h-9V25H15Z"/></svg></span>
+      <span class="fav d"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" fill="#fb7185" d="M13 4h38a9 9 0 0 1 9 9v38a9 9 0 0 1-9 9H13a9 9 0 0 1-9-9V13a9 9 0 0 1 9-9Z M15 16h34v9H36.5v24h-9V25H15Z"/></svg></span>
+      <span class="fav l"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true"><path fill-rule="evenodd" fill="#e11d48" d="M13 4h38a9 9 0 0 1 9 9v38a9 9 0 0 1-9 9H13a9 9 0 0 1-9-9V13a9 9 0 0 1 9-9Z M15 16h34v9H36.5v24h-9V25H15Z"/></svg></span>
+      <span class="fav l"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" fill="#e11d48" d="M13 4h38a9 9 0 0 1 9 9v38a9 9 0 0 1-9 9H13a9 9 0 0 1-9-9V13a9 9 0 0 1 9-9Z M15 16h34v9H36.5v24h-9V25H15Z"/></svg></span>
+      <a class="file" href="tiro.svg">tiro.svg</a>
+    </div>
+  </div>
+</article>
+<article class="card" id="nave">
+  <div class="stage dark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Nave logo">
+
+<g transform="translate(44 36) scale(1.375)"><path d="M32 5L55.38 18.5L55.38 45.5L32 59L8.62 45.5L8.62 18.5Z" fill="none" stroke="#f5f5f7" stroke-width="4.5" stroke-linejoin="round"/>
+<path d="M32 21L32 5M41.53 26.5L55.38 18.5M41.53 37.5L55.38 45.5M32 43L32 59M22.47 37.5L8.62 45.5M22.47 26.5L8.62 18.5" stroke="#f5f5f7" stroke-width="3.5" stroke-linecap="round"/>
+<circle cx="32" cy="32" r="6.5" fill="#fb7185"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#f5f5f7">Nave</text>
+</svg></div>
+  <div class="body">
+    <header>
+      <span class="num">06</span>
+      <h3>Nave</h3>
+      
+    </header>
+    <p class="why">The wheelwright's word for the hub of a wheel, where every spoke meets.</p>
+    <ul class="tags"><li>old trade</li><li>hub</li></ul>
+    <dl>
+      <div><dt>Say it</dt><dd>NAYV</dd></div>
+      <div><dt>Domain idea</dt><dd><code>nave.life / navehome.com</code></dd></div>
+      <div><dt>Mark</dt><dd>Hexagon wheel with a hub</dd></div>
+      <div><dt>Noticed</dt><dd class="conflict">Nave is a Kanban analytics tool (getnave.com). Also reads as a church "nave" or "knave".</dd></div>
+    </dl>
+    <div class="variants">
+      <figure class="v mono"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Nave logo">
+
+<g transform="translate(44 36) scale(1.375)"><path d="M32 5L55.38 18.5L55.38 45.5L32 59L8.62 45.5L8.62 18.5Z" fill="none" stroke="#f5f5f7" stroke-width="4.5" stroke-linejoin="round"/>
+<path d="M32 21L32 5M41.53 26.5L55.38 18.5M41.53 37.5L55.38 45.5M32 43L32 59M22.47 37.5L8.62 45.5M22.47 26.5L8.62 18.5" stroke="#f5f5f7" stroke-width="3.5" stroke-linecap="round"/>
+<circle cx="32" cy="32" r="6.5" fill="#f5f5f7"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#f5f5f7">Nave</text>
+</svg><figcaption>Mono, dark</figcaption></figure>
+      <figure class="v light"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Nave logo">
+
+<g transform="translate(44 36) scale(1.375)"><path d="M32 5L55.38 18.5L55.38 45.5L32 59L8.62 45.5L8.62 18.5Z" fill="none" stroke="#0b0b10" stroke-width="4.5" stroke-linejoin="round"/>
+<path d="M32 21L32 5M41.53 26.5L55.38 18.5M41.53 37.5L55.38 45.5M32 43L32 59M22.47 37.5L8.62 45.5M22.47 26.5L8.62 18.5" stroke="#0b0b10" stroke-width="3.5" stroke-linecap="round"/>
+<circle cx="32" cy="32" r="6.5" fill="#e11d48"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#0b0b10">Nave</text>
+</svg><figcaption>Light</figcaption></figure>
+    </div>
+    <div class="favs">
+      <span class="lbl">Favicon</span>
+      <span class="fav d"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true"><path d="M32 5L55.38 18.5L55.38 45.5L32 59L8.62 45.5L8.62 18.5Z" fill="none" stroke="#f5f5f7" stroke-width="4.5" stroke-linejoin="round"/>
+<path d="M32 21L32 5M41.53 26.5L55.38 18.5M41.53 37.5L55.38 45.5M32 43L32 59M22.47 37.5L8.62 45.5M22.47 26.5L8.62 18.5" stroke="#f5f5f7" stroke-width="3.5" stroke-linecap="round"/>
+<circle cx="32" cy="32" r="6.5" fill="#fb7185"/></svg></span>
+      <span class="fav d"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="16" height="16" aria-hidden="true"><path d="M32 5L55.38 18.5L55.38 45.5L32 59L8.62 45.5L8.62 18.5Z" fill="none" stroke="#f5f5f7" stroke-width="4.5" stroke-linejoin="round"/>
+<path d="M32 21L32 5M41.53 26.5L55.38 18.5M41.53 37.5L55.38 45.5M32 43L32 59M22.47 37.5L8.62 45.5M22.47 26.5L8.62 18.5" stroke="#f5f5f7" stroke-width="3.5" stroke-linecap="round"/>
+<circle cx="32" cy="32" r="6.5" fill="#fb7185"/></svg></span>
+      <span class="fav l"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true"><path d="M32 5L55.38 18.5L55.38 45.5L32 59L8.62 45.5L8.62 18.5Z" fill="none" stroke="#0b0b10" stroke-width="4.5" stroke-linejoin="round"/>
+<path d="M32 21L32 5M41.53 26.5L55.38 18.5M41.53 37.5L55.38 45.5M32 43L32 59M22.47 37.5L8.62 45.5M22.47 26.5L8.62 18.5" stroke="#0b0b10" stroke-width="3.5" stroke-linecap="round"/>
+<circle cx="32" cy="32" r="6.5" fill="#e11d48"/></svg></span>
+      <span class="fav l"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="16" height="16" aria-hidden="true"><path d="M32 5L55.38 18.5L55.38 45.5L32 59L8.62 45.5L8.62 18.5Z" fill="none" stroke="#0b0b10" stroke-width="4.5" stroke-linejoin="round"/>
+<path d="M32 21L32 5M41.53 26.5L55.38 18.5M41.53 37.5L55.38 45.5M32 43L32 59M22.47 37.5L8.62 45.5M22.47 26.5L8.62 18.5" stroke="#0b0b10" stroke-width="3.5" stroke-linecap="round"/>
+<circle cx="32" cy="32" r="6.5" fill="#e11d48"/></svg></span>
+      <a class="file" href="nave.svg">nave.svg</a>
+    </div>
+  </div>
+</article>
+<article class="card" id="quire">
+  <div class="stage dark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Quire logo">
+
+<g transform="translate(44 36) scale(1.375)"><path d="M5 12 29 18v38L5 50Z" fill="#f5f5f7"/>
+<path d="M59 12 35 18v38l24-6Z" fill="#fb7185"/>
+<path d="M9 8l20 5M55 8l-20 5" stroke="#f5f5f7" stroke-width="3" stroke-linecap="round" opacity=".55"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#f5f5f7">Quire</text>
+</svg></div>
+  <div class="body">
+    <header>
+      <span class="num">07</span>
+      <h3>Quire</h3>
+      
+    </header>
+    <p class="why">A gathering of loose sheets folded together into one book: scattered pages, bound.</p>
+    <ul class="tags"><li>bookbinding</li><li>craft</li></ul>
+    <dl>
+      <div><dt>Say it</dt><dd>KWIRE (rhymes with "choir")</dd></div>
+      <div><dt>Domain idea</dt><dd><code>quire.life / quirehome.com</code></dd></div>
+      <div><dt>Mark</dt><dd>Open book, two pages</dd></div>
+      <div><dt>Noticed</dt><dd class="conflict">Quire (quire.io) is an established task/project-management app. Strong conflict.</dd></div>
+    </dl>
+    <div class="variants">
+      <figure class="v mono"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Quire logo">
+
+<g transform="translate(44 36) scale(1.375)"><path d="M5 12 29 18v38L5 50Z" fill="#f5f5f7"/>
+<path d="M59 12 35 18v38l24-6Z" fill="#f5f5f7"/>
+<path d="M9 8l20 5M55 8l-20 5" stroke="#f5f5f7" stroke-width="3" stroke-linecap="round" opacity=".55"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#f5f5f7">Quire</text>
+</svg><figcaption>Mono, dark</figcaption></figure>
+      <figure class="v light"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Quire logo">
+
+<g transform="translate(44 36) scale(1.375)"><path d="M5 12 29 18v38L5 50Z" fill="#0b0b10"/>
+<path d="M59 12 35 18v38l24-6Z" fill="#e11d48"/>
+<path d="M9 8l20 5M55 8l-20 5" stroke="#0b0b10" stroke-width="3" stroke-linecap="round" opacity=".55"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#0b0b10">Quire</text>
+</svg><figcaption>Light</figcaption></figure>
+    </div>
+    <div class="favs">
+      <span class="lbl">Favicon</span>
+      <span class="fav d"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true"><path d="M5 12 29 18v38L5 50Z" fill="#f5f5f7"/>
+<path d="M59 12 35 18v38l24-6Z" fill="#fb7185"/>
+<path d="M9 8l20 5M55 8l-20 5" stroke="#f5f5f7" stroke-width="3" stroke-linecap="round" opacity=".55"/></svg></span>
+      <span class="fav d"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="16" height="16" aria-hidden="true"><path d="M5 12 29 18v38L5 50Z" fill="#f5f5f7"/>
+<path d="M59 12 35 18v38l24-6Z" fill="#fb7185"/>
+<path d="M9 8l20 5M55 8l-20 5" stroke="#f5f5f7" stroke-width="3" stroke-linecap="round" opacity=".55"/></svg></span>
+      <span class="fav l"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true"><path d="M5 12 29 18v38L5 50Z" fill="#0b0b10"/>
+<path d="M59 12 35 18v38l24-6Z" fill="#e11d48"/>
+<path d="M9 8l20 5M55 8l-20 5" stroke="#0b0b10" stroke-width="3" stroke-linecap="round" opacity=".55"/></svg></span>
+      <span class="fav l"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="16" height="16" aria-hidden="true"><path d="M5 12 29 18v38L5 50Z" fill="#0b0b10"/>
+<path d="M59 12 35 18v38l24-6Z" fill="#e11d48"/>
+<path d="M9 8l20 5M55 8l-20 5" stroke="#0b0b10" stroke-width="3" stroke-linecap="round" opacity=".55"/></svg></span>
+      <a class="file" href="quire.svg">quire.svg</a>
+    </div>
+  </div>
+</article>
+<article class="card" id="keel">
+  <div class="stage dark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Keel logo">
+
+<g transform="translate(44 36) scale(1.375)"><path d="M5 14h54c0 17-11 28-27 29C16 42 5 31 5 14Z" fill="#f5f5f7"/>
+<rect x="28.5" y="38" width="7" height="22" rx="2" fill="#fb7185"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#f5f5f7">Keel</text>
+</svg></div>
+  <div class="body">
+    <header>
+      <span class="num">08</span>
+      <h3>Keel</h3>
+      
+    </header>
+    <p class="why">The spine along the bottom of a ship that keeps it upright and on course: an even keel.</p>
+    <ul class="tags"><li>nautical</li></ul>
+    <dl>
+      <div><dt>Say it</dt><dd><span class="muted">as written</span></dd></div>
+      <div><dt>Domain idea</dt><dd><code>getkeel.ai / keel.life</code></dd></div>
+      <div><dt>Mark</dt><dd>Hull cross-section with fin</dd></div>
+      <div><dt>Noticed</dt><dd class="conflict">Crowded: a "Keel" AI-coach productivity app on the App Store, Keel (keel.so) ops software, older fintech uses.</dd></div>
+    </dl>
+    <div class="variants">
+      <figure class="v mono"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Keel logo">
+
+<g transform="translate(44 36) scale(1.375)"><path d="M5 14h54c0 17-11 28-27 29C16 42 5 31 5 14Z" fill="#f5f5f7"/>
+<rect x="28.5" y="38" width="7" height="22" rx="2" fill="#f5f5f7"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#f5f5f7">Keel</text>
+</svg><figcaption>Mono, dark</figcaption></figure>
+      <figure class="v light"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Keel logo">
+
+<g transform="translate(44 36) scale(1.375)"><path d="M5 14h54c0 17-11 28-27 29C16 42 5 31 5 14Z" fill="#0b0b10"/>
+<rect x="28.5" y="38" width="7" height="22" rx="2" fill="#e11d48"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#0b0b10">Keel</text>
+</svg><figcaption>Light</figcaption></figure>
+    </div>
+    <div class="favs">
+      <span class="lbl">Favicon</span>
+      <span class="fav d"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true"><path d="M5 14h54c0 17-11 28-27 29C16 42 5 31 5 14Z" fill="#f5f5f7"/>
+<rect x="28.5" y="38" width="7" height="22" rx="2" fill="#fb7185"/></svg></span>
+      <span class="fav d"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="16" height="16" aria-hidden="true"><path d="M5 14h54c0 17-11 28-27 29C16 42 5 31 5 14Z" fill="#f5f5f7"/>
+<rect x="28.5" y="38" width="7" height="22" rx="2" fill="#fb7185"/></svg></span>
+      <span class="fav l"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true"><path d="M5 14h54c0 17-11 28-27 29C16 42 5 31 5 14Z" fill="#0b0b10"/>
+<rect x="28.5" y="38" width="7" height="22" rx="2" fill="#e11d48"/></svg></span>
+      <span class="fav l"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="16" height="16" aria-hidden="true"><path d="M5 14h54c0 17-11 28-27 29C16 42 5 31 5 14Z" fill="#0b0b10"/>
+<rect x="28.5" y="38" width="7" height="22" rx="2" fill="#e11d48"/></svg></span>
+      <a class="file" href="keel.svg">keel.svg</a>
+    </div>
+  </div>
+</article>
+<article class="card" id="sextant">
+  <div class="stage dark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Sextant logo">
+
+<g transform="translate(44 36) scale(1.375)"><path fill-rule="evenodd" fill="#f5f5f7" d="M32 5 6 50a52 52 0 0 0 52 0Z M13.5 46.5a42 42 0 0 0 37 0L48 42.2a37 37 0 0 1-32 0Z M27 17a5 5 0 1 0 10 0a5 5 0 1 0 -10 0Z"/>
+<circle cx="32" cy="17" r="5" fill="#fb7185"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#f5f5f7">Sextant</text>
+</svg></div>
+  <div class="body">
+    <header>
+      <span class="num">09</span>
+      <h3>Sextant</h3>
+      
+    </header>
+    <p class="why">The navigator's instrument that fixes exactly where you are from the stars.</p>
+    <ul class="tags"><li>nautical</li><li>astronomy</li></ul>
+    <dl>
+      <div><dt>Say it</dt><dd><span class="muted">as written</span></dd></div>
+      <div><dt>Domain idea</dt><dd><code>sextant.app / usesextant.com</code></dd></div>
+      <div><dt>Mark</dt><dd>Sixty-degree sector</dd></div>
+      <div><dt>Noticed</dt><dd class="conflict">Used by several small tech firms; the "sex-" prefix may trip content filters and invite jokes.</dd></div>
+    </dl>
+    <div class="variants">
+      <figure class="v mono"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Sextant logo">
+
+<g transform="translate(44 36) scale(1.375)"><path fill-rule="evenodd" fill="#f5f5f7" d="M32 5 6 50a52 52 0 0 0 52 0Z M13.5 46.5a42 42 0 0 0 37 0L48 42.2a37 37 0 0 1-32 0Z M27 17a5 5 0 1 0 10 0a5 5 0 1 0 -10 0Z"/>
+</g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#f5f5f7">Sextant</text>
+</svg><figcaption>Mono, dark</figcaption></figure>
+      <figure class="v light"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Sextant logo">
+
+<g transform="translate(44 36) scale(1.375)"><path fill-rule="evenodd" fill="#0b0b10" d="M32 5 6 50a52 52 0 0 0 52 0Z M13.5 46.5a42 42 0 0 0 37 0L48 42.2a37 37 0 0 1-32 0Z M27 17a5 5 0 1 0 10 0a5 5 0 1 0 -10 0Z"/>
+<circle cx="32" cy="17" r="5" fill="#e11d48"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#0b0b10">Sextant</text>
+</svg><figcaption>Light</figcaption></figure>
+    </div>
+    <div class="favs">
+      <span class="lbl">Favicon</span>
+      <span class="fav d"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true"><path fill-rule="evenodd" fill="#f5f5f7" d="M32 5 6 50a52 52 0 0 0 52 0Z M13.5 46.5a42 42 0 0 0 37 0L48 42.2a37 37 0 0 1-32 0Z M27 17a5 5 0 1 0 10 0a5 5 0 1 0 -10 0Z"/>
+<circle cx="32" cy="17" r="5" fill="#fb7185"/></svg></span>
+      <span class="fav d"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" fill="#f5f5f7" d="M32 5 6 50a52 52 0 0 0 52 0Z M13.5 46.5a42 42 0 0 0 37 0L48 42.2a37 37 0 0 1-32 0Z M27 17a5 5 0 1 0 10 0a5 5 0 1 0 -10 0Z"/>
+<circle cx="32" cy="17" r="5" fill="#fb7185"/></svg></span>
+      <span class="fav l"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true"><path fill-rule="evenodd" fill="#0b0b10" d="M32 5 6 50a52 52 0 0 0 52 0Z M13.5 46.5a42 42 0 0 0 37 0L48 42.2a37 37 0 0 1-32 0Z M27 17a5 5 0 1 0 10 0a5 5 0 1 0 -10 0Z"/>
+<circle cx="32" cy="17" r="5" fill="#e11d48"/></svg></span>
+      <span class="fav l"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" fill="#0b0b10" d="M32 5 6 50a52 52 0 0 0 52 0Z M13.5 46.5a42 42 0 0 0 37 0L48 42.2a37 37 0 0 1-32 0Z M27 17a5 5 0 1 0 10 0a5 5 0 1 0 -10 0Z"/>
+<circle cx="32" cy="17" r="5" fill="#e11d48"/></svg></span>
+      <a class="file" href="sextant.svg">sextant.svg</a>
+    </div>
+  </div>
+</article>
+<article class="card" id="cairn">
+  <div class="stage dark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Cairn logo">
+
+<g transform="translate(44 36) scale(1.375)"><ellipse cx="32" cy="52" rx="25" ry="8" fill="#f5f5f7"/>
+<ellipse cx="31" cy="37" rx="17" ry="6.5" fill="#f5f5f7" transform="rotate(-6 31 37)"/>
+<ellipse cx="33" cy="22.5" rx="10" ry="5.5" fill="#fb7185" transform="rotate(5 33 22.5)"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#f5f5f7">Cairn</text>
+</svg></div>
+  <div class="body">
+    <header>
+      <span class="num">10</span>
+      <h3>Cairn</h3>
+      
+    </header>
+    <p class="why">A stack of stones hikers leave to mark the way: balance, order and a clear next step.</p>
+    <ul class="tags"><li>wayfinding</li><li>calm</li></ul>
+    <dl>
+      <div><dt>Say it</dt><dd>KAIRN</dd></div>
+      <div><dt>Domain idea</dt><dd><code>cairn.life / cairnhq.com</code></dd></div>
+      <div><dt>Mark</dt><dd>Three balanced stones</dd></div>
+      <div><dt>Noticed</dt><dd class="conflict">Very common: Cairn Tasks (App Store), Cairn Journal, Cairn AI coding assistant, Cairn Oil &amp; Gas.</dd></div>
+    </dl>
+    <div class="variants">
+      <figure class="v mono"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Cairn logo">
+
+<g transform="translate(44 36) scale(1.375)"><ellipse cx="32" cy="52" rx="25" ry="8" fill="#f5f5f7"/>
+<ellipse cx="31" cy="37" rx="17" ry="6.5" fill="#f5f5f7" transform="rotate(-6 31 37)"/>
+<ellipse cx="33" cy="22.5" rx="10" ry="5.5" fill="#f5f5f7" transform="rotate(5 33 22.5)"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#f5f5f7">Cairn</text>
+</svg><figcaption>Mono, dark</figcaption></figure>
+      <figure class="v light"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Cairn logo">
+
+<g transform="translate(44 36) scale(1.375)"><ellipse cx="32" cy="52" rx="25" ry="8" fill="#0b0b10"/>
+<ellipse cx="31" cy="37" rx="17" ry="6.5" fill="#0b0b10" transform="rotate(-6 31 37)"/>
+<ellipse cx="33" cy="22.5" rx="10" ry="5.5" fill="#e11d48" transform="rotate(5 33 22.5)"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#0b0b10">Cairn</text>
+</svg><figcaption>Light</figcaption></figure>
+    </div>
+    <div class="favs">
+      <span class="lbl">Favicon</span>
+      <span class="fav d"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true"><ellipse cx="32" cy="52" rx="25" ry="8" fill="#f5f5f7"/>
+<ellipse cx="31" cy="37" rx="17" ry="6.5" fill="#f5f5f7" transform="rotate(-6 31 37)"/>
+<ellipse cx="33" cy="22.5" rx="10" ry="5.5" fill="#fb7185" transform="rotate(5 33 22.5)"/></svg></span>
+      <span class="fav d"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="16" height="16" aria-hidden="true"><ellipse cx="32" cy="52" rx="25" ry="8" fill="#f5f5f7"/>
+<ellipse cx="31" cy="37" rx="17" ry="6.5" fill="#f5f5f7" transform="rotate(-6 31 37)"/>
+<ellipse cx="33" cy="22.5" rx="10" ry="5.5" fill="#fb7185" transform="rotate(5 33 22.5)"/></svg></span>
+      <span class="fav l"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true"><ellipse cx="32" cy="52" rx="25" ry="8" fill="#0b0b10"/>
+<ellipse cx="31" cy="37" rx="17" ry="6.5" fill="#0b0b10" transform="rotate(-6 31 37)"/>
+<ellipse cx="33" cy="22.5" rx="10" ry="5.5" fill="#e11d48" transform="rotate(5 33 22.5)"/></svg></span>
+      <span class="fav l"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="16" height="16" aria-hidden="true"><ellipse cx="32" cy="52" rx="25" ry="8" fill="#0b0b10"/>
+<ellipse cx="31" cy="37" rx="17" ry="6.5" fill="#0b0b10" transform="rotate(-6 31 37)"/>
+<ellipse cx="33" cy="22.5" rx="10" ry="5.5" fill="#e11d48" transform="rotate(5 33 22.5)"/></svg></span>
+      <a class="file" href="cairn.svg">cairn.svg</a>
+    </div>
+  </div>
+</article>
+<article class="card" id="plumb">
+  <div class="stage dark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Plumb logo">
+
+<g transform="translate(44 36) scale(1.375)"><rect x="18" y="4" width="28" height="5" rx="2.5" fill="#f5f5f7"/>
+<path d="M32 9v12" stroke="#f5f5f7" stroke-width="3.5"/>
+<path d="M32 21c9 7 13 16 13 22a13 13 0 0 1-13 17 13 13 0 0 1-13-17c0-6 4-15 13-22Z" fill="#fb7185"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#f5f5f7">Plumb</text>
+</svg></div>
+  <div class="body">
+    <header>
+      <span class="num">11</span>
+      <h3>Plumb</h3>
+      
+    </header>
+    <p class="why">A mason's weighted line that shows true vertical: straight, honest and accurate, "to plumb the depths".</p>
+    <ul class="tags"><li>craft</li><li>bold</li></ul>
+    <dl>
+      <div><dt>Say it</dt><dd>PLUM (silent b)</dd></div>
+      <div><dt>Domain idea</dt><dd><code>plumb.ai / useplumb.com</code></dd></div>
+      <div><dt>Mark</dt><dd>Plumb bob on a line</dd></div>
+      <div><dt>Noticed</dt><dd class="conflict">Plumb's (veterinary reference), Plumb Development (agency). May be misread as plumbing.</dd></div>
+    </dl>
+    <div class="variants">
+      <figure class="v mono"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Plumb logo">
+
+<g transform="translate(44 36) scale(1.375)"><rect x="18" y="4" width="28" height="5" rx="2.5" fill="#f5f5f7"/>
+<path d="M32 9v12" stroke="#f5f5f7" stroke-width="3.5"/>
+<path d="M32 21c9 7 13 16 13 22a13 13 0 0 1-13 17 13 13 0 0 1-13-17c0-6 4-15 13-22Z" fill="#f5f5f7"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#f5f5f7">Plumb</text>
+</svg><figcaption>Mono, dark</figcaption></figure>
+      <figure class="v light"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Plumb logo">
+
+<g transform="translate(44 36) scale(1.375)"><rect x="18" y="4" width="28" height="5" rx="2.5" fill="#0b0b10"/>
+<path d="M32 9v12" stroke="#0b0b10" stroke-width="3.5"/>
+<path d="M32 21c9 7 13 16 13 22a13 13 0 0 1-13 17 13 13 0 0 1-13-17c0-6 4-15 13-22Z" fill="#e11d48"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#0b0b10">Plumb</text>
+</svg><figcaption>Light</figcaption></figure>
+    </div>
+    <div class="favs">
+      <span class="lbl">Favicon</span>
+      <span class="fav d"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true"><rect x="18" y="4" width="28" height="5" rx="2.5" fill="#f5f5f7"/>
+<path d="M32 9v12" stroke="#f5f5f7" stroke-width="3.5"/>
+<path d="M32 21c9 7 13 16 13 22a13 13 0 0 1-13 17 13 13 0 0 1-13-17c0-6 4-15 13-22Z" fill="#fb7185"/></svg></span>
+      <span class="fav d"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="16" height="16" aria-hidden="true"><rect x="18" y="4" width="28" height="5" rx="2.5" fill="#f5f5f7"/>
+<path d="M32 9v12" stroke="#f5f5f7" stroke-width="3.5"/>
+<path d="M32 21c9 7 13 16 13 22a13 13 0 0 1-13 17 13 13 0 0 1-13-17c0-6 4-15 13-22Z" fill="#fb7185"/></svg></span>
+      <span class="fav l"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true"><rect x="18" y="4" width="28" height="5" rx="2.5" fill="#0b0b10"/>
+<path d="M32 9v12" stroke="#0b0b10" stroke-width="3.5"/>
+<path d="M32 21c9 7 13 16 13 22a13 13 0 0 1-13 17 13 13 0 0 1-13-17c0-6 4-15 13-22Z" fill="#e11d48"/></svg></span>
+      <span class="fav l"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="16" height="16" aria-hidden="true"><rect x="18" y="4" width="28" height="5" rx="2.5" fill="#0b0b10"/>
+<path d="M32 9v12" stroke="#0b0b10" stroke-width="3.5"/>
+<path d="M32 21c9 7 13 16 13 22a13 13 0 0 1-13 17 13 13 0 0 1-13-17c0-6 4-15 13-22Z" fill="#e11d48"/></svg></span>
+      <a class="file" href="plumb.svg">plumb.svg</a>
+    </div>
+  </div>
+</article>
+<article class="card" id="selvedge">
+  <div class="stage dark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Selvedge logo">
+
+<g transform="translate(44 36) scale(1.375)"><rect x="6" y="6" width="6" height="14" rx="1" fill="#f5f5f7"/><rect x="6" y="26" width="6" height="32" rx="1" fill="#f5f5f7"/><rect x="15" y="6" width="6" height="32" rx="1" fill="#f5f5f7"/><rect x="15" y="44" width="6" height="14" rx="1" fill="#f5f5f7"/><rect x="24" y="6" width="6" height="14" rx="1" fill="#f5f5f7"/><rect x="24" y="26" width="6" height="32" rx="1" fill="#f5f5f7"/><rect x="33" y="6" width="6" height="32" rx="1" fill="#f5f5f7"/><rect x="33" y="44" width="6" height="14" rx="1" fill="#f5f5f7"/><rect x="43" y="6" width="15" height="52" rx="2" fill="#fb7185"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#f5f5f7">Selvedge</text>
+</svg></div>
+  <div class="body">
+    <header>
+      <span class="num">12</span>
+      <h3>Selvedge</h3>
+      
+    </header>
+    <p class="why">The tightly woven edge of cloth that stops the whole fabric unravelling.</p>
+    <ul class="tags"><li>textile</li><li>bold</li></ul>
+    <dl>
+      <div><dt>Say it</dt><dd>SEL-vij</dd></div>
+      <div><dt>Domain idea</dt><dd><code>selvedge.app / selvedge.life</code></dd></div>
+      <div><dt>Mark</dt><dd>Woven stripes with a solid edge</dd></div>
+      <div><dt>Noticed</dt><dd class="conflict">Selvedge is a well-known UK textile magazine. Spelling (selvage vs. selvedge) is a hurdle.</dd></div>
+    </dl>
+    <div class="variants">
+      <figure class="v mono"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Selvedge logo">
+
+<g transform="translate(44 36) scale(1.375)"><rect x="6" y="6" width="6" height="14" rx="1" fill="#f5f5f7"/><rect x="6" y="26" width="6" height="32" rx="1" fill="#f5f5f7"/><rect x="15" y="6" width="6" height="32" rx="1" fill="#f5f5f7"/><rect x="15" y="44" width="6" height="14" rx="1" fill="#f5f5f7"/><rect x="24" y="6" width="6" height="14" rx="1" fill="#f5f5f7"/><rect x="24" y="26" width="6" height="32" rx="1" fill="#f5f5f7"/><rect x="33" y="6" width="6" height="32" rx="1" fill="#f5f5f7"/><rect x="33" y="44" width="6" height="14" rx="1" fill="#f5f5f7"/><rect x="43" y="6" width="15" height="52" rx="2" fill="#f5f5f7"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#f5f5f7">Selvedge</text>
+</svg><figcaption>Mono, dark</figcaption></figure>
+      <figure class="v light"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Selvedge logo">
+
+<g transform="translate(44 36) scale(1.375)"><rect x="6" y="6" width="6" height="14" rx="1" fill="#0b0b10"/><rect x="6" y="26" width="6" height="32" rx="1" fill="#0b0b10"/><rect x="15" y="6" width="6" height="32" rx="1" fill="#0b0b10"/><rect x="15" y="44" width="6" height="14" rx="1" fill="#0b0b10"/><rect x="24" y="6" width="6" height="14" rx="1" fill="#0b0b10"/><rect x="24" y="26" width="6" height="32" rx="1" fill="#0b0b10"/><rect x="33" y="6" width="6" height="32" rx="1" fill="#0b0b10"/><rect x="33" y="44" width="6" height="14" rx="1" fill="#0b0b10"/><rect x="43" y="6" width="15" height="52" rx="2" fill="#e11d48"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#0b0b10">Selvedge</text>
+</svg><figcaption>Light</figcaption></figure>
+    </div>
+    <div class="favs">
+      <span class="lbl">Favicon</span>
+      <span class="fav d"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true"><rect x="6" y="6" width="6" height="14" rx="1" fill="#f5f5f7"/><rect x="6" y="26" width="6" height="32" rx="1" fill="#f5f5f7"/><rect x="15" y="6" width="6" height="32" rx="1" fill="#f5f5f7"/><rect x="15" y="44" width="6" height="14" rx="1" fill="#f5f5f7"/><rect x="24" y="6" width="6" height="14" rx="1" fill="#f5f5f7"/><rect x="24" y="26" width="6" height="32" rx="1" fill="#f5f5f7"/><rect x="33" y="6" width="6" height="32" rx="1" fill="#f5f5f7"/><rect x="33" y="44" width="6" height="14" rx="1" fill="#f5f5f7"/><rect x="43" y="6" width="15" height="52" rx="2" fill="#fb7185"/></svg></span>
+      <span class="fav d"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="16" height="16" aria-hidden="true"><rect x="6" y="6" width="6" height="14" rx="1" fill="#f5f5f7"/><rect x="6" y="26" width="6" height="32" rx="1" fill="#f5f5f7"/><rect x="15" y="6" width="6" height="32" rx="1" fill="#f5f5f7"/><rect x="15" y="44" width="6" height="14" rx="1" fill="#f5f5f7"/><rect x="24" y="6" width="6" height="14" rx="1" fill="#f5f5f7"/><rect x="24" y="26" width="6" height="32" rx="1" fill="#f5f5f7"/><rect x="33" y="6" width="6" height="32" rx="1" fill="#f5f5f7"/><rect x="33" y="44" width="6" height="14" rx="1" fill="#f5f5f7"/><rect x="43" y="6" width="15" height="52" rx="2" fill="#fb7185"/></svg></span>
+      <span class="fav l"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true"><rect x="6" y="6" width="6" height="14" rx="1" fill="#0b0b10"/><rect x="6" y="26" width="6" height="32" rx="1" fill="#0b0b10"/><rect x="15" y="6" width="6" height="32" rx="1" fill="#0b0b10"/><rect x="15" y="44" width="6" height="14" rx="1" fill="#0b0b10"/><rect x="24" y="6" width="6" height="14" rx="1" fill="#0b0b10"/><rect x="24" y="26" width="6" height="32" rx="1" fill="#0b0b10"/><rect x="33" y="6" width="6" height="32" rx="1" fill="#0b0b10"/><rect x="33" y="44" width="6" height="14" rx="1" fill="#0b0b10"/><rect x="43" y="6" width="15" height="52" rx="2" fill="#e11d48"/></svg></span>
+      <span class="fav l"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="16" height="16" aria-hidden="true"><rect x="6" y="6" width="6" height="14" rx="1" fill="#0b0b10"/><rect x="6" y="26" width="6" height="32" rx="1" fill="#0b0b10"/><rect x="15" y="6" width="6" height="32" rx="1" fill="#0b0b10"/><rect x="15" y="44" width="6" height="14" rx="1" fill="#0b0b10"/><rect x="24" y="6" width="6" height="14" rx="1" fill="#0b0b10"/><rect x="24" y="26" width="6" height="32" rx="1" fill="#0b0b10"/><rect x="33" y="6" width="6" height="32" rx="1" fill="#0b0b10"/><rect x="33" y="44" width="6" height="14" rx="1" fill="#0b0b10"/><rect x="43" y="6" width="15" height="52" rx="2" fill="#e11d48"/></svg></span>
+      <a class="file" href="selvedge.svg">selvedge.svg</a>
+    </div>
+  </div>
+</article>
+<article class="card" id="tessera">
+  <div class="stage dark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Tessera logo">
+
+<g transform="translate(44 36) scale(1.375)"><rect x="6" y="6" width="23" height="23" rx="3" fill="#f5f5f7"/>
+<rect x="6" y="35" width="23" height="23" rx="3" fill="#f5f5f7"/>
+<rect x="35" y="35" width="23" height="23" rx="3" fill="#f5f5f7"/>
+<path d="M46.5 4.5 60 18 46.5 31.5 33 18Z" fill="#fb7185"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#f5f5f7">Tessera</text>
+</svg></div>
+  <div class="body">
+    <header>
+      <span class="num">13</span>
+      <h3>Tessera</h3>
+      
+    </header>
+    <p class="why">One small tile in a mosaic: many pieces of your life making one picture.</p>
+    <ul class="tags"><li>Latin</li><li>mosaic</li></ul>
+    <dl>
+      <div><dt>Say it</dt><dd>TESS-er-uh</dd></div>
+      <div><dt>Domain idea</dt><dd><code>tessera.life / hellotessera.com</code></dd></div>
+      <div><dt>Mark</dt><dd>Mosaic with one turned tile</dd></div>
+      <div><dt>Noticed</dt><dd class="conflict">Well used: Tessera Technologies (now Xperi), Tessera Therapeutics, several design tools.</dd></div>
+    </dl>
+    <div class="variants">
+      <figure class="v mono"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Tessera logo">
+
+<g transform="translate(44 36) scale(1.375)"><rect x="6" y="6" width="23" height="23" rx="3" fill="#f5f5f7"/>
+<rect x="6" y="35" width="23" height="23" rx="3" fill="#f5f5f7"/>
+<rect x="35" y="35" width="23" height="23" rx="3" fill="#f5f5f7"/>
+<path d="M46.5 4.5 60 18 46.5 31.5 33 18Z" fill="#f5f5f7"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#f5f5f7">Tessera</text>
+</svg><figcaption>Mono, dark</figcaption></figure>
+      <figure class="v light"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Tessera logo">
+
+<g transform="translate(44 36) scale(1.375)"><rect x="6" y="6" width="23" height="23" rx="3" fill="#0b0b10"/>
+<rect x="6" y="35" width="23" height="23" rx="3" fill="#0b0b10"/>
+<rect x="35" y="35" width="23" height="23" rx="3" fill="#0b0b10"/>
+<path d="M46.5 4.5 60 18 46.5 31.5 33 18Z" fill="#e11d48"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#0b0b10">Tessera</text>
+</svg><figcaption>Light</figcaption></figure>
+    </div>
+    <div class="favs">
+      <span class="lbl">Favicon</span>
+      <span class="fav d"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true"><rect x="6" y="6" width="23" height="23" rx="3" fill="#f5f5f7"/>
+<rect x="6" y="35" width="23" height="23" rx="3" fill="#f5f5f7"/>
+<rect x="35" y="35" width="23" height="23" rx="3" fill="#f5f5f7"/>
+<path d="M46.5 4.5 60 18 46.5 31.5 33 18Z" fill="#fb7185"/></svg></span>
+      <span class="fav d"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="16" height="16" aria-hidden="true"><rect x="6" y="6" width="23" height="23" rx="3" fill="#f5f5f7"/>
+<rect x="6" y="35" width="23" height="23" rx="3" fill="#f5f5f7"/>
+<rect x="35" y="35" width="23" height="23" rx="3" fill="#f5f5f7"/>
+<path d="M46.5 4.5 60 18 46.5 31.5 33 18Z" fill="#fb7185"/></svg></span>
+      <span class="fav l"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true"><rect x="6" y="6" width="23" height="23" rx="3" fill="#0b0b10"/>
+<rect x="6" y="35" width="23" height="23" rx="3" fill="#0b0b10"/>
+<rect x="35" y="35" width="23" height="23" rx="3" fill="#0b0b10"/>
+<path d="M46.5 4.5 60 18 46.5 31.5 33 18Z" fill="#e11d48"/></svg></span>
+      <span class="fav l"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="16" height="16" aria-hidden="true"><rect x="6" y="6" width="23" height="23" rx="3" fill="#0b0b10"/>
+<rect x="6" y="35" width="23" height="23" rx="3" fill="#0b0b10"/>
+<rect x="35" y="35" width="23" height="23" rx="3" fill="#0b0b10"/>
+<path d="M46.5 4.5 60 18 46.5 31.5 33 18Z" fill="#e11d48"/></svg></span>
+      <a class="file" href="tessera.svg">tessera.svg</a>
+    </div>
+  </div>
+</article>
+<article class="card" id="hesper">
+  <div class="stage dark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Hesper logo">
+
+<g transform="translate(44 36) scale(1.375)"><path fill-rule="evenodd" fill="#f5f5f7" d="M32 4L40.2 12.2L51.8 12.2L51.8 23.8L60 32L51.8 40.2L51.8 51.8L40.2 51.8L32 60L23.8 51.8L12.2 51.8L12.2 40.2L4 32L12.2 23.8L12.2 12.2L23.8 12.2Z M23 32a9 9 0 1 0 18 0a9 9 0 1 0 -18 0Z"/>
+<circle cx="32" cy="32" r="4.5" fill="#fb7185"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#f5f5f7">Hesper</text>
+</svg></div>
+  <div class="body">
+    <header>
+      <span class="num">14</span>
+      <h3>Hesper</h3>
+      
+    </header>
+    <p class="why">The evening star, first light at dusk: a nod to the calm end-of-day review.</p>
+    <ul class="tags"><li>astronomy</li></ul>
+    <dl>
+      <div><dt>Say it</dt><dd>HESS-per</dd></div>
+      <div><dt>Domain idea</dt><dd><code>hesper.life / hesper.app</code></dd></div>
+      <div><dt>Mark</dt><dd>Eight-point star, hollow core</dd></div>
+      <div><dt>Noticed</dt><dd class="conflict">Hesper AI (YC, insurance claims agents, founded 2026) and Hesper Labs on GitHub.</dd></div>
+    </dl>
+    <div class="variants">
+      <figure class="v mono"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Hesper logo">
+
+<g transform="translate(44 36) scale(1.375)"><path fill-rule="evenodd" fill="#f5f5f7" d="M32 4L40.2 12.2L51.8 12.2L51.8 23.8L60 32L51.8 40.2L51.8 51.8L40.2 51.8L32 60L23.8 51.8L12.2 51.8L12.2 40.2L4 32L12.2 23.8L12.2 12.2L23.8 12.2Z M23 32a9 9 0 1 0 18 0a9 9 0 1 0 -18 0Z"/>
+<circle cx="32" cy="32" r="4.5" fill="#f5f5f7"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#f5f5f7">Hesper</text>
+</svg><figcaption>Mono, dark</figcaption></figure>
+      <figure class="v light"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Hesper logo">
+
+<g transform="translate(44 36) scale(1.375)"><path fill-rule="evenodd" fill="#0b0b10" d="M32 4L40.2 12.2L51.8 12.2L51.8 23.8L60 32L51.8 40.2L51.8 51.8L40.2 51.8L32 60L23.8 51.8L12.2 51.8L12.2 40.2L4 32L12.2 23.8L12.2 12.2L23.8 12.2Z M23 32a9 9 0 1 0 18 0a9 9 0 1 0 -18 0Z"/>
+<circle cx="32" cy="32" r="4.5" fill="#e11d48"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#0b0b10">Hesper</text>
+</svg><figcaption>Light</figcaption></figure>
+    </div>
+    <div class="favs">
+      <span class="lbl">Favicon</span>
+      <span class="fav d"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true"><path fill-rule="evenodd" fill="#f5f5f7" d="M32 4L40.2 12.2L51.8 12.2L51.8 23.8L60 32L51.8 40.2L51.8 51.8L40.2 51.8L32 60L23.8 51.8L12.2 51.8L12.2 40.2L4 32L12.2 23.8L12.2 12.2L23.8 12.2Z M23 32a9 9 0 1 0 18 0a9 9 0 1 0 -18 0Z"/>
+<circle cx="32" cy="32" r="4.5" fill="#fb7185"/></svg></span>
+      <span class="fav d"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" fill="#f5f5f7" d="M32 4L40.2 12.2L51.8 12.2L51.8 23.8L60 32L51.8 40.2L51.8 51.8L40.2 51.8L32 60L23.8 51.8L12.2 51.8L12.2 40.2L4 32L12.2 23.8L12.2 12.2L23.8 12.2Z M23 32a9 9 0 1 0 18 0a9 9 0 1 0 -18 0Z"/>
+<circle cx="32" cy="32" r="4.5" fill="#fb7185"/></svg></span>
+      <span class="fav l"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true"><path fill-rule="evenodd" fill="#0b0b10" d="M32 4L40.2 12.2L51.8 12.2L51.8 23.8L60 32L51.8 40.2L51.8 51.8L40.2 51.8L32 60L23.8 51.8L12.2 51.8L12.2 40.2L4 32L12.2 23.8L12.2 12.2L23.8 12.2Z M23 32a9 9 0 1 0 18 0a9 9 0 1 0 -18 0Z"/>
+<circle cx="32" cy="32" r="4.5" fill="#e11d48"/></svg></span>
+      <span class="fav l"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="16" height="16" aria-hidden="true"><path fill-rule="evenodd" fill="#0b0b10" d="M32 4L40.2 12.2L51.8 12.2L51.8 23.8L60 32L51.8 40.2L51.8 51.8L40.2 51.8L32 60L23.8 51.8L12.2 51.8L12.2 40.2L4 32L12.2 23.8L12.2 12.2L23.8 12.2Z M23 32a9 9 0 1 0 18 0a9 9 0 1 0 -18 0Z"/>
+<circle cx="32" cy="32" r="4.5" fill="#e11d48"/></svg></span>
+      <a class="file" href="hesper.svg">hesper.svg</a>
+    </div>
+  </div>
+</article>
+<article class="card" id="unio">
+  <div class="stage dark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Unio logo">
+
+<g transform="translate(44 36) scale(1.375)"><path d="M8 6h11v27a13 13 0 0 0 26 0V6h11v27a24 24 0 0 1-48 0Z" fill="#f5f5f7"/>
+<circle cx="32" cy="20" r="7" fill="#fb7185"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#f5f5f7">Unio</text>
+</svg></div>
+  <div class="body">
+    <header>
+      <span class="num">15</span>
+      <h3>Unio</h3>
+      
+    </header>
+    <p class="why">Latin for "oneness", and also the word for a single, perfect pearl.</p>
+    <ul class="tags"><li>Latin</li></ul>
+    <dl>
+      <div><dt>Say it</dt><dd>OO-nee-oh</dd></div>
+      <div><dt>Domain idea</dt><dd><code>unio.ai / getunio.com</code></dd></div>
+      <div><dt>Mark</dt><dd>U letterform holding a pearl</dd></div>
+      <div><dt>Noticed</dt><dd class="conflict">Several small "Unio" apps: a business-docs app, a financial-advisor CRM, a Pilates studio tool.</dd></div>
+    </dl>
+    <div class="variants">
+      <figure class="v mono"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Unio logo">
+
+<g transform="translate(44 36) scale(1.375)"><path d="M8 6h11v27a13 13 0 0 0 26 0V6h11v27a24 24 0 0 1-48 0Z" fill="#f5f5f7"/>
+<circle cx="32" cy="20" r="7" fill="#f5f5f7"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#f5f5f7">Unio</text>
+</svg><figcaption>Mono, dark</figcaption></figure>
+      <figure class="v light"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Unio logo">
+
+<g transform="translate(44 36) scale(1.375)"><path d="M8 6h11v27a13 13 0 0 0 26 0V6h11v27a24 24 0 0 1-48 0Z" fill="#0b0b10"/>
+<circle cx="32" cy="20" r="7" fill="#e11d48"/></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#0b0b10">Unio</text>
+</svg><figcaption>Light</figcaption></figure>
+    </div>
+    <div class="favs">
+      <span class="lbl">Favicon</span>
+      <span class="fav d"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true"><path d="M8 6h11v27a13 13 0 0 0 26 0V6h11v27a24 24 0 0 1-48 0Z" fill="#f5f5f7"/>
+<circle cx="32" cy="20" r="7" fill="#fb7185"/></svg></span>
+      <span class="fav d"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="16" height="16" aria-hidden="true"><path d="M8 6h11v27a13 13 0 0 0 26 0V6h11v27a24 24 0 0 1-48 0Z" fill="#f5f5f7"/>
+<circle cx="32" cy="20" r="7" fill="#fb7185"/></svg></span>
+      <span class="fav l"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true"><path d="M8 6h11v27a13 13 0 0 0 26 0V6h11v27a24 24 0 0 1-48 0Z" fill="#0b0b10"/>
+<circle cx="32" cy="20" r="7" fill="#e11d48"/></svg></span>
+      <span class="fav l"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="16" height="16" aria-hidden="true"><path d="M8 6h11v27a13 13 0 0 0 26 0V6h11v27a24 24 0 0 1-48 0Z" fill="#0b0b10"/>
+<circle cx="32" cy="20" r="7" fill="#e11d48"/></svg></span>
+      <a class="file" href="unio.svg">unio.svg</a>
+    </div>
+  </div>
+</article>
+<article class="card" id="muster">
+  <div class="stage dark"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Muster logo">
+
+<g transform="translate(44 36) scale(1.375)"><rect x="24" y="6" width="16" height="12" rx="3" fill="#fb7185"/>
+<g fill="#f5f5f7"><rect x="13" y="26" width="16" height="12" rx="3"/><rect x="35" y="26" width="16" height="12" rx="3"/>
+<rect x="2" y="46" width="16" height="12" rx="3"/><rect x="24" y="46" width="16" height="12" rx="3"/><rect x="46" y="46" width="16" height="12" rx="3"/></g></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#f5f5f7">Muster</text>
+</svg></div>
+  <div class="body">
+    <header>
+      <span class="num">16</span>
+      <h3>Muster</h3>
+      
+    </header>
+    <p class="why">To call everything together for inspection: all hands on deck, every morning.</p>
+    <ul class="tags"><li>nautical</li><li>bold</li></ul>
+    <dl>
+      <div><dt>Say it</dt><dd><span class="muted">as written</span></dd></div>
+      <div><dt>Domain idea</dt><dd><code>muster.life / musterhq.com</code></dd></div>
+      <div><dt>Mark</dt><dd>Ranks forming up</dd></div>
+      <div><dt>Noticed</dt><dd class="conflict">Muster (advocacy CRM), a Muster all-in-one app for founders, Startup Muster (AU survey).</dd></div>
+    </dl>
+    <div class="variants">
+      <figure class="v mono"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Muster logo">
+
+<g transform="translate(44 36) scale(1.375)"><rect x="24" y="6" width="16" height="12" rx="3" fill="#f5f5f7"/>
+<g fill="#f5f5f7"><rect x="13" y="26" width="16" height="12" rx="3"/><rect x="35" y="26" width="16" height="12" rx="3"/>
+<rect x="2" y="46" width="16" height="12" rx="3"/><rect x="24" y="46" width="16" height="12" rx="3"/><rect x="46" y="46" width="16" height="12" rx="3"/></g></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#f5f5f7">Muster</text>
+</svg><figcaption>Mono, dark</figcaption></figure>
+      <figure class="v light"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-label="Muster logo">
+
+<g transform="translate(44 36) scale(1.375)"><rect x="24" y="6" width="16" height="12" rx="3" fill="#e11d48"/>
+<g fill="#0b0b10"><rect x="13" y="26" width="16" height="12" rx="3"/><rect x="35" y="26" width="16" height="12" rx="3"/>
+<rect x="2" y="46" width="16" height="12" rx="3"/><rect x="24" y="46" width="16" height="12" rx="3"/><rect x="46" y="46" width="16" height="12" rx="3"/></g></g>
+<text x="152" y="99" font-family="Geist, Inter, system-ui, sans-serif" font-size="54" font-weight="600" letter-spacing="-1.5" fill="#0b0b10">Muster</text>
+</svg><figcaption>Light</figcaption></figure>
+    </div>
+    <div class="favs">
+      <span class="lbl">Favicon</span>
+      <span class="fav d"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true"><rect x="24" y="6" width="16" height="12" rx="3" fill="#fb7185"/>
+<g fill="#f5f5f7"><rect x="13" y="26" width="16" height="12" rx="3"/><rect x="35" y="26" width="16" height="12" rx="3"/>
+<rect x="2" y="46" width="16" height="12" rx="3"/><rect x="24" y="46" width="16" height="12" rx="3"/><rect x="46" y="46" width="16" height="12" rx="3"/></g></svg></span>
+      <span class="fav d"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="16" height="16" aria-hidden="true"><rect x="24" y="6" width="16" height="12" rx="3" fill="#fb7185"/>
+<g fill="#f5f5f7"><rect x="13" y="26" width="16" height="12" rx="3"/><rect x="35" y="26" width="16" height="12" rx="3"/>
+<rect x="2" y="46" width="16" height="12" rx="3"/><rect x="24" y="46" width="16" height="12" rx="3"/><rect x="46" y="46" width="16" height="12" rx="3"/></g></svg></span>
+      <span class="fav l"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="32" height="32" aria-hidden="true"><rect x="24" y="6" width="16" height="12" rx="3" fill="#e11d48"/>
+<g fill="#0b0b10"><rect x="13" y="26" width="16" height="12" rx="3"/><rect x="35" y="26" width="16" height="12" rx="3"/>
+<rect x="2" y="46" width="16" height="12" rx="3"/><rect x="24" y="46" width="16" height="12" rx="3"/><rect x="46" y="46" width="16" height="12" rx="3"/></g></svg></span>
+      <span class="fav l"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="16" height="16" aria-hidden="true"><rect x="24" y="6" width="16" height="12" rx="3" fill="#e11d48"/>
+<g fill="#0b0b10"><rect x="13" y="26" width="16" height="12" rx="3"/><rect x="35" y="26" width="16" height="12" rx="3"/>
+<rect x="2" y="46" width="16" height="12" rx="3"/><rect x="24" y="46" width="16" height="12" rx="3"/><rect x="46" y="46" width="16" height="12" rx="3"/></g></svg></span>
+      <a class="file" href="muster.svg">muster.svg</a>
+    </div>
+  </div>
+</article>
+  </div>
+  <footer>Wordmarks are set in Geist, falling back to Inter or the system font. Each card links to its standalone dark SVG (480×160).</footer>
+</main>
+</body>
+</html>
