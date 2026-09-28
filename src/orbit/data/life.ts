@@ -41,13 +41,15 @@ export type Doc = {
   reference?: string;
   holder?: string;
   notes?: string;
+  /** Registration, for documents that belong to a car. */
+  vehicle?: string;
   source: SourceId;
 };
 
 export const docs: Doc[] = [
-  { id: "doc-car-insurance", title: "Car insurance", kind: "insurance", expires: on(10), reference: "HB-2291-0045", notes: "Renewal quote £486.20 (last year £431.50).", source: "outlook" },
-  { id: "doc-mot", title: "MOT · VW Golf (LK19 XRT)", kind: "mot", expires: on(47), reference: "LK19 XRT", source: "dvla" },
-  { id: "doc-vehicle-tax", title: "Vehicle tax · LK19 XRT", kind: "tax", expires: on(78), source: "dvla" },
+  { id: "doc-car-insurance", title: "Car insurance", kind: "insurance", expires: on(10), reference: "HB-2291-0045", notes: "Renewal quote £486.20 (last year £431.50).", vehicle: "LK19 XRT", holder: "Alex Rowe", source: "outlook" },
+  { id: "doc-mot", title: "MOT · VW Golf (LK19 XRT)", kind: "mot", expires: on(47), reference: "LK19 XRT", vehicle: "LK19 XRT", source: "dvla" },
+  { id: "doc-vehicle-tax", title: "Vehicle tax · LK19 XRT", kind: "tax", expires: on(78), vehicle: "LK19 XRT", notes: "Paid yearly by Direct Debit.", source: "dvla" },
   { id: "doc-passport", title: "Passport", kind: "passport", expires: on(212), holder: "Alex Rowe", reference: "Ends 4471", notes: "Some countries need 6 months left.", source: "manual" },
   { id: "doc-passport-sam", title: "Passport (Sam)", kind: "passport", expires: on(590), holder: "Sam Rowe", source: "manual" },
   { id: "doc-licence", title: "Driving licence photocard", kind: "licence", expires: on(1120), source: "manual" },
