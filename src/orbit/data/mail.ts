@@ -25,6 +25,14 @@ export type Message = {
   attachments?: { name: string; size: string }[];
   links?: Ref[];
   source: SourceId;
+  /** Hidden from the inbox until this time (ISO datetime). */
+  snoozedUntil?: string;
+  /** A short reply Orbit drafted for messages that need one. Paragraphs are separated by a blank line. */
+  suggestedReply?: string;
+  /** On a sent message: the id of the message it replies to. */
+  replyTo?: string;
+  /** When you replied from Orbit. */
+  repliedAt?: string;
 };
 
 const me: Person = { name: "Alex Rowe", email: "alex@rowe.example" };
@@ -52,6 +60,8 @@ export const messages: Message[] = [
     category: "work",
     needsReply: true,
     why: "Priya asked for something by Thursday",
+    suggestedReply:
+      "Hi Priya,\n\nYes, I'll have the final revenue and retention numbers to you by Wednesday evening, so you have Thursday to check them. I'll fill them straight into the slides in the deck.\n\nThanks,\nAlex",
     attachments: [{ name: "Q3-board-pack-draft.key", size: "4.2 MB" }],
     source: "gmail",
   }),
@@ -100,6 +110,7 @@ export const messages: Message[] = [
     category: "personal",
     needsReply: true,
     why: "Mum needs an answer by Friday",
+    suggestedReply: "Hi Mum,\n\nYes, we're both coming on Sunday. Tell Dad we can't wait for the roast. What time would you like us?\n\nLove, Alex x",
     source: "gmail",
   }),
   m({
@@ -124,6 +135,7 @@ export const messages: Message[] = [
     category: "personal",
     needsReply: true,
     why: "Your landlord is waiting to book the engineer",
+    suggestedReply: "Hi Tom,\n\nWednesday morning works best for me. I'll be in from 8.\n\nThanks for sorting it,\nAlex",
     source: "gmail",
   }),
   m({
@@ -172,6 +184,7 @@ export const messages: Message[] = [
     date: at(0, "11:15"),
     category: "personal",
     needsReply: true,
+    suggestedReply: "Count me in. See you at Market Road just before 7.",
     source: "gmail",
   }),
   m({
@@ -205,6 +218,111 @@ export const messages: Message[] = [
     body: ["Booked the hotel. Flight's at 16:20 so we can leave from work."],
     date: at(-6, "12:30"),
     folder: "sent",
+    read: true,
+    category: "personal",
+    source: "gmail",
+  }),
+  m({
+    id: "msg-lena",
+    from: { name: "Lena Fischer", email: "lena@lumen.example" },
+    subject: "Can we move our catch-up?",
+    snippet: "Something's come up on Wednesday afternoon. Could we do Friday at 10 instead? Same room.",
+    body: [
+      "Hi Alex,",
+      "Something's come up on Wednesday afternoon. Could we move our catch-up to Friday at 10 instead? Same room.",
+      "If Friday is tricky, Monday morning also works.",
+      "Lena",
+    ],
+    date: at(0, "09:57"),
+    category: "work",
+    needsReply: true,
+    why: "Lena wants to move your catch-up",
+    suggestedReply: "Hi Lena,\n\nFriday at 10 works for me. See you then.\n\nAlex",
+    source: "outlook",
+  }),
+  m({
+    id: "msg-dentist",
+    from: { name: "Parkside Dental", email: "reception@parksidedental.example" },
+    subject: "Your check-up is due",
+    snippet: "It's been six months since your last check-up. Reply to this email or call us to book.",
+    body: [
+      "Dear Alex,",
+      "It's been six months since your last check-up with Dr Morgan. Reply to this email or call the practice to book a time that suits you.",
+      "Parkside Dental",
+    ],
+    date: at(-2, "14:05"),
+    category: "updates",
+    source: "gmail",
+  }),
+  m({
+    id: "msg-halden",
+    from: { name: "Halden Books", email: "orders@haldenbooks.example" },
+    subject: "Your receipt for order 10442",
+    snippet: "Thanks for your order. The Well-Tended Garden, £22.00, paid by card ending 4471.",
+    body: ["Thanks for your order.", "The Well-Tended Garden (hardback), £22.00. Paid by card ending 4471.", "Your receipt is attached."],
+    date: at(-4, "19:22"),
+    read: true,
+    category: "receipts",
+    attachments: [{ name: "Receipt-10442.pdf", size: "88 KB" }],
+    source: "gmail",
+  }),
+  m({
+    id: "msg-slow-kitchen",
+    from: { name: "The Slow Kitchen", email: "letters@slowkitchen.example" },
+    subject: "Five soups for colder evenings",
+    snippet: "Roast squash with sage, a proper minestrone and a ten-minute miso broth.",
+    body: ["Roast squash with sage, a proper minestrone and a ten-minute miso broth.", "Plus: how to keep a batch of stock going all week."],
+    date: at(-2, "06:30"),
+    category: "newsletters",
+    source: "gmail",
+  }),
+  m({
+    id: "msg-climbing",
+    from: { name: "Hollow Lane Climbing", email: "members@hollowlane.example" },
+    subject: "Your membership freeze ends soon",
+    snippet: "Your membership restarts on the 1st. Nothing to do if you're coming back.",
+    body: ["Your membership freeze ends at the end of the month and your membership restarts on the 1st.", "Nothing to do if you're coming back. To extend the freeze, reply to this email."],
+    date: at(-3, "12:40"),
+    read: true,
+    category: "updates",
+    snoozedUntil: at(1, "08:00"),
+    source: "gmail",
+  }),
+  m({
+    id: "msg-council",
+    from: { name: "Ashby Borough Council", email: "counciltax@ashby.example" },
+    subject: "Your council tax account",
+    snippet: "Your payment plan for this year is set up. The next instalment is on the 1st.",
+    body: ["Your payment plan for this year is set up.", "The next instalment of £162.00 is collected on the 1st by Direct Debit."],
+    date: at(-12, "10:15"),
+    folder: "archive",
+    read: true,
+    category: "updates",
+    source: "outlook",
+  }),
+  m({
+    id: "msg-sent-marcus",
+    from: me,
+    to: [{ name: "Marcus Webb", email: "marcus@lumen.example" }],
+    subject: "Re: Retro notes from Monday",
+    snippet: "Thanks, got both. I'll have the roadmap draft over by next week.",
+    body: ["Thanks, got both. I'll have the roadmap draft over by next week."],
+    date: at(-1, "17:02"),
+    folder: "sent",
+    read: true,
+    category: "work",
+    replyTo: "msg-lumen-standup",
+    source: "outlook",
+  }),
+  m({
+    id: "msg-draft-garage",
+    from: me,
+    to: [{ name: "Castle Garage", email: "bookings@castlegarage.example" }],
+    subject: "MOT for the Golf",
+    snippet: "Hi, could I book the Golf in for its MOT some time next month? Mornings are best.",
+    body: ["Hi,", "Could I book the Golf (LK19 XRT) in for its MOT some time next month? Mornings are best for me.", "Thanks,\nAlex Rowe"],
+    date: at(-1, "21:48"),
+    folder: "drafts",
     read: true,
     category: "personal",
     source: "gmail",
