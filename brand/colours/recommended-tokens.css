@@ -1,0 +1,48 @@
+/*
+ * Orbit colour tokens: "Evergreen" scheme (recommended).
+ * Drop-in replacement for the :root block in src/index.css. Token names are unchanged.
+ * Note: `green` is the jade accent, `blue` the secondary accent.
+ * The two glow tokens keep their old names so existing gradients keep working;
+ * --glow-violet now holds the jade glow and --glow-rose the blue glow.
+ */
+:root {
+  --paper: #0b110e;
+  --white: #121a16;
+  --soft: #1b2520;
+  --line: #27332c;
+  --ink: #eef4f0;
+  --muted: #98a89e;
+  --green: #6bd6a0;
+  --sage: #12281d;
+  --sageDeep: #a8e8c6;
+  --coral: #f0705f;
+  --blue: #8ab4f8;
+  --yellow: #e8b84e;
+
+  --glow-violet: rgba(107, 214, 160, 0.16);
+  --glow-rose: rgba(138, 180, 248, 0.07);
+
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --paper: #f5f8f5;
+    --white: #ffffff;
+    --soft: #eaf0eb;
+    --line: #d8e2da;
+    --ink: #0f1c15;
+    --muted: #56665c;
+    --green: #1e7a4c;
+    --sage: #e3f2e8;
+    --sageDeep: #155c38;
+    --coral: #b93a2b;
+    --blue: #2f5fb3;
+    --yellow: #8a5d00;
+
+    --glow-violet: rgba(30, 122, 76, 0.12);
+    --glow-rose: rgba(47, 95, 179, 0.06);
+
+    color-scheme: light;
+  }
+}
