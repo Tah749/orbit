@@ -47,7 +47,11 @@ export function minutesBetween(a: string, b: string) {
   return Math.round((parse(b).getTime() - parse(a).getTime()) / MIN);
 }
 
-const fmt = (o: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat("en-GB", o);
+/** en-GB formatting, with "Sept" written as "Sep" to match the other short months. */
+const fmt = (o: Intl.DateTimeFormatOptions) => {
+  const f = new Intl.DateTimeFormat("en-GB", o);
+  return { format: (d: Date) => f.format(d).replace(/\bSept\b/, "Sep") };
+};
 const fTime = fmt({ hour: "2-digit", minute: "2-digit", hour12: false });
 const fDay = fmt({ weekday: "short", day: "numeric", month: "short" });
 const fLong = fmt({ weekday: "long", day: "numeric", month: "long" });
