@@ -5,3 +5,5 @@ dist
 *.tsbuildinfo
 dist-standalone
 brag-output/work
+.claude/worktrees/
+.claude/settings.local.json
