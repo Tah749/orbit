@@ -175,7 +175,7 @@ Rules:
 - `Wordmark` (`src/components/ui/Logo.tsx`): widely spaced lowercase monoline "orbit"; the i's tittle
   is the accent dot. Used in headers.
 - `Orb`: the symbol, a monoline ring with an accent dot (stroke is `currentColor`). Used as the small
-  mark and the assistant avatar in the demo app.
+  mark and the assistant avatar in the app.
 - `OrbitAppIcon`: the symbol in cream + teal on a charcoal tile. `drawOrbitIcon` in
   `src/story/brands.ts` draws the same icon on canvas for 3D textures. Keep the two in sync, and the
   favicon too.
