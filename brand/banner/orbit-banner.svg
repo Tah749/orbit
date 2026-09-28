@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1500 500" width="1500" height="500">
+  <rect width="1500" height="500" fill="#FFFFFF"/>
+  <!-- Symbol: monoline o with the accent tittle -->
+  <g transform="translate(394 145) scale(1.84)">
+    <circle cx="44" cy="56" r="29" fill="none" stroke="#1D1B18" stroke-width="11"/>
+    <circle cx="84" cy="22" r="10" fill="#0C6B66"/>
+  </g>
+  <!-- Wordmark: widely tracked monoline "orbit" -->
+  <g transform="translate(619 333) scale(2.02)">
+    <path d="M2.5 -25a22.5 22.5 0 1 0 45 0a22.5 22.5 0 1 0 -45 0ZM76.5 0V-50M124.92 0V-74M124.92 -25a22.5 22.5 0 1 0 45 0a22.5 22.5 0 1 0 -45 0ZM76.5 -26.13A21.38 21.38 0 0 1 97.88 -47.5h5.34M198.92 0V-50M226.12 -63.2V0M220.62 -47.5H232.62" fill="none" stroke="#1D1B18" stroke-width="5"/>
+    <circle cx="198.92" cy="-61" r="5" fill="#0C6B66"/>
+  </g>
+</svg>
