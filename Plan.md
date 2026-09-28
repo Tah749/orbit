@@ -218,7 +218,38 @@ Design notes:
 - Headline figures are simple (sales, orders, payouts, refunds) and always say which source and
   period they cover. No forecasting or tax advice.
 
-### 4.13 Everything else
+### 4.13 More integrations to consider
+
+Grouped by the life area they help with. "Easy" means self-serve keys or OAuth; "Gated" means a
+review, partnership or fee.
+
+| Area | Service | Route | What it adds | Effort |
+| --- | --- | --- | --- | --- |
+| **Car** | DVLA Vehicle Enquiry Service | Free API key (application reviewed) | Tax status, MOT expiry, vehicle details from a registration number | Easy |
+| | DVSA MOT history API | Registration required (new API since Sept 2025) | MOT results, advisories, mileage history | Gated (light) |
+| | Tesla Fleet API, other EV apps | OAuth | Charge level, charging sessions | Later |
+| **Home and energy** | Octopus Energy API | Customer's own API key | Half-hourly usage, tariff and cost | Easy (paste a key) |
+| | n3rgy / Glowmarkt (Hildebrand) | Consent via meter details | Smart-meter usage for any supplier | Gated, reliability varies |
+| | Google Nest (Device Access) | Programme with a one-off fee | Thermostat, doorbell events | Later |
+| **Getting around** | TfL Unified API | Free key | Tube and bus status, journey times for London commutes | Easy |
+| | National Rail (Darwin) | Free registration | Live train times for booked journeys | Easy |
+| | Google Maps Routes API | Paid per call | Leave-by times between calendar events | Easy |
+| | Met Office DataHub | Free tier | Weather in the morning briefing | Easy |
+| **Health** | Withings | OAuth | Weight, blood pressure, sleep | Easy |
+| | NHS App / NHS login | Partner programme only | Appointments, prescriptions | Gated; use appointment emails instead |
+| **Money with others** | Splitwise | OAuth | Shared expenses and who owes whom, for couples and housemates | Easy |
+| **Work and side projects** | Asana, Trello, Jira, Linear, ClickUp, Monday | OAuth | Tasks due and mentions, in the briefing | Easy |
+| | Zoom | OAuth | Meeting links and recordings for calendar events | Easy |
+| **Going out** | Ticketmaster Discovery, Eventbrite | API keys / OAuth | Tickets and events (plus confirmation emails) | Easy |
+| **Photos** | Google Photos | Picker API only | Picking a photo (e.g. a receipt) to hand to Orbit; since March 2025 apps can't read a whole library | Limited |
+| **Notes** | Evernote, Obsidian (local files) | API / file import | Search across notes in Ask Orbit | Later |
+| **Education** | Google Classroom | OAuth (school-managed accounts) | Homework due for older children | Later; school emails cover most |
+
+Not worth chasing (no usable API): Apple Notes, Goodreads (API closed), ClearScore/Experian credit
+scores, Tesco Clubcard and other loyalty schemes, school apps such as ClassDojo or ParentPay (use
+their emails), Headspace and most wellbeing apps.
+
+### 4.14 Everything else
 
 | Service | Plan |
 | --- | --- |
@@ -408,3 +439,8 @@ Research done in September 2026. Re-check before relying on any of it, since pro
 - Shopify approval for orders older than 60 days: https://www.cleverence.com/articles/shopify-dev-documentation/apps-now-need-shopify-approval-to-read-orders-older-than-60-3815/
 - Stripe Connect OAuth reference: https://docs.stripe.com/connect/oauth-reference
 - Etsy Open API v3 authentication: https://developer.etsy.com/documentation/essentials/authentication/
+- DVSA MOT history API: https://dvsa.github.io/mot-history-api-documentation/
+- DVLA Vehicle Enquiry API guide: https://paul-walsh.co.uk/dvla-vehicle-enquiry-api-guide/
+- Google Photos API updates (March 2025): https://developers.google.com/photos/support/updates
+- Octopus Energy API guide: https://www.guylipman.com/octopus/api_guide.html
+- Smart meter data access (n3rgy, Glowmarkt): https://www.smartme.co.uk/meter-data
