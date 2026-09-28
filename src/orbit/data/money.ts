@@ -94,6 +94,69 @@ export const txns: Txn[] = [
   t(-12, "20:15", "Dishoom", -41.5, "eating-out"),
   t(-13, "17:02", "Sainsbury's", -44.1, "groceries"),
   t(-14, "09:00", "Rent", -1450, "bills"),
+  // Earlier weeks, so this month can be compared with last month.
+  t(-15, "19:10", "Sainsbury's", -41.2, "groceries"),
+  t(-15, "12:30", "Pret A Manger", -6.1, "eating-out"),
+  t(-16, "08:40", "TfL", -6.8, "transport"),
+  t(-16, "06:00", "Guardian News", -4.99, "entertainment", "acc-amex"),
+  t(-17, "20:30", "Hawksmoor", -78.5, "eating-out", "acc-amex"),
+  t(-18, "06:00", "Shopify", -25, "business", "acc-starling"),
+  t(-18, "14:20", "Uniqlo", -39.9, "shopping", "acc-amex"),
+  t(-19, "18:05", "Waitrose", -47.3, "groceries"),
+  t(-20, "10:15", "Shopify payout", 388.2, "business", "acc-starling"),
+  t(-20, "13:00", "Leon", -10.45, "eating-out"),
+  t(-21, "06:00", "Wren Mobile", -18, "bills"),
+  t(-21, "17:40", "TfL", -8.4, "transport"),
+  t(-22, "11:00", "Boots", -8.99, "health"),
+  t(-23, "19:30", "Tesco", -28.4, "groceries"),
+  t(-24, "06:00", "Stratus", -7.99, "bills", "acc-amex"),
+  t(-24, "21:15", "Deliveroo", -31.2, "eating-out", "acc-amex"),
+  t(-25, "06:00", "Spotify", -16.99, "entertainment", "acc-amex"),
+  t(-26, "06:00", "Lumen Fibre", -29.99, "bills"),
+  t(-26, "12:10", "Olmo", -18.5, "eating-out"),
+  t(-27, "06:00", "Northgrid Energy", -64.22, "bills"),
+  t(-27, "18:55", "Sainsbury's", -36.8, "groceries"),
+  t(-28, "20:00", "Barbican", -42, "entertainment", "acc-amex"),
+  t(-29, "06:00", "Chapterhouse Audio", -8.99, "entertainment", "acc-amex"),
+  t(-29, "10:30", "Waterstones", -22.99, "shopping"),
+  t(-30, "08:20", "Uber", -11.6, "transport", "acc-amex"),
+  t(-31, "19:45", "Waitrose", -58.9, "groceries"),
+  t(-32, "13:10", "Pret A Manger", -5.45, "eating-out"),
+  t(-33, "09:00", "Transfer to Rainy day pot", -150, "transfers"),
+  t(-33, "20:10", "Netflix", -10.99, "entertainment", "acc-amex"),
+  t(-34, "15:30", "Packaging Direct", -38.2, "business", "acc-starling"),
+  t(-35, "08:30", "Lumen Labs Ltd salary", 3450, "income"),
+  t(-35, "19:00", "Dishoom", -46.0, "eating-out", "acc-amex"),
+  t(-36, "11:45", "Arlo & Co", -28, "shopping", "acc-amex"),
+  t(-37, "18:30", "Tesco", -33.6, "groceries"),
+  t(-38, "10:10", "Council tax", -148, "bills"),
+  t(-38, "09:55", "Thames Water", -38.2, "bills"),
+  t(-39, "08:10", "TfL", -7.2, "transport"),
+  t(-40, "12:00", "Boots", -15.3, "health"),
+  t(-41, "08:00", "Third Space", -95, "health"),
+  t(-42, "19:20", "Sainsbury's", -42.75, "groceries"),
+  t(-43, "21:30", "Everyman Cinema", -24, "entertainment"),
+  t(-44, "09:00", "Rent", -1450, "bills"),
+  t(-45, "13:20", "Leon", -9.45, "eating-out"),
+  t(-46, "06:00", "Guardian News", -4.99, "entertainment", "acc-amex"),
+  t(-47, "10:00", "Shopify payout", 296.4, "business", "acc-starling"),
+  t(-48, "18:10", "Waitrose", -49.6, "groceries"),
+  t(-49, "06:00", "Shopify", -25, "business", "acc-starling"),
+  t(-50, "14:00", "COS", -85, "shopping", "acc-amex"),
+  t(-51, "06:00", "Wren Mobile", -18, "bills"),
+  t(-52, "20:40", "Bao", -34.5, "eating-out", "acc-amex"),
+  t(-53, "19:05", "Tesco", -29.9, "groceries"),
+  t(-54, "06:00", "Stratus", -7.99, "bills", "acc-amex"),
+  t(-55, "06:00", "Spotify", -16.99, "entertainment", "acc-amex"),
+  t(-55, "17:30", "TfL", -9.6, "transport"),
+  t(-56, "06:00", "Lumen Fibre", -29.99, "bills"),
+  t(-57, "06:00", "Northgrid Energy", -64.22, "bills"),
+  t(-57, "18:40", "Sainsbury's", -39.4, "groceries"),
+  t(-58, "12:15", "Pret A Manger", -4.95, "eating-out"),
+  t(-59, "06:00", "Chapterhouse Audio", -8.99, "entertainment", "acc-amex"),
+  t(-59, "19:30", "Uber", -16.8, "transport", "acc-amex"),
+  t(-61, "19:00", "Waitrose", -44.2, "groceries"),
+  t(-62, "09:00", "Transfer to Rainy day pot", -150, "transfers"),
 ];
 
 export type Bill = {
@@ -112,6 +175,13 @@ export type Bill = {
   /** Previous amount, if it changed. */
   previous?: number;
   source: SourceId;
+  /** When it was last marked as paid in Orbit. */
+  lastPaid?: string;
+  /** Last sign the subscription was used, and where that came from. */
+  lastUsed?: string;
+  usageSource?: SourceId;
+  /** What counts as use, e.g. "download receipt". */
+  usageSign?: string;
 };
 
 export const bills: Bill[] = [
@@ -128,6 +198,7 @@ export const bills: Bill[] = [
   { id: "sub-gym", name: "Third Space", payee: "Third Space", amount: 95, due: on(19), recurrence: "monthly", kind: "subscription", category: "fitness", autopay: true, status: "upcoming", accountId: "acc-monzo", source: "monzo" },
   { id: "sub-shopify", name: "Shopify Basic", payee: "Shopify", amount: 25, due: on(12), recurrence: "monthly", kind: "subscription", category: "software", autopay: true, status: "upcoming", accountId: "acc-starling", source: "shopify" },
   { id: "sub-news", name: "The Observer", payee: "Guardian News", amount: 5.99, previous: 4.99, due: on(14), recurrence: "monthly", kind: "subscription", category: "other", autopay: true, status: "upcoming", accountId: "acc-amex", source: "amex" },
+  { id: "sub-audio", name: "Chapterhouse Audio", payee: "Chapterhouse Audio", amount: 8.99, due: on(1), recurrence: "monthly", kind: "subscription", category: "other", autopay: true, status: "upcoming", accountId: "acc-amex", source: "amex", lastUsed: at(-66, "21:40"), usageSource: "gmail", usageSign: "download receipt" },
 ];
 
 export type Holding = {
