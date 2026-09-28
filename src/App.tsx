@@ -7,12 +7,13 @@ import type { TabKey } from "./app/data";
 
 const BelowFold = lazy(() => import("./components/BelowFold"));
 const OrbitApp = lazy(() => import("./app/OrbitApp"));
+const Journey = lazy(() => import("./journey/Journey"));
 
 const appTabs: TabKey[] = ["home", "inbox", "calendar", "email", "bills", "investments", "bookings", "fitness", "tasks", "assistant", "settings"];
 
 /**
  * Tiny hash router. "#/privacy" style routes are pages, "#/app/<tab>" is the interactive demo
- * ("#app" is a short alias), and plain "#anchor" hashes are in-page links.
+ * ("#app" is a short alias), "#/journey" is the 3D scroll experience, and plain "#anchor" hashes are in-page links.
  */
 function readRoute() {
   const h = window.location.hash;
@@ -72,6 +73,13 @@ export default function App() {
     return (
       <Suspense fallback={<AppFallback />}>
         <OrbitApp tab={tab} go={go} />
+      </Suspense>
+    );
+  }
+  if (route === "journey") {
+    return (
+      <Suspense fallback={<div className="min-h-[100dvh] bg-paper" />}>
+        <Journey />
       </Suspense>
     );
   }

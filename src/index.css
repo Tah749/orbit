@@ -127,3 +127,21 @@
     opacity: 1;
   }
 }
+
+/* Journey: Lenis handles smooth scrolling, so the native smooth behaviour must be off. */
+html.lenis,
+html.lenis body {
+  height: auto;
+  scroll-behavior: auto;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+@keyframes scrollcue {
+  0% {
+    transform: translateY(-100%);
+  }
+  100% {
+    transform: translateY(250%);
+  }
+}
