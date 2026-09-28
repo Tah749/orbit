@@ -8,7 +8,13 @@ npm install
 npm run dev       # local dev server
 npm run build     # typecheck + production build into dist/
 npm run preview   # serve the production build
+npm run build:standalone   # one self-contained file: dist-standalone/index.html
 ```
+
+Don't open the root `index.html` directly: it's the Vite source entry and needs `npm run dev`.
+To view the site without a server, run `npm run build:standalone` and open
+`dist-standalone/index.html` (JS, CSS and fonts are all inlined). The normal `dist/` build uses
+relative asset paths, so it can be hosted from any folder or subpath, such as GitHub Pages.
 
 ## Structure
 
