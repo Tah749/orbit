@@ -1,0 +1,129 @@
+@import "tailwindcss";
+
+/*
+ * Orbit colour tokens. Names match the product design system exactly.
+ * Change them here and the whole site follows.
+ * Note: `green` is intentionally the rose-pink accent.
+ */
+:root {
+  --paper: #0b0a10;
+  --white: #16141d;
+  --soft: #221f2b;
+  --line: #2e2a3a;
+  --ink: #f8f6fb;
+  --muted: #a39db0;
+  --green: #ff4d7a;
+  --sage: #2a1320;
+  --sageDeep: #ffb0c4;
+  --coral: #ff5a4f;
+  --blue: #a78bfa;
+  --yellow: #ffa24d;
+
+  --glow-violet: rgba(124, 77, 255, 0.2);
+  --glow-rose: rgba(232, 51, 107, 0.08);
+
+  color-scheme: dark;
+}
+
+/* Semantic Tailwind aliases for the tokens above (bg-surface, text-muted, border-line...). */
+@theme inline {
+  --color-paper: var(--paper);
+  --color-surface: var(--white);
+  --color-soft: var(--soft);
+  --color-line: var(--line);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-accent: var(--green);
+  --color-accent-bg: var(--sage);
+  --color-accent-fg: var(--sageDeep);
+  --color-coral: var(--coral);
+  --color-info: var(--blue);
+  --color-warn: var(--yellow);
+
+  --font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono Variable", ui-monospace, monospace;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 5rem;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    overflow-x: hidden;
+  }
+  ::selection {
+    background: color-mix(in srgb, var(--green) 35%, transparent);
+    color: var(--ink);
+  }
+  :focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  /* Atmospheric top glow: violet into rose into nothing. */
+  .glow-top {
+    background:
+      radial-gradient(60% 55% at 50% 0%, var(--glow-violet) 0%, var(--glow-rose) 45%, transparent 75%);
+  }
+  .glow-cta {
+    background:
+      radial-gradient(50% 60% at 50% 55%, var(--glow-violet) 0%, var(--glow-rose) 50%, transparent 80%);
+  }
+  /* The Orbit mark: a lit sphere. */
+  .orb {
+    border-radius: 9999px;
+    background:
+      radial-gradient(circle at 34% 28%, #ffd3e0 0%, #ff4d7a 32%, #7c4dff 72%, #2a1a55 100%);
+    box-shadow:
+      inset -2px -3px 6px rgba(11, 10, 16, 0.45),
+      0 0 0 1px rgba(255, 255, 255, 0.06);
+  }
+  .hairline-top {
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  }
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@keyframes draw-check {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes pop-in {
+  from {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
