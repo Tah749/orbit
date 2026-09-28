@@ -249,7 +249,25 @@ Not worth chasing (no usable API): Apple Notes, Goodreads (API closed), ClearSco
 scores, Tesco Clubcard and other loyalty schemes, school apps such as ClassDojo or ParentPay (use
 their emails), Headspace and most wellbeing apps.
 
-### 4.14 Everything else
+### 4.14 More life areas
+
+| Area | Service | Route | What it adds | Effort |
+| --- | --- | --- | --- | --- |
+| **People and family** | Google Contacts (People API), Microsoft contacts (Graph), iOS Contacts | OAuth / on-device | Birthdays and anniversaries in the briefing, "who is this email from" | Easy (contacts is a sensitive scope on Google) |
+| **Tax and admin** | HMRC Making Tax Digital APIs | HMRC developer hub; recognised software status | Quarterly update deadlines and estimates for sole traders and landlords (MTD for Income Tax began April 2026 above £50k) | Gated; start by reading figures from Xero/QuickBooks/FreeAgent instead |
+| **Faith and routine** | Prayer-time and religious calendar APIs (e.g. Aladhan, Hebcal) | Free APIs | Prayer times, fasting and festival dates in the day view | Easy |
+| **News and sport** | Guardian Open Platform | Free key | A short headlines line in the briefing | Easy |
+| | Football and sports fixtures APIs (e.g. football-data.org) | Free tier / paid | "Your team plays at 8pm", ticket reminders | Easy |
+| **Watching and listening** | Trakt, TMDB | OAuth / free key | New episodes of shows you follow, film release dates | Easy |
+| | Spotify | OAuth | Concerts from artists you listen to (with Ticketmaster) | Easy |
+| | Steam | Web API key | Game releases and wishlist sales | Easy, niche |
+| **Reading and learning** | Readwise / Readwise Reader | User API token | Saved articles and highlights in Ask Orbit | Easy |
+| | Pocket | | **Shut down (API ended October 2025).** | No |
+| **Giving** | JustGiving | API | Sponsorship pages and pledges you've made | Later |
+| **Pets** | None usable | Vet and insurer emails, manual reminders | Vaccinations, flea treatment, pet insurance renewal | Manual |
+| **Renting and home admin** | Letting agents, councils, landlords | Emails and letter uploads | Rent due, inspections, bin days, tenancy renewal | Email |
+
+### 4.15 Everything else
 
 | Service | Plan |
 | --- | --- |
@@ -444,3 +462,7 @@ Research done in September 2026. Re-check before relying on any of it, since pro
 - Google Photos API updates (March 2025): https://developers.google.com/photos/support/updates
 - Octopus Energy API guide: https://www.guylipman.com/octopus/api_guide.html
 - Smart meter data access (n3rgy, Glowmarkt): https://www.smartme.co.uk/meter-data
+- HMRC MTD for Income Tax end-to-end service guide: https://developer.service.hmrc.gov.uk/guides/income-tax-mtd-end-to-end-service-guide/
+- Pocket shutdown: https://9to5mac.com/2025/05/22/mozilla-announces-shutdown-of-pocket/
+- Readwise API: https://readwise.io/api_deets
+- Trakt API: https://github.com/trakt/trakt-api
