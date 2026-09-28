@@ -127,6 +127,7 @@ src/
 brand/                     brand explorations, each with an index.html gallery
   names/  logos/  colours/  colours-v2/
 brag-output/               promo video assets (work/ is ignored)
+Plan.md                    product and integrations roadmap for the future app (not built in this repo)
 ```
 
 ## Design system
