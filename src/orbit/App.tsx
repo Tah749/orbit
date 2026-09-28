@@ -8,7 +8,7 @@ import { href, useRoute } from "./router";
 import { useDB } from "./store";
 import { cx, Kbd, Skeleton, Toasts } from "./ui";
 import { CommandPalette } from "./CommandPalette";
-import { stamp } from "./time";
+import { on, stamp } from "./time";
 
 const groups: { key: Section["group"]; label?: string }[] = [
   { key: "main" },
@@ -20,7 +20,7 @@ const groups: { key: Section["group"]; label?: string }[] = [
 function useBadges(): Record<string, number> {
   return useDB((d) => ({
     inbox: d.messages.filter((m) => m.folder === "inbox" && !m.read).length,
-    tasks: d.tasks.filter((t) => !t.done && t.due && t.due <= new Date().toISOString().slice(0, 10)).length,
+    tasks: d.tasks.filter((t) => !t.done && t.due && t.due <= on(0)).length,
     deliveries: d.orders.filter((o) => o.status === "out-for-delivery").length,
     business: d.shopOrders.filter((o) => o.status === "unfulfilled").length,
   }));
