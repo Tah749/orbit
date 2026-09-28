@@ -148,14 +148,14 @@ html.lenis body {
 
 /* Story: hologram treatments */
 .holo-scan {
-  background: repeating-linear-gradient(to bottom, rgba(201, 184, 255, 0.5) 0 1px, transparent 1px 3px);
+  background: repeating-linear-gradient(to bottom, rgba(142, 232, 255, 0.5) 0 1px, transparent 1px 3px);
 }
 .holo-text {
-  background: linear-gradient(180deg, #ffffff 0%, #e6e0ff 35%, #a78bfa 70%, #ff4d7a 100%);
+  background: linear-gradient(180deg, #ffffff 0%, #dff8ff 35%, #45d4f0 70%, #ff4d7a 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  filter: drop-shadow(0 0 18px rgba(167, 139, 250, 0.55)) drop-shadow(0 0 2px rgba(255, 255, 255, 0.6));
+  filter: drop-shadow(0 0 18px rgba(69, 212, 240, 0.5)) drop-shadow(0 0 2px rgba(255, 255, 255, 0.6));
   animation: holo-flicker 5s infinite steps(1);
 }
 @keyframes holo-flicker {

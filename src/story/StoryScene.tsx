@@ -26,13 +26,14 @@ const C = V(0, 0, -30); // the world inside the phone
 const col = (hex: string) => new THREE.Color(hex);
 const outro = "\n#include <colorspace_fragment>\n";
 
+/** Midnight blue and cyan for the world; rose stays the brand accent. */
 const pal = {
   rose: "#FF4D7A",
   roseSoft: "#FFB0C4",
-  violet: "#A78BFA",
-  deep: "#7C4DFF",
-  blue: "#6F7DFF",
-  ice: "#DCD6FF",
+  violet: "#45D4F0",
+  deep: "#0F5E8C",
+  blue: "#3D8BFF",
+  ice: "#D4F6FF",
   amber: "#FFA24D",
   hot: "#FFE6EE",
 };
@@ -42,9 +43,17 @@ type Key = { pos: THREE.Vector3; look: THREE.Vector3; desk: [number, number]; mo
 const keys: Key[] = [
   { pos: V(0, 0.3, 17), look: V(0, 0, 0), desk: [0.2, 0], mob: [0, -0.2], m: 1.7 },
   { pos: V(0, 0, 12), look: V(0, 0, 0), desk: [0.2, 0], mob: [0, -0.17], m: 1.6 },
-  { pos: V(0, 0.3, -2), look: C, desk: [0.19, 0], mob: [0, -0.14], m: 1.15 },
+  { pos: V(0, 0.3, -0.4), look: C, desk: [0.15, 0], mob: [-0.06, -0.14], m: 1 },
   { pos: V(-5, 2.5, -9), look: C, desk: [-0.2, 0], mob: [0, 0.2], m: 1.4 },
   { pos: V(0, 0, -15.5), look: C, desk: [0, -0.16], mob: [0, -0.2], m: 1 },
+  // V: back out through the glass; the phone now runs Orbit.
+  { pos: V(0, 5, 31), look: V(0, 1.6, 0), desk: [0, 0.2], mob: [0, 0.3], m: 1.5 },
+  // Inside Orbit: the camera drifts in around the phone while each feature is shown.
+  { pos: V(-9.5, 3.5, 17.5), look: V(0, 0.6, 0), desk: [-0.25, 0.02], mob: [0, 0.3], m: 1.5 },
+  { pos: V(9.5, 2.2, 15.5), look: V(0, 0.3, 0), desk: [0.25, 0], mob: [0, 0.3], m: 1.5 },
+  { pos: V(-8.5, 0.8, 15), look: V(0, 0, 0), desk: [-0.25, 0], mob: [0, 0.3], m: 1.5 },
+  { pos: V(8.5, 4.5, 17), look: V(0, 0.8, 0), desk: [0.25, 0], mob: [0, 0.3], m: 1.5 },
+  // Join: pull back to the phone and its hologram above the call to action.
   { pos: V(0, 5, 31), look: V(0, 1.6, 0), desk: [0, 0.3], mob: [0, 0.35], m: 1.5 },
 ];
 
@@ -102,7 +111,7 @@ function Rig({ reduce }: { reduce: boolean }) {
     if (st.start < 0) st.start = t;
     live.time = t;
     live.mobile = size.width / size.height < 0.8;
-    live.inner = live.mobile ? 0.6 : 1;
+    live.inner = live.mobile ? 0.5 : 1;
 
     live.prevK = st.k;
     st.k += (actAt(story.progress) - st.k) * (1 - Math.exp(-dt * (reduce ? 20 : 4.5)));
@@ -157,7 +166,9 @@ function Rig({ reduce }: { reduce: boolean }) {
     if (crossed(2.72)) sfx.swell();
     if (crossed(3.52)) sfx.shimmer();
     if (crossed(4.8)) sfx.powerUp();
-    const cross = (k > 1 && k < 2.2) || (k > 4 && k < 5) ? Math.exp(-dz * dz * 0.9) : 0;
+    // Only while actually travelling through the glass, not while parked just behind it.
+    const transit = Math.max(ramp(1.2, 1.35, 1.85, 1.97, k), ramp(4.2, 4.35, 4.75, 4.9, k));
+    const cross = transit * Math.exp(-dz * dz * 0.9);
     const flash = Math.max(cross * 0.85, ramp(2.72, 2.8, 2.8, 2.95, k) * 0.5);
     const el = document.getElementById("story-flash");
     if (el) el.style.opacity = flash.toFixed(3);
@@ -193,7 +204,7 @@ function Stars() {
       transparent: true,
       depthWrite: false,
       blending: THREE.AdditiveBlending,
-      uniforms: { uPR: { value: 1 }, uTime: { value: 0 }, uC: { value: col("#D9D2FF") } },
+      uniforms: { uPR: { value: 1 }, uTime: { value: 0 }, uC: { value: col("#D6ECFF") } },
       vertexShader: /* glsl */ `
         attribute float aSize; uniform float uPR, uTime; varying float vT;
         void main(){ gl_Position = projectionMatrix * modelViewMatrix * vec4(position,1.); gl_PointSize = aSize*uPR*1.5; vT = 0.6 + 0.4*sin(uTime*1.3 + position.x); }`,
@@ -474,8 +485,24 @@ const reelZ = C.z + 0.3 - REEL.r;
 /** Each reel lands Orbit on the payline; the apps either side of it break out into the network. */
 const stopCell = [0, 3, 6, 9, 2];
 /** Act positions where each reel stops. The last one holds on for suspense. */
-const stopAt = [2.06, 2.11, 2.16, 2.21, 2.34];
-const JACKPOT = 2.36;
+const SPIN_FROM = 2.04;
+const stopAt = [2.2, 2.25, 2.3, 2.35, 2.47];
+const JACKPOT = 2.49;
+/** Seconds after a manual pull when each reel lands; the last one holds for suspense. */
+const manualStop = [1.25, 1.55, 1.85, 2.15, 2.95];
+const idleCell = stopCell.map((c, i) => (c + 3 + i) % 12);
+
+/**
+ * The machine can be played two ways: pull the lever (time-driven) or keep scrolling
+ * (scroll-driven). Either way it lands on the jackpot, and wonAt marks the moment.
+ */
+export const slot = { pulledAt: -1, wonAt: -1 };
+const leverReady = (k: number) => k > 1.86 && k < SPIN_FROM && slot.pulledAt < 0 && slot.wonAt < 0;
+function pullLever() {
+  if (live.k < 1.7 || live.k >= JACKPOT || slot.pulledAt >= 0 || slot.wonAt >= 0) return;
+  slot.pulledAt = live.time;
+  sfx.lever();
+}
 
 const reelOrders = stopCell.map((c, r) => {
   const order = new Array<number>(REEL.cells).fill(-1);
@@ -607,13 +634,26 @@ function Machine({ glow }: { glow: THREE.Texture }) {
     if (atlas) parts.mats.forEach((m) => (m.uniforms.uMap.value = atlas));
   }, [atlas, parts]);
 
-  const reels = useRef(stopCell.map((c, i) => ({ angle: c * cellA + i * 1.3, v: 0, aim: null as number | null, spinning: false })));
+  const reels = useRef(idleCell.map((c) => ({ angle: c * cellA, v: 0, aim: null as number | null, target: c, spinning: false })));
   const tick = useRef(0);
+  const knob = useRef<THREE.MeshPhysicalMaterial>(null);
+  const hovering = useRef(false);
   const { camera } = useThree();
+
+  useEffect(() => {
+    const onPull = () => pullLever();
+    window.addEventListener("story:pull", onPull);
+    return () => {
+      window.removeEventListener("story:pull", onPull);
+      document.body.style.cursor = "";
+      slot.pulledAt = slot.wonAt = -1;
+    };
+  }, []);
 
   useFrame((_, delta) => {
     const dt = Math.min(delta, 1 / 20);
     const k = live.k;
+    const now = live.time;
     const g = group.current;
     if (!g) return;
     // Only once the camera is through the glass, so it never shows around the phone.
@@ -623,33 +663,51 @@ function Machine({ glow }: { glow: THREE.Texture }) {
     g.visible = vis > 0.001;
     g.scale.setScalar(Math.max(0.001, live.inner * (0.55 + 0.45 * through) * (1 - collapse * 0.95)));
     g.rotation.y = collapse * 0.9;
-    const won = k >= JACKPOT;
-    const win = ramp(JACKPOT, JACKPOT + 0.03, 2.62, 2.72, k) * (0.7 + 0.3 * Math.sin(live.time * 22));
+
+    // Scrolling back above the machine resets it so it can be played again.
+    if (k < 1.8) slot.pulledAt = slot.wonAt = -1;
+    const manual = slot.pulledAt >= 0;
+    const since = now - slot.pulledAt;
+    if (!manual && crossed(2.01)) sfx.lever();
 
     let anySpin = 0;
     reels.current.forEach((r, i) => {
-      const spinning = k > 1.3 && k < stopAt[i];
+      const spinning = manual ? since > 0.22 && since < manualStop[i] : k > SPIN_FROM && k < stopAt[i];
+      const settled = manual ? since >= manualStop[i] : k >= stopAt[i];
       if (spinning) {
         // The last reel slows right down before it lands.
-        const slow = i === 4 ? 1 - smooth(stopAt[3], stopAt[4], k) * 0.8 : 1;
-        r.v = (9 + i * 0.7) * slow;
+        const slow = i === 4 ? 1 - (manual ? smooth(manualStop[3], manualStop[4], since) : smooth(stopAt[3], stopAt[4], k)) * 0.8 : 1;
+        const spinUp = manual ? smooth(0.22, 0.6, since) : 1;
+        r.v = (9 + i * 0.7) * slow * spinUp;
         r.angle += r.v * dt;
         r.aim = null;
         anySpin = Math.max(anySpin, r.v);
       } else {
-        if (r.aim === null) {
-          const target = stopCell[i] * cellA;
-          r.aim = target + Math.ceil((r.angle - target) / (Math.PI * 2) + 0.02) * Math.PI * 2;
-          if (r.spinning && k > live.prevK) sfx.clunk(i === 4);
+        const target = settled ? stopCell[i] : idleCell[i];
+        if (r.aim === null || r.target !== target) {
+          r.target = target;
+          r.aim = target * cellA + Math.ceil((r.angle - target * cellA) / (Math.PI * 2) + 0.02) * Math.PI * 2;
+          if (r.spinning && settled) sfx.clunk(i === 4);
         }
         // A damped spring, so each reel lands with a small bounce.
         r.v += ((r.aim - r.angle) * 90 - r.v * 11) * dt;
         r.angle += r.v * dt;
       }
       r.spinning = spinning;
+    });
+
+    // The jackpot: after the last reel of a manual pull, or when scrolling past it.
+    if (slot.wonAt < 0 && ((manual && since >= manualStop[4] + 0.12) || (!manual && crossed(JACKPOT)))) {
+      slot.wonAt = now;
+      sfx.jackpot();
+    }
+    if (!manual && k < JACKPOT - 0.02) slot.wonAt = -1;
+    const won = slot.wonAt >= 0;
+    const win = won ? smooth(0, 0.15, now - slot.wonAt) * (0.7 + 0.3 * Math.sin(now * 22)) * (1 - smooth(2.62, 2.72, k)) : 0;
+    reels.current.forEach((_, i) => {
       const m = parts.mats[i];
-      m.uniforms.uAngle.value = r.angle;
-      m.uniforms.uBlur.value = Math.min(1, Math.abs(r.v) / 9);
+      m.uniforms.uAngle.value = reels.current[i].angle;
+      m.uniforms.uBlur.value = Math.min(1, Math.abs(reels.current[i].v) / 9);
       m.uniforms.uWin.value = won ? Math.max(0.35, win) * (1 - collapse) : 0;
     });
 
@@ -661,14 +719,25 @@ function Machine({ glow }: { glow: THREE.Texture }) {
         sfx.tick();
       }
     }
-    if (crossed(1.78)) sfx.lever();
 
-    const phase = Math.floor(live.time * (won ? 9 : 3)) % 2;
+    const phase = Math.floor(now * (won ? 9 : 3)) % 2;
     if (marqueeMat.current) marqueeMat.current.map = marquees[(won ? 2 : 0) + phase];
-    parts.haloMat.uniforms.uI.value = 0.8 + win * 1.5 + Math.sin(live.time * 3) * 0.1;
+    parts.haloMat.uniforms.uI.value = 0.8 + win * 1.5 + Math.sin(now * 3) * 0.1;
     parts.winMat.opacity = win;
     parts.winHaloMat.uniforms.uI.value = win * 2.2;
-    if (lever.current) lever.current.rotation.x = ramp(1.75, 1.9, 1.95, 2.15, k) * 1.1;
+
+    // The lever: pulled by hand (time) or by scrolling past it.
+    const pullHand = manual ? (since < 0.18 ? since / 0.18 : since < 0.35 ? 1 : Math.max(0, 1 - (since - 0.35) / 0.45)) : 0;
+    const pullScroll = manual ? 0 : ramp(2.0, 2.05, 2.07, 2.16, k);
+    if (lever.current) lever.current.rotation.x = Math.max(pullHand, pullScroll) * 1.1;
+    const ready = leverReady(k) && through > 0.9;
+    if (knob.current) knob.current.emissiveIntensity = 0.5 + (ready ? 0.9 + Math.sin(now * 6) * 0.6 : 0) + (hovering.current && ready ? 0.8 : 0);
+    const hint = document.getElementById("lever-hint");
+    if (hint) {
+      hint.style.opacity = ready ? "1" : "0";
+      hint.style.pointerEvents = ready ? "auto" : "none";
+    }
+    if (!ready && hovering.current) document.body.style.cursor = "";
   });
 
   return (
@@ -685,7 +754,7 @@ function Machine({ glow }: { glow: THREE.Texture }) {
         {/* Backplate behind the reels */}
         <mesh position={[0, -0.6, -REEL.r * 2 + 0.2]}>
           <planeGeometry args={[19, 8]} />
-          <meshBasicMaterial color="#07060a" />
+          <meshBasicMaterial color="#03070b" />
         </mesh>
         {atlas &&
           parts.mats.map((m, i) => (
@@ -709,14 +778,32 @@ function Machine({ glow }: { glow: THREE.Texture }) {
             <cylinderGeometry args={[0.55, 0.55, 0.8, 32]} />
             <primitive object={parts.frameMat} attach="material" />
           </mesh>
-          <group ref={lever}>
+          <group
+            ref={lever}
+            onPointerDown={(e) => {
+              e.stopPropagation();
+              pullLever();
+            }}
+            onPointerOver={() => {
+              hovering.current = true;
+              if (leverReady(live.k)) document.body.style.cursor = "grab";
+            }}
+            onPointerOut={() => {
+              hovering.current = false;
+              document.body.style.cursor = "";
+            }}
+          >
             <mesh position={[0.3, 2.4, 0]}>
               <cylinderGeometry args={[0.12, 0.12, 4.8, 16]} />
               <meshPhysicalMaterial color="#b8b2c8" metalness={1} roughness={0.2} />
             </mesh>
             <mesh position={[0.3, 4.9, 0]}>
               <sphereGeometry args={[0.62, 32, 24]} />
-              <meshPhysicalMaterial color={pal.rose} emissive={pal.rose} emissiveIntensity={0.5} roughness={0.15} clearcoat={1} />
+              <meshPhysicalMaterial ref={knob} color={pal.rose} emissive={pal.rose} emissiveIntensity={0.5} roughness={0.15} clearcoat={1} />
+            </mesh>
+            {/* A larger invisible target so the lever is easy to hit, even on a phone. */}
+            <mesh position={[0.3, 3.6, 0]} visible={false}>
+              <boxGeometry args={[2.6, 4.2, 2.6]} />
             </mesh>
           </group>
         </group>
@@ -735,7 +822,6 @@ function Jackpot({ glow }: { glow: THREE.Texture }) {
       alive = false;
     };
   }, []);
-  const start = useRef(-1);
   const coinRefs = useRef<(THREE.Sprite | null)[]>([]);
   const flash = useRef<THREE.Sprite>(null);
   const COINS = 26;
@@ -802,13 +888,7 @@ function Jackpot({ glow }: { glow: THREE.Texture }) {
   const group = useRef<THREE.Group>(null);
   const tmp = useMemo(() => new THREE.Vector3(), []);
   useFrame(() => {
-    const k = live.k;
-    if (crossed(JACKPOT)) {
-      start.current = live.time;
-      sfx.jackpot();
-    }
-    if (k < JACKPOT - 0.02) start.current = -1;
-    const t = start.current < 0 ? -1 : live.time - start.current;
+    const t = slot.wonAt < 0 ? -1 : live.time - slot.wonAt;
     live.shake = t >= 0 ? Math.max(0, 1 - t / 0.6) : 0;
     mat.uniforms.uT.value = t;
     mat.uniforms.uPR.value = gl.getPixelRatio();
@@ -1082,7 +1162,7 @@ function Network({ glow }: { glow: THREE.Texture }) {
         tmp.orbit.set(Math.cos(ang) * 2.7, Math.sin(ang * 2 + i) * 0.25, Math.sin(ang) * 2.7);
         rotAxis(tmp.orbit, tmp.axis, 0.35).add(holoCenter);
         tmp.a.copy(tmp.orbit);
-        scale = 0.62 * back;
+        scale = 0.62 * back * (1 - ramp(5.3, 5.8, 9.2, 9.7, k) * 0.9);
         vis = back > 0.01;
       }
       g.position.copy(tmp.a);
@@ -1153,7 +1233,7 @@ function holoMaterial(seed: number) {
     depthWrite: false,
     side: THREE.DoubleSide,
     blending: THREE.AdditiveBlending,
-    uniforms: { uMap: { value: null }, uTime: { value: 0 }, uReveal: { value: 0 }, uVis: { value: 0 }, uSeed: { value: seed }, uTint: { value: col("#E6E0FF") }, uEdge: { value: col(pal.violet) } },
+    uniforms: { uMap: { value: null }, uTime: { value: 0 }, uReveal: { value: 0 }, uVis: { value: 0 }, uSeed: { value: seed }, uTint: { value: col("#DDF7FF") }, uEdge: { value: col(pal.violet) } },
     vertexShader: /* glsl */ `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.); }`,
     fragmentShader: /* glsl */ `
       uniform sampler2D uMap; uniform float uTime, uReveal, uVis, uSeed; uniform vec3 uTint, uEdge;
@@ -1297,8 +1377,11 @@ function Projection({ glow }: { glow: THREE.Texture }) {
 
   useFrame(() => {
     const k = live.k;
-    const on = smooth(4.78, 4.98, k);
-    const flick = on < 1 ? 0.6 + 0.4 * Math.sin(live.time * 60) : 1;
+    // Dim the projection while the feature chapters sit beside the phone.
+    const power = smooth(4.78, 4.98, k);
+    const on = power * (1 - ramp(5.3, 5.8, 9.2, 9.7, k) * 0.85);
+    // Flicker only while it powers up.
+    const flick = power < 1 ? 0.6 + 0.4 * Math.sin(live.time * 60) : 1;
     beamMat.uniforms.uTime.value = live.time;
     beamMat.uniforms.uVis.value = on * flick;
     orbMat.uniforms.uTime.value = live.time;
@@ -1383,7 +1466,7 @@ export default function StoryScene({ reduce }: { reduce: boolean }) {
       dpr={[1, 1.75]}
       gl={{ antialias: true, powerPreference: "high-performance", alpha: false }}
       camera={{ fov: 45, near: 0.05, far: 3000, position: [0, 0, 40] }}
-      onCreated={({ gl }) => gl.setClearColor("#07060a")}
+      onCreated={({ gl }) => gl.setClearColor("#04080D")}
     >
       <World reduce={reduce} />
     </Canvas>

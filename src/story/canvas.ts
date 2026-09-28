@@ -179,14 +179,14 @@ export async function makeLockScreen() {
     if (n === last) return;
     last = n;
     const bg = g.createRadialGradient(w * 0.5, h * 0.32, 0, w * 0.5, h * 0.4, h * 0.75);
-    bg.addColorStop(0, "#4a1238");
-    bg.addColorStop(0.4, "#1d1233");
-    bg.addColorStop(1, "#07060b");
+    bg.addColorStop(0, "#44122f");
+    bg.addColorStop(0.42, "#0d2233");
+    bg.addColorStop(1, "#03070b");
     g.fillStyle = bg;
     g.fillRect(0, 0, w, h);
     const blob = g.createRadialGradient(w * 0.85, h * 0.78, 0, w * 0.85, h * 0.78, w * 0.8);
-    blob.addColorStop(0, "rgba(124,77,255,0.35)");
-    blob.addColorStop(1, "rgba(124,77,255,0)");
+    blob.addColorStop(0, "rgba(69,212,240,0.28)");
+    blob.addColorStop(1, "rgba(69,212,240,0)");
     g.fillStyle = blob;
     g.fillRect(0, 0, w, h);
 
@@ -257,7 +257,7 @@ export async function makeDashboard() {
   g.fillStyle = "#0B0A10";
   g.fillRect(0, 0, w, h);
   const glow = g.createRadialGradient(w * 0.5, 0, 0, w * 0.5, 0, h * 0.55);
-  glow.addColorStop(0, "rgba(124,77,255,0.32)");
+  glow.addColorStop(0, "rgba(40,160,210,0.3)");
   glow.addColorStop(0.5, "rgba(232,51,107,0.1)");
   glow.addColorStop(1, "rgba(0,0,0,0)");
   g.fillStyle = glow;
@@ -368,19 +368,19 @@ export async function makeDashboard() {
  * Hologram panels (light on transparent, lit up additively in the scene)
  * ---------------------------------------------------------------------------------------------- */
 
-const holo = { ink: "#F4F0FF", muted: "#B9B0E6", rose: "#FF86A8", amber: "#FFBE7A", violet: "#C9B8FF", line: "rgba(201,184,255,0.55)" };
+const holo = { ink: "#EFFBFF", muted: "#9FC7D8", rose: "#FF86A8", amber: "#FFBE7A", violet: "#8EE8FF", line: "rgba(142,232,255,0.55)" };
 export const panelSize = { w: 800, h: 500 };
 
 function frame(g: CanvasRenderingContext2D, title: string, glyph: HTMLImageElement | null) {
   const { w, h } = panelSize;
   roundRect(g, 6, 6, w - 12, h - 12, 30);
-  g.fillStyle = "rgba(150,130,255,0.09)";
+  g.fillStyle = "rgba(80,200,255,0.08)";
   g.fill();
   g.lineWidth = 2.5;
   g.strokeStyle = holo.line;
   g.stroke();
   // Corner brackets
-  g.strokeStyle = "rgba(240,235,255,0.95)";
+  g.strokeStyle = "rgba(235,250,255,0.95)";
   g.lineWidth = 4;
   const b = 34;
   for (const [x, y, dx, dy] of [
@@ -399,11 +399,11 @@ function frame(g: CanvasRenderingContext2D, title: string, glyph: HTMLImageEleme
   if (glyph) g.drawImage(glyph, 34, 30, 34, 34);
   text(g, title, 80, 58, 30, holo.ink, 600);
   roundRect(g, w - 170, 30, 136, 30, 15);
-  g.strokeStyle = "rgba(201,184,255,0.5)";
+  g.strokeStyle = "rgba(142,232,255,0.5)";
   g.lineWidth = 1.5;
   g.stroke();
   text(g, "DEMO DATA", w - 102, 51, 15, holo.muted, 500, mono, "center");
-  g.fillStyle = "rgba(201,184,255,0.25)";
+  g.fillStyle = "rgba(142,232,255,0.25)";
   g.fillRect(34, 84, w - 68, 1.5);
 }
 
@@ -434,7 +434,7 @@ export async function makeHoloPanels() {
       ["16:20", "Flight to Edinburgh", "Tomorrow"],
     ].forEach(([t, e, r], i) => {
       const y = 150 + i * 82;
-      g.fillStyle = i === 2 ? "rgba(255,134,168,0.12)" : "rgba(201,184,255,0.06)";
+      g.fillStyle = i === 2 ? "rgba(255,134,168,0.12)" : "rgba(142,232,255,0.06)";
       roundRect(g, 24, y - 44, W - 48, 64, 16);
       g.fill();
       row(g, y, t, e, r, i === 2 ? holo.rose : holo.muted);
@@ -468,7 +468,7 @@ export async function makeHoloPanels() {
       ["Music streaming", "£10.99", "in 10 days"],
     ].forEach(([n, a, d], i) => {
       const y = 262 + i * 70;
-      g.fillStyle = "rgba(201,184,255,0.06)";
+      g.fillStyle = "rgba(142,232,255,0.06)";
       roundRect(g, 24, y - 40, W - 48, 58, 14);
       g.fill();
       text(g, n, 44, y, 24, holo.ink, 500);
@@ -485,12 +485,12 @@ export async function makeHoloPanels() {
       ["Hotel Calder", "Your booking is confirmed", "Travel", holo.violet],
     ].forEach(([f, s, tag, col], i) => {
       const y = 108 + i * 118;
-      g.fillStyle = "rgba(201,184,255,0.06)";
+      g.fillStyle = "rgba(142,232,255,0.06)";
       roundRect(g, 24, y, W - 48, 100, 18);
       g.fill();
       g.beginPath();
       g.arc(74, y + 50, 26, 0, Math.PI * 2);
-      g.fillStyle = "rgba(201,184,255,0.16)";
+      g.fillStyle = "rgba(142,232,255,0.16)";
       g.fill();
       text(g, f[0], 74, y + 59, 24, holo.ink, 600, sans, "center");
       text(g, f, 118, y + 42, 25, holo.ink, 600);
@@ -546,7 +546,7 @@ export async function makeHoloPanels() {
       [1, "Dinner at The Kitchin", "Thu · 19:30"],
     ].forEach(([a, t, r], i) => {
       const y = 214 + i * 82;
-      g.fillStyle = "rgba(201,184,255,0.06)";
+      g.fillStyle = "rgba(142,232,255,0.06)";
       roundRect(g, 24, y, W - 48, 68, 16);
       g.fill();
       appTile(g, 38, y + 12, 44, a as number, gl[a as number]);

@@ -12,7 +12,7 @@ export const story = {
   ready: false,
 };
 
-export const actCount = 6;
+export const actCount = 11;
 
 /** Scroll progress to an act position (0 to actCount - 1), eased so each act lingers while it's read. */
 export function actAt(p: number) {
