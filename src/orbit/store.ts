@@ -48,13 +48,16 @@ export type Collection = {
 export type Item<K extends Collection> = DB[K][number];
 
 const KEY = "orbit.app.v1";
-type Saved = { seededOn: string; db: DB };
+/** Bump when the sample data changes shape or content, so saved copies are replaced. */
+const SEED_VERSION = 2;
+type Saved = { seededOn: string; version?: number; db: DB };
 
 function load(): DB {
   try {
     const raw = localStorage.getItem(KEY);
     if (raw) {
       const saved = JSON.parse(raw) as Saved;
+      if (saved.version !== SEED_VERSION) return seed();
       // Keep sample data current: move every date forward by the days since it was saved.
       const gap = -daysFrom(saved.seededOn);
       const db = shiftDates(saved.db, gap);
@@ -75,7 +78,7 @@ function emit() {
   window.clearTimeout(saveTimer);
   saveTimer = window.setTimeout(() => {
     try {
-      localStorage.setItem(KEY, JSON.stringify({ seededOn: on(0), db: state } satisfies Saved));
+      localStorage.setItem(KEY, JSON.stringify({ seededOn: on(0), version: SEED_VERSION, db: state } satisfies Saved));
     } catch {
       /* ignore quota or privacy mode */
     }
