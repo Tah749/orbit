@@ -50,4 +50,13 @@ export const events: CalEvent[] = [
   { id: "ev-mum-bday", title: "Mum's birthday", start: at(9, "00:00"), end: at(10, "00:00"), allDay: true, calendar: "family", links: [{ kind: "contact", id: "ct-mum" }], source: "icloud" },
   { id: "ev-yoga", title: "Yoga", start: at(-1, "07:00"), end: at(-1, "08:00"), calendar: "personal", location: "Triyoga, Camden", source: "google-calendar" },
   { id: "ev-design", title: "Design crit", start: at(-1, "14:00"), end: at(-1, "15:00"), calendar: "work", source: "outlook-calendar" },
+  { id: "ev-dan-call", title: "Call with Dan", start: at(0, "15:30"), end: at(0, "16:00"), calendar: "personal", notes: "About the stag weekend dates.", links: [{ kind: "contact", id: "ct-dan" }], source: "google-calendar" },
+  { id: "ev-edinburgh", title: "Edinburgh", start: at(1, "00:00"), end: at(4, "00:00"), allDay: true, calendar: "travel", location: "Hotel Calder", links: [{ kind: "booking", id: "bk-hotel" }], source: "orbit" },
+  { id: "ev-olmo", title: "Dinner at Olmo", start: at(4, "19:30"), end: at(4, "21:30"), calendar: "personal", location: "Olmo, Marylebone", attendees: ["Sam Rowe"], links: [{ kind: "booking", id: "bk-olmo" }], source: "orbit" },
+  { id: "ev-focus", title: "Focus time: board deck", start: at(4, "09:30"), end: at(4, "12:00"), calendar: "work", source: "outlook-calendar" },
+  { id: "ev-allhands", title: "Company all-hands", start: at(4, "11:00"), end: at(4, "12:00"), calendar: "work", video: "Teams", source: "outlook-calendar" },
+  { id: "ev-swim", title: "Swim", start: at(6, "08:00"), end: at(6, "09:00"), calendar: "personal", location: "Oasis, Holborn", source: "google-calendar" },
+  { id: "ev-gig", title: "Nils Frahm at the Barbican", start: at(12, "19:30"), end: at(12, "22:00"), calendar: "personal", attendees: ["Sam Rowe"], links: [{ kind: "booking", id: "bk-gig" }], source: "orbit" },
+  { id: "ev-cinema", title: "Cinema with Sam", start: at(-3, "19:45"), end: at(-3, "22:10"), calendar: "personal", location: "Curzon, Bloomsbury", source: "google-calendar" },
+  { id: "ev-bins", title: "Recycling collection", start: at(3, "00:00"), end: at(4, "00:00"), allDay: true, calendar: "family", source: "icloud" },
 ];
