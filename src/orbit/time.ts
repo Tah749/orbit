@@ -59,6 +59,13 @@ const fShort = fmt({ day: "numeric", month: "short" });
 const fWeekday = fmt({ weekday: "long" });
 
 export const time = (s: string) => fTime.format(parse(s));
+/** Weekday name for today + `days`, for sample text ("before Thursday"). */
+export const weekday = (days: number) => fWeekday.format(parse(on(days)));
+/** Days from today to the next Sunday at least two days away. */
+export const nextSunday = () => {
+  const n = (7 - new Date().getDay()) % 7;
+  return n < 2 ? n + 7 : n;
+};
 export const longDate = (s: string) => fLong.format(parse(s));
 export const shortDate = (s: string) => fShort.format(parse(s));
 export const dayLabel = (s: string) => fDay.format(parse(s));

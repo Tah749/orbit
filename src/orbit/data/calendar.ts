@@ -1,4 +1,4 @@
-import { at } from "../time";
+import { at, nextSunday } from "../time";
 import type { Ref, SourceId } from "./sources";
 
 export type CalendarId = "personal" | "work" | "family" | "travel";
@@ -26,7 +26,7 @@ export type CalEvent = {
 };
 
 export const events: CalEvent[] = [
-  { id: "ev-standup", title: "Team stand-up", start: at(0, "09:30"), end: at(0, "09:45"), calendar: "work", video: "Meet", attendees: ["Priya Shah", "Marcus Webb", "Lena Fox"], source: "outlook-calendar" },
+  { id: "ev-standup", title: "Team stand-up", start: at(0, "09:30"), end: at(0, "09:45"), calendar: "work", video: "Meet", attendees: ["Priya Shah", "Marcus Webb", "Lena Fischer"], source: "outlook-calendar" },
   { id: "ev-lunch", title: "Lunch with Tomás", start: at(0, "12:30"), end: at(0, "13:30"), calendar: "personal", location: "Dishoom, Carnaby", source: "google-calendar" },
   { id: "ev-review", title: "Q3 project review", start: at(0, "15:00"), end: at(0, "16:00"), calendar: "work", location: "Room 4", attendees: ["Priya Shah", "Marcus Webb"], notes: "Moved from 11:00.", source: "outlook-calendar" },
   { id: "ev-gym", title: "Strength session", start: at(0, "18:15"), end: at(0, "19:15"), calendar: "personal", location: "Third Space, Soho", source: "google-calendar" },
@@ -44,7 +44,7 @@ export const events: CalEvent[] = [
   { id: "ev-kitchin", title: "Dinner at The Kitchin", start: at(2, "19:30"), end: at(2, "21:30"), calendar: "travel", location: "Leith, Edinburgh", links: [{ kind: "booking", id: "bk-dinner" }], source: "orbit" },
   { id: "ev-flight-back", title: "Flight BZ 1459 to London", start: at(3, "18:05"), end: at(3, "19:30"), calendar: "travel", location: "Edinburgh Airport", links: [{ kind: "booking", id: "bk-flight-back" }], source: "orbit" },
   { id: "ev-5aside", title: "5-a-side", start: at(2, "19:00"), end: at(2, "20:00"), calendar: "personal", location: "Market Road", source: "google-calendar" },
-  { id: "ev-lunch-mum", title: "Sunday lunch at Mum and Dad's", start: at(5, "13:00"), end: at(5, "16:00"), calendar: "family", location: "St Albans", source: "icloud" },
+  { id: "ev-lunch-mum", title: "Sunday lunch at Mum and Dad's", start: at(nextSunday(), "13:00"), end: at(nextSunday(), "16:00"), calendar: "family", location: "St Albans", source: "icloud" },
   { id: "ev-dentist", title: "Dentist check-up", start: at(8, "08:30"), end: at(8, "09:00"), calendar: "personal", location: "Bright Smile, Angel", source: "google-calendar" },
   { id: "ev-planning", title: "Roadmap planning", start: at(7, "13:00"), end: at(7, "15:00"), calendar: "work", location: "Room 2", source: "outlook-calendar" },
   { id: "ev-mum-bday", title: "Mum's birthday", start: at(9, "00:00"), end: at(10, "00:00"), allDay: true, calendar: "family", links: [{ kind: "contact", id: "ct-mum" }], source: "icloud" },

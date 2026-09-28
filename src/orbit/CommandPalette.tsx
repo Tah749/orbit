@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { ArrowRight, ChatCircleText, MagnifyingGlass } from "@phosphor-icons/react";
 import { sections } from "./sections";
 import { go } from "./router";
-import { db } from "./store";
+import { view } from "./store";
 import { cx, Kbd } from "./ui";
 import { relDay } from "./time";
 
@@ -10,7 +10,7 @@ type Hit = { id: string; label: string; meta: string; path: string; group: strin
 
 /** Everything searchable, built from the store when the palette opens. */
 function index(): Hit[] {
-  const d = db.get();
+  const d = view();
   return [
     ...sections.map((s) => ({ id: `s-${s.key}`, label: s.label, meta: "Go to", path: s.key, group: "Sections" })),
     ...d.messages.map((m) => ({ id: m.id, label: m.subject, meta: m.from.name, path: `inbox/${m.id}`, group: "Email" })),

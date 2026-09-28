@@ -1,4 +1,4 @@
-import { at } from "../time";
+import { at, on, shortDate, weekday } from "../time";
 import type { Ref, SourceId } from "./sources";
 
 export type Person = { name: string; email: string };
@@ -48,20 +48,20 @@ export const messages: Message[] = [
   m({
     id: "msg-priya",
     from: { name: "Priya Shah", email: "priya@lumen.example" },
-    subject: "Numbers for Thursday",
-    snippet: "Could you send the final Q3 numbers before Thursday? The board pack goes out Friday morning.",
+    subject: `Numbers for ${weekday(2)}`,
+    snippet: `Could you send the final Q3 numbers before ${weekday(2)}? The board pack goes out ${weekday(3)} morning.`,
     body: [
       "Hi Alex,",
-      "Could you send the final Q3 numbers before Thursday? The board pack goes out Friday morning and I'd like a day to check it.",
+      `Could you send the final Q3 numbers before ${weekday(2)}? The board pack goes out ${weekday(3)} morning and I'd like a day to check it.`,
       "Revenue and retention are the two I need. The deck is attached with the slides that need filling in.",
       "Thanks,\nPriya",
     ],
     date: at(0, "08:42"),
     category: "work",
     needsReply: true,
-    why: "Priya asked for something by Thursday",
+    why: `Priya asked for something by ${weekday(2)}`,
     suggestedReply:
-      "Hi Priya,\n\nYes, I'll have the final revenue and retention numbers to you by Wednesday evening, so you have Thursday to check them. I'll fill them straight into the slides in the deck.\n\nThanks,\nAlex",
+      `Hi Priya,\n\nYes, I'll have the final revenue and retention numbers to you by ${weekday(1)} evening, so you have ${weekday(2)} to check them. I'll fill them straight into the slides in the deck.\n\nThanks,\nAlex`,
     attachments: [{ name: "Q3-board-pack-draft.key", size: "4.2 MB" }],
     source: "gmail",
   }),
@@ -85,10 +85,10 @@ export const messages: Message[] = [
     id: "msg-northgrid",
     from: { name: "Northgrid Energy", email: "billing@northgrid.example" },
     subject: "Your October bill is ready",
-    snippet: "Your bill for £68.32 will be collected by Direct Debit on Friday.",
+    snippet: `Your bill for £68.32 will be collected by Direct Debit on ${weekday(3)}.`,
     body: [
       "Your October electricity bill is £68.32.",
-      "It will be collected by Direct Debit from your Monzo account on Friday. That's £4.10 more than September, mostly because of colder evenings.",
+      `It will be collected by Direct Debit from your Monzo account on ${weekday(3)}. That's £4.10 more than last month, mostly because of colder evenings.`,
     ],
     date: at(-1, "18:10"),
     read: true,
@@ -100,16 +100,16 @@ export const messages: Message[] = [
     id: "msg-mum",
     from: { name: "Mum", email: "jan.rowe@example.com" },
     subject: "Sunday lunch?",
-    snippet: "Are you and Sam still coming on Sunday? Dad's doing the roast. Let me know by Friday so I can order the lamb.",
+    snippet: `Are you and Sam still coming on Sunday? Dad's doing the roast. Let me know by ${weekday(3)} so I can order the lamb.`,
     body: [
       "Hi love,",
-      "Are you and Sam still coming on Sunday? Dad's doing the roast. Let me know by Friday so I can order the lamb.",
+      `Are you and Sam still coming on Sunday? Dad's doing the roast. Let me know by ${weekday(3)} so I can order the lamb.`,
       "Lots of love, Mum x",
     ],
     date: at(-1, "20:31"),
     category: "personal",
     needsReply: true,
-    why: "Mum needs an answer by Friday",
+    why: `Mum needs an answer by ${weekday(3)}`,
     suggestedReply: "Hi Mum,\n\nYes, we're both coming on Sunday. Tell Dad we can't wait for the roast. What time would you like us?\n\nLove, Alex x",
     source: "gmail",
   }),
@@ -163,10 +163,10 @@ export const messages: Message[] = [
   m({
     id: "msg-insurer",
     from: { name: "Harbour Insurance", email: "renewals@harbour.example" },
-    subject: "Your car insurance renews on the 24th",
+    subject: `Your car insurance renews on ${shortDate(on(10))}`,
     snippet: "Your renewal price is £486.20, up from £431.50 last year. You can review or change your cover online.",
     body: [
-      "Your car insurance policy renews on the 24th.",
+      `Your car insurance policy renews on ${shortDate(on(10))}.`,
       "Your renewal price is £486.20, up from £431.50 last year. If you do nothing, your policy will renew automatically.",
     ],
     date: at(-3, "08:00"),
@@ -178,9 +178,9 @@ export const messages: Message[] = [
   m({
     id: "msg-dan",
     from: { name: "Dan Okafor", email: "dan@okafor.example" },
-    subject: "5-a-side Thursday?",
-    snippet: "We're one short for Thursday. You in? 7pm at Market Road.",
-    body: ["We're one short for Thursday. You in? 7pm at Market Road, usual pitch."],
+    subject: `5-a-side ${weekday(2)}?`,
+    snippet: `We're one short for ${weekday(2)}. You in? 7pm at Market Road.`,
+    body: [`We're one short for ${weekday(2)}. You in? 7pm at Market Road, usual pitch.`],
     date: at(0, "11:15"),
     category: "personal",
     needsReply: true,
@@ -201,7 +201,7 @@ export const messages: Message[] = [
   m({
     id: "msg-lumen-standup",
     from: { name: "Marcus Webb", email: "marcus@lumen.example" },
-    subject: "Retro notes from Monday",
+    subject: `Retro notes from ${weekday(-1)}`,
     snippet: "Notes from the retro are in the doc. Two actions for you: roadmap draft and the pricing page copy.",
     body: ["Notes from the retro are in the doc.", "Two actions for you: the roadmap draft and the pricing page copy. No rush on the copy."],
     date: at(-1, "16:40"),
@@ -304,7 +304,7 @@ export const messages: Message[] = [
     id: "msg-sent-marcus",
     from: me,
     to: [{ name: "Marcus Webb", email: "marcus@lumen.example" }],
-    subject: "Re: Retro notes from Monday",
+    subject: `Re: Retro notes from ${weekday(-1)}`,
     snippet: "Thanks, got both. I'll have the roadmap draft over by next week.",
     body: ["Thanks, got both. I'll have the roadmap draft over by next week."],
     date: at(-1, "17:02"),

@@ -8,6 +8,7 @@ import { bookings, orders, trips } from "./data/plans";
 import { contacts, daily, docs, workouts } from "./data/life";
 import { payouts, products, revenue, shopOrders } from "./data/business";
 import { connections, settings } from "./data/connections";
+import { visible } from "./visible";
 
 /**
  * The whole app's data, held in the browser. There is no server: this is sample data that the
@@ -49,7 +50,7 @@ export type Item<K extends Collection> = DB[K][number];
 
 const KEY = "orbit.app.v1";
 /** Bump when the sample data changes shape or content, so saved copies are replaced. */
-const SEED_VERSION = 2;
+const SEED_VERSION = 3;
 type Saved = { seededOn: string; version?: number; db: DB };
 
 function load(): DB {
@@ -116,6 +117,13 @@ export const db = {
   },
 };
 
+/** The store as sections see it: without data from connections switched off in Settings. */
+let viewCache: { s: DB; v: DB } | null = null;
+export function view(): DB {
+  if (!viewCache || viewCache.s !== state) viewCache = { s: state, v: visible(state) };
+  return viewCache.v;
+}
+
 /**
  * Subscribe to part of the store: `useDB((d) => d.tasks.filter((t) => !t.done))`.
  * The result is cached until the store or the selector changes, so derived arrays are safe.
@@ -124,7 +132,7 @@ export function useDB<T>(select: (d: DB) => T): T {
   const cache = useRef<{ s: DB; f: (d: DB) => T; v: T } | null>(null);
   const get = () => {
     const c = cache.current;
-    if (!c || c.s !== state || c.f !== select) cache.current = { s: state, f: select, v: select(state) };
+    if (!c || c.s !== state || c.f !== select) cache.current = { s: state, f: select, v: select(view()) };
     return cache.current!.v;
   };
   return useSyncExternalStore(db.subscribe, get, get);

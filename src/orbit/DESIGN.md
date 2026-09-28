@@ -56,12 +56,20 @@ an active state. Don't put icons in coloured circles.
 
 ## Data and routing
 
-- `useDB((d) => d.tasks.filter(...))` reads (derived arrays are safe). `db.patch("tasks", id, {...})`,
+- `useDB((d) => d.tasks.filter(...))` reads (derived arrays are safe). It sees the store *without* data from
+  connections switched off in Settings (`visible.ts`); `db.get()` is the raw store. `db.patch("tasks", id, {...})`,
   `db.insert("tasks", item)`, `db.remove("tasks", id)`, `db.set("settings", ...)`, `newId("tk")`.
 - Types and sample data are in `src/orbit/data/*.ts`. Items link to each other with `Ref` (`{kind, id}`);
   open a linked item with `go("<section>/<id>")` or `<a href={href("inbox/msg-priya")}>`.
 - Deep links: your section gets `useRoute().rest` (e.g. `#/app/inbox/msg-priya` → `rest = ["msg-priya"]`).
   Support opening an item from its id, because the command palette and other sections link to it.
 - Section paths used by others: `inbox/<messageId>`, `calendar/<eventId>`, `tasks/<taskId>`,
-  `money/bills/<billId>`, `plans/<bookingId>`, `deliveries/<orderId>`, `people/<contactId>`,
+  `money/bills/<billId>`, `money/transactions/<txnId>`, `business/<orderId>`, `health/<workoutId>`, `plans/<bookingId>`, `plans/trip/<tripId>`, `deliveries/<orderId>`, `people/<contactId>`,
   `admin/<docId>`, `ask/<question>`.
+
+## Gotchas
+
+- In a `Sheet` footer, give swapped buttons distinct `key`s (e.g. Edit → Save). Otherwise React reuses the
+  element and a button that becomes `type="submit"` mid-click submits the form immediately.
+- When sample data changes, bump `SEED_VERSION` in `store.ts` so saved copies in browsers are replaced.
+- Sample text that names a weekday should use `weekday(n)` from `time.ts`, so it matches the relative dates.

@@ -252,6 +252,8 @@ look (editorial, hairline rules, serif titles, ink buttons, no AI-looking patter
 
 - `store.ts`: all data in one local store (`useDB`, `db.patch/insert/remove/set/reset`), saved to
   `localStorage["orbit.app.v1"]`. On load, saved dates are shifted forward so sample data stays current.
+  `SEED_VERSION` replaces saved copies when sample data changes. `useDB` hides data from connections
+  switched off in Settings (`visible.ts`).
 - `data/*.ts`: types and sample data per domain, written relative to today with `at()` / `on()`.
 - `sections.ts`: the section registry (nav, icons, lazy pages). Each section owns its folder.
 - `router.ts`: `useRoute()` gives `{ section, rest }` for `#/app/<section>/<...rest>`; `go(path)`, `href(path)`.
