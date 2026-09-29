@@ -1,5 +1,5 @@
-import { Placeholder } from "../../src/sections/Placeholder";
+import { PeopleDetail } from "../../src/sections/people/detail";
 
 export default function Screen() {
-  return <Placeholder eyebrow="People" title="Contact" back={true} />;
+  return <PeopleDetail />;
 }

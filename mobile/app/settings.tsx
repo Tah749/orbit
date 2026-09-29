@@ -1,5 +1,5 @@
-import { Placeholder } from "../src/sections/Placeholder";
+import { SettingsSection } from "../src/sections/settings";
 
 export default function Screen() {
-  return <Placeholder eyebrow="Admin" title="Settings" back={true} />;
+  return <SettingsSection />;
 }
