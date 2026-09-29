@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState, type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode, type SelectHTMLAttributes, type TextareaHTMLAttributes } from "react";
 import { X, Check as CheckMark } from "@phosphor-icons/react";
 import { sourceName, type SourceId } from "../data/sources";
+import { money, type Tone } from "../format";
+
+export { money, type Tone };
 
 /* ------------------------------------------------------------------------------------------------
  * Orbit app UI kit. Read src/orbit/DESIGN.md before adding to it.
@@ -126,11 +129,6 @@ export function Facts({ items, className }: { items: [ReactNode, ReactNode][]; c
 
 /* Text and numbers -------------------------------------------------------------------------------- */
 
-const gbp = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP" });
-const gbp0 = new Intl.NumberFormat("en-GB", { style: "currency", currency: "GBP", maximumFractionDigits: 0 });
-
-export const money = (n: number, whole = false) => (whole ? gbp0 : gbp).format(n);
-
 /** An amount in tabular figures. Income can be shown in the accent with `signed`. */
 export function Amount({ value, signed = false, whole = false, className }: { value: number; signed?: boolean; whole?: boolean; className?: string }) {
   const text = signed && value > 0 ? `+${money(value, whole)}` : money(value, whole);
@@ -158,7 +156,6 @@ export function Source({ id, className }: { id: SourceId; className?: string }) 
   );
 }
 
-export type Tone = "neutral" | "accent" | "info" | "warn" | "coral";
 const tones: Record<Tone, string> = {
   neutral: "bg-soft text-muted",
   accent: "bg-accent-bg text-accent-fg",

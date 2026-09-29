@@ -1,31 +1,55 @@
-import { useRef, useSyncExternalStore } from "react";
-import { visible } from "./visible";
-import { KEY, restore, seed, serialize, type Collection, type DB, type Item } from "./seed";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { KEY, restore, seed, serialize, type Collection, type DB, type Item } from "@orbit/seed";
+import { visible } from "@orbit/visible";
 
 export type { Collection, DB, Item };
 
-let state: DB = restore(safeGet());
+/**
+ * The whole app's data, held on the device. Same API as the web store (src/orbit/store.ts).
+ * It starts as sample data; `hydrate()` loads the saved copy from AsyncStorage before first render.
+ */
+let state: DB = seed();
+let hydrated = false;
 const listeners = new Set<() => void>();
-function safeGet() {
-  try {
-    return localStorage.getItem(KEY);
-  } catch {
-    return null;
-  }
-}
+const hydrationListeners = new Set<() => void>();
+let saveTimer: ReturnType<typeof setTimeout> | undefined;
 
-let saveTimer = 0;
+function save() {
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    AsyncStorage.setItem(KEY, serialize(state)).catch(() => {});
+  }, 250);
+}
 
 function emit() {
   listeners.forEach((l) => l());
-  window.clearTimeout(saveTimer);
-  saveTimer = window.setTimeout(() => {
-    try {
-      localStorage.setItem(KEY, serialize(state));
-    } catch {
-      /* ignore quota or privacy mode */
-    }
-  }, 250);
+  save();
+}
+
+export async function hydrate() {
+  if (hydrated) return;
+  try {
+    state = restore(await AsyncStorage.getItem(KEY));
+  } catch {
+    state = seed();
+  }
+  hydrated = true;
+  viewCache = null;
+  listeners.forEach((l) => l());
+  hydrationListeners.forEach((l) => l());
+}
+
+/** True once the saved data has been read. */
+export function useHydrated() {
+  const [ok, setOk] = useState(hydrated);
+  useEffect(() => {
+    if (hydrated) return setOk(true);
+    const l = () => setOk(true);
+    hydrationListeners.add(l);
+    return () => void hydrationListeners.delete(l);
+  }, []);
+  return ok;
 }
 
 export const db = {
@@ -66,10 +90,7 @@ export function view(): DB {
   return viewCache.v;
 }
 
-/**
- * Subscribe to part of the store: `useDB((d) => d.tasks.filter((t) => !t.done))`.
- * The result is cached until the store or the selector changes, so derived arrays are safe.
- */
+/** Subscribe to part of the store: `useDB((d) => d.tasks.filter((t) => !t.done))`. Derived arrays are safe. */
 export function useDB<T>(select: (d: DB) => T): T {
   const cache = useRef<{ s: DB; f: (d: DB) => T; v: T } | null>(null);
   const get = () => {

@@ -1,10 +1,10 @@
-import type { DB } from "../../store";
+import type { DB } from "../../seed";
 import type { SourceId } from "../../data/sources";
 import type { Booking } from "../../data/plans";
 import type { Message } from "../../data/mail";
 import type { Contact } from "../../data/life";
 import { dayLabel, daysFrom, on, parse, time } from "../../time";
-import { money } from "../../ui";
+import { money } from "../../format";
 
 /* ------------------------------------------------------------------------------------------------
  * Shared reading of the store for Today and Ask Orbit. Pure functions of the data and the clock,

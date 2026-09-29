@@ -4,7 +4,7 @@ import type { Booking, BookingKind } from "../../data/plans";
 import { go } from "../../router";
 import { Button, Field, Input, Select, Sheet, toast } from "../../ui";
 import { on, parse } from "../../time";
-import { kinds } from "./lib";
+import { kinds } from "./kinds";
 
 const blank = { kind: "restaurant" as BookingKind, title: "", provider: "", date: on(1), time: "19:30", ref: "", tripId: "" };
 

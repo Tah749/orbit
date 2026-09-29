@@ -6,7 +6,8 @@ import type { Task } from "../../data/tasks";
 import { href } from "../../router";
 import { Button, Facts, IconButton, Label, Sheet, Source, Tag, Textarea, toast } from "../../ui";
 import { relDay, stamp, time } from "../../time";
-import { dayPhrase, dayWord, kinds, openTaskFor, reminderFor, statusText, statusTone, whenText } from "./lib";
+import { dayPhrase, dayWord, openTaskFor, reminderFor, statusText, statusTone, whenText } from "./lib";
+import { kinds } from "./kinds";
 
 export async function copyText(text: string, what: string) {
   try {

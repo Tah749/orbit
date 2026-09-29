@@ -1,5 +1,5 @@
 import type { CalEvent, CalendarId } from "../../data/calendar";
-import type { Tone } from "../../ui";
+import type { Tone } from "../../format";
 import { parse, ymd } from "../../time";
 
 export type View = "Day" | "Week" | "Month" | "Agenda";

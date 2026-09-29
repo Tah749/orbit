@@ -1,4 +1,4 @@
-import type { DB } from "../../store";
+import type { DB } from "../../seed";
 import type { SourceId } from "../../data/sources";
 import type { Booking } from "../../data/plans";
 import type { Category } from "../../data/money";
@@ -6,7 +6,7 @@ import { categoryName } from "../../data/money";
 import type { Contact } from "../../data/life";
 import type { Message } from "../../data/mail";
 import { daysFrom, on, parse, relDay, time } from "../../time";
-import { money } from "../../ui";
+import { money } from "../../format";
 import { cap, count, deliveryWindow, eventsOn, firstName, flightNo, isActiveOrder, list, lower, nextBirthday, nights, topic, visible, when } from "../today/derive";
 
 /* ------------------------------------------------------------------------------------------------

@@ -1,15 +1,14 @@
-import { AirplaneTilt, Bed, Car, ForkKnife, Ticket, Train, type Icon } from "@phosphor-icons/react";
 import type { Booking, BookingKind, Trip } from "../../data/plans";
 import type { Task } from "../../data/tasks";
 import { dayLabel, daysFrom, on, parse, relDay, time, ymd } from "../../time";
 
-export const kinds: Record<BookingKind, { name: string; icon: Icon }> = {
-  flight: { name: "Flight", icon: AirplaneTilt },
-  hotel: { name: "Stay", icon: Bed },
-  train: { name: "Train", icon: Train },
-  restaurant: { name: "Table", icon: ForkKnife },
-  event: { name: "Tickets", icon: Ticket },
-  car: { name: "Car hire", icon: Car },
+export const kindNames: Record<BookingKind, string> = {
+  flight: "Flight",
+  hotel: "Stay",
+  train: "Train",
+  restaurant: "Table",
+  event: "Tickets",
+  car: "Car hire",
 };
 
 export const statusText: Record<Booking["status"], string> = {

@@ -1,4 +1,4 @@
-import type { DB } from "./store";
+import type { DB } from "./seed";
 import type { Ref, SourceId } from "./data/sources";
 
 /**

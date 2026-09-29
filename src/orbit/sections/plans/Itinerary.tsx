@@ -1,7 +1,8 @@
 import type { Booking } from "../../data/plans";
 import { cx, Tag } from "../../ui";
 import { daysFrom, longDate, relDay } from "../../time";
-import { itinerary, kinds, statusText, statusTone, type Step } from "./lib";
+import { itinerary, statusText, statusTone, type Step } from "./lib";
+import { kinds } from "./kinds";
 
 /** The status at the end of a row: quiet text when all is well, a tag when something changed. */
 export function Status({ b }: { b: Booking }) {
