@@ -1,5 +1,5 @@
-import { Placeholder } from "../src/sections/Placeholder";
+import BusinessScreen from "../src/sections/business";
 
 export default function Screen() {
-  return <Placeholder eyebrow="Life" title="Business" back={true} />;
+  return <BusinessScreen />;
 }
