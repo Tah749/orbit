@@ -1,5 +1,3 @@
-import { Placeholder } from "../../src/sections/Placeholder";
+import AskScreen from "../../src/sections/ask/AskScreen";
 
-export default function Screen() {
-  return <Placeholder eyebrow="Assistant" title="Ask Orbit" back={false} />;
-}
+export default AskScreen;

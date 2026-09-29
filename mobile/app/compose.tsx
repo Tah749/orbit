@@ -1,5 +1,3 @@
-import { Placeholder } from "../src/sections/Placeholder";
+import ComposeScreen from "../src/sections/inbox/ComposeScreen";
 
-export default function Screen() {
-  return <Placeholder eyebrow="Mail" title="New message" back={true} />;
-}
+export default ComposeScreen;

@@ -1,5 +1,3 @@
-import { Placeholder } from "../../src/sections/Placeholder";
+import InboxScreen from "../../src/sections/inbox/InboxScreen";
 
-export default function Screen() {
-  return <Placeholder eyebrow="Mail" title="Inbox" back={false} />;
-}
+export default InboxScreen;

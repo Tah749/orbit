@@ -1,5 +1,3 @@
-import { Placeholder } from "../src/sections/Placeholder";
+import TasksScreen from "../src/sections/tasks/TasksScreen";
 
-export default function Screen() {
-  return <Placeholder eyebrow="Main" title="Tasks" back={true} />;
-}
+export default TasksScreen;
