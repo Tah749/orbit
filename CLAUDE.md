@@ -36,6 +36,8 @@ It is:
 - A scroll-driven 3D story (`#/story`) that demonstrates Orbit and collects waitlist signups.
 - The Orbit app front end (`#/app`, `src/orbit/`): a full, working app running entirely on sample data
   held in the browser. Gated behind a password (static site, not security). No server, no database, no real connections.
+- The Orbit app as a React Native app (`mobile/`): an Expo app running on sample data held on the device.
+  No backend, no network calls. Open in Expo Go or bundled for iOS/Android.
 - A folder of brand explorations (`brand/`): names, logos and colour schemes.
 
 It is not:
@@ -51,7 +53,8 @@ These come from the project owner and apply to every change.
    Never a service-role key, never any other secret.
 3. **Never store waitlist emails in `localStorage`/`sessionStorage`.** Browser storage holds only the
    light/dark preference (`orbit-theme`), the app's own sample data (`orbit.app.v1`, see `src/orbit/store.ts`),
-   and the app gate unlock flag (`sessionStorage["orbit.unlock"]`).
+   and the app gate unlock flag (`sessionStorage["orbit.unlock"]`). The mobile app stores only `orbit.app.v1`
+   (sample data), `orbit.theme`, and `orbit.home.mode` in AsyncStorage on the device.
 4. **No invented facts.** No fake customers, testimonials, partnerships, press logos, user counts,
    ratings or "live" integrations.
 5. **No unsupported claims** about security, privacy, compliance, accuracy or finance (no "bank-grade",
@@ -75,6 +78,7 @@ These come from the project owner and apply to every change.
 
 ## Commands
 
+Web app:
 ```bash
 npm install
 npm run dev               # dev server
@@ -84,8 +88,18 @@ npm run preview           # serve dist/ (default port 4173)
 npm run build:standalone  # one self-contained HTML file: dist-standalone/index.html
 ```
 
+Mobile app:
+```bash
+cd mobile
+npm install
+npx expo start            # dev server; open in Expo Go
+npx tsc --noEmit          # typecheck
+npx expo export --platform ios  # production iOS bundle
+```
+
 There is no test runner or linter config in the repo. "Checking" a change means: `npm run build`
-passes, and the affected pages are looked at in a browser (see Visual testing below).
+(web) or `npx tsc --noEmit` (mobile) passes, and the affected pages/screens are looked at in a
+browser or on a device (see Visual testing below).
 
 Deployment: `.github/workflows/deploy.yml` builds and publishes to GitHub Pages on push. Base path is
 relative (`base: "./"`) so the build works from any subpath.
@@ -118,14 +132,24 @@ src/
     WaitlistForm.tsx       two-step signup form
   orbit/                   the Orbit app (see "The Orbit app" below and src/orbit/DESIGN.md)
     App.tsx, CommandPalette.tsx, router.ts, sections.ts, store.ts, time.ts
+    format.ts              money, Tone type (shared with mobile)
+    seed.ts                seed, restore, serialize, KEY, Collection, Item (shared with mobile)
     data/                  types + sample data per domain (mail, calendar, tasks, money, plans, life, business)
-    ui/                    the app's design kit
+    ui/                    the app's design kit (web-only)
     sections/<key>/        one folder per section (today, ask, inbox, calendar, tasks, money, business,
                            plans, deliveries, health, people, admin, settings)
+      lib.ts, derive.ts    pure helpers (shared with mobile)
+      engine.ts            logic layer (shared with mobile)
+      plans/kinds.ts       booking kinds with web icons (web only; names are in plans/lib.ts)
   story/                   the phone story (see below)
     glsl.ts                simplex noise and fbm helpers for shaders
     textures.ts            glow and card-atlas helpers
     previews.tsx           app-style feature chapter panels (acts 6–9)
+mobile/                    React Native app (see "The mobile app" below)
+  app/                     file-based routing: tabs, stack screens
+  src/
+    theme.ts, store.ts, prefs.ts, ui/
+    intro/, home/, sections/
 brand/                     brand explorations, each with an index.html gallery
   names/  logos/  colours/  colours-v2/
 brag-output/               promo video assets (work/ is ignored)
@@ -244,6 +268,11 @@ A full front end for the product, on sample data (persona: Alex Rowe in London, 
 Fern & Thread, on Shopify and Etsy). **Read `src/orbit/DESIGN.md` before touching it**: it sets the
 look (editorial, hairline rules, serif titles, ink buttons, no AI-looking patterns) and the kit.
 
+Pure logic in this folder is shared with the mobile app: `data/*.ts` (types and sample), `time.ts`,
+`format.ts`, `seed.ts`, `visible.ts`, and `sections/*/lib.ts`, `derive.ts`, `engine.ts` must stay
+free of DOM, React and UI imports. Booking kind names live in `sections/plans/lib.ts` (shared); `sections/plans/kinds.ts` adds the web
+icons and is web only. `money()` and the `Tone` type are in `format.ts`.
+
 - `store.ts`: all data in one local store (`useDB`, `db.patch/insert/remove/set/reset`), saved to
   `localStorage["orbit.app.v1"]`. On load, saved dates are shifted forward so sample data stays current.
   `SEED_VERSION` replaces saved copies when sample data changes. `useDB` hides data from connections
@@ -253,6 +282,25 @@ look (editorial, hairline rules, serif titles, ink buttons, no AI-looking patter
 - `router.ts`: `useRoute()` gives `{ section, rest }` for `#/app/<section>/<...rest>`; `go(path)`, `href(path)`.
 - Every surfaced item shows its source (`<Source />`). The sidebar says "Sample data. Nothing is connected."
 - Newsreader (`font-serif`) is loaded only by the app.
+
+## The mobile app (`mobile/`)
+
+An Expo React Native front end running sample data on the device. **Read `mobile/README.md` for setup,
+structure and the `@orbit/*` import rule.**
+
+- No backend, no network calls, no waitlist collection.
+- Sample data and store API match the web app; stored in `AsyncStorage` with key `orbit.app.v1`.
+- File-based routing via Expo Router: tabs (Home, Ask, Inbox, Calendar, Money, More) and stack screens.
+- Two Home modes persisted as `orbit.home.mode`: Minimal (list view) and Jarvis (dashboard, allowed a
+  subtle glow as an exception).
+- Skeleton loaders via `useSimulatedLoad(key)` showing data loads (really from the store).
+- Colours: Oat scheme (light and dark) via `theme.ts`; Jarvis mode uses `jarvis` palette (deep petrol
+  with teal linework).
+- Fonts: Geist (sans) and Newsreader (serif), registered via expo-font.
+- Import pure logic from `@orbit/*` (data, time, format, seed, visible, section lib/derive/engine).
+  Never import `@orbit/ui`, `@orbit/store`, `@orbit/router` or `.tsx` components.
+- Every surfaced item shows its source. More and Settings say "Sample data. Nothing is connected."
+- Typecheck with `npx tsc --noEmit`; bundle iOS with `npx expo export --platform ios`.
 
 ## Waitlist
 
