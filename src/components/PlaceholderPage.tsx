@@ -1,6 +1,5 @@
 import { ArrowLeft } from "@phosphor-icons/react";
-import { Navbar } from "./Navbar";
-import { Footer } from "./Footer";
+import { Wordmark } from "./ui/Logo";
 
 const pages: Record<string, { title: string; body: string[] }> = {
   privacy: {
@@ -15,37 +14,26 @@ const pages: Record<string, { title: string; body: string[] }> = {
     title: "Terms",
     body: ["This is a placeholder. Orbit's Terms of Service will be published before early access opens."],
   },
-  "sign-in": {
-    title: "Sign in",
-    body: ["Orbit isn't open yet, so there's nothing to sign in to. Join the waitlist and we'll let you know when early access is ready. In the meantime, you can try the live demo with sample data."],
-  },
 };
 
 export function PlaceholderPage({ slug }: { slug: string }) {
   const page = pages[slug] ?? { title: "Page not found", body: ["We couldn't find that page."] };
   return (
-    <>
-      <Navbar home={false} />
-      <main id="main" className="relative isolate min-h-[70dvh] pt-32">
-        <div aria-hidden="true" className="glow-top pointer-events-none absolute inset-x-0 top-0 -z-10 h-[500px]" />
-        <article className="mx-auto max-w-[680px] px-4 pb-24 sm:px-6">
-          <a href="#/" className="inline-flex items-center gap-1.5 text-[14px] text-muted hover:text-ink">
-            <ArrowLeft size={14} /> Back to Orbit
-          </a>
-          <h1 className="mt-6 text-[40px] font-semibold tracking-[-0.04em] text-ink">{page.title}</h1>
-          <div className="mt-6 flex flex-col gap-4 text-[16px] leading-relaxed text-muted">
-            {page.body.map((p) => (
-              <p key={p}>{p}</p>
-            ))}
-          </div>
-          {slug === "sign-in" && (
-            <a href="#/app" className="mt-8 inline-flex h-11 items-center rounded-full bg-accent px-5 text-[14.5px] font-medium text-paper hover:bg-accent-hover">
-              Open the live demo
-            </a>
-          )}
-        </article>
-      </main>
-      <Footer home={false} />
-    </>
+    <main id="main" className="min-h-[100dvh] bg-paper">
+      <div className="mx-auto max-w-[680px] px-4 pb-24 pt-8">
+        <a href="#/" aria-label="Orbit home" className="inline-block text-ink">
+          <Wordmark />
+        </a>
+        <a href="#/" className="mt-12 inline-flex items-center gap-1.5 text-[14px] text-muted hover:text-ink">
+          <ArrowLeft size={14} /> Back to Orbit
+        </a>
+        <h1 className="mt-6 font-serif text-[40px] font-normal tracking-[-0.02em] text-ink">{page.title}</h1>
+        <div className="mt-6 flex flex-col gap-4 text-[16px] leading-relaxed text-muted">
+          {page.body.map((p) => (
+            <p key={p}>{p}</p>
+          ))}
+        </div>
+      </div>
+    </main>
   );
 }

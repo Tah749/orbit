@@ -1,5 +1,4 @@
 import { Suspense, useEffect, useState } from "react";
-import "@fontsource-variable/newsreader";
 import { DotsThree, MagnifyingGlass, X } from "@phosphor-icons/react";
 import { Wordmark } from "../components/ui/Logo";
 import { ThemeToggle } from "../components/ui/ThemeToggle";
