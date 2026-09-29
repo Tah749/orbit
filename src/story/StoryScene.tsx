@@ -3,8 +3,8 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
 import { story, actAt, actCount, smooth, ramp, theme } from "./state";
-import { noise } from "../journey/glsl";
-import { makeGlowTexture, atlasGrid } from "../journey/textures";
+import { noise } from "./glsl";
+import { makeGlowTexture, atlasGrid } from "./textures";
 import { makeDashboard, makeHoloPanels, makeLockScreen, makeMarquee, panelSize } from "./canvas";
 import { ORBIT, aboveApps, belowApps, brandGrid, brands, makeBrandAtlas, makeBrandCardAtlas, networkApps } from "./brands";
 import { sfx } from "./sound";
@@ -53,7 +53,6 @@ const palettes = {
     reelA: [0.07, 0.064, 0.058],
     reelB: [0.115, 0.105, 0.095],
     reelSep: 0.05,
-    holoTint: "#DDF7F2",
     studio: ["#2A2724", "#1A1917", "#0D0C0B"],
     shadow: "#000000",
     shadowOpacity: 0.7,
@@ -80,7 +79,6 @@ const palettes = {
     reelA: [0.8, 0.77, 0.72],
     reelB: [0.95, 0.94, 0.91],
     reelSep: -0.12,
-    holoTint: "#5CC9BC",
     studio: ["#FBFAF7", "#F1EEE8", "#E2DDD3"],
     shadow: "#3A3226",
     shadowOpacity: 0.32,
@@ -1303,39 +1301,31 @@ const deskLayout = [
 /** Phones show two panels in a column: today and bills. */
 const mobLayout: Record<number, THREE.Vector3> = { 0: V(0, 1.55, 0), 2: V(0, -1.55, 0) };
 
-function holoMaterial(seed: number) {
-  return ink(new THREE.ShaderMaterial({
+/** Flat floating app screens: normal blending, a bottom-up reveal and a fade, nothing glowing. */
+function holoMaterial() {
+  return new THREE.ShaderMaterial({
     transparent: true,
     depthWrite: false,
     side: THREE.DoubleSide,
-    blending: THREE.AdditiveBlending,
-    uniforms: { uMap: { value: null }, uTime: { value: 0 }, uReveal: { value: 0 }, uVis: { value: 0 }, uSeed: { value: seed }, uTint: { value: col(pal.holoTint) }, uEdge: { value: col(pal.violet) } },
+    blending: THREE.NormalBlending,
+    uniforms: { uMap: { value: null }, uReveal: { value: 0 }, uVis: { value: 0 } },
     vertexShader: /* glsl */ `varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.); }`,
     fragmentShader: /* glsl */ `
-      uniform sampler2D uMap; uniform float uTime, uReveal, uVis, uSeed; uniform vec3 uTint, uEdge;
+      uniform sampler2D uMap; uniform float uReveal, uVis;
       varying vec2 vUv;
       void main(){
-        float front = uReveal * 1.15;
+        float front = uReveal * 1.05;
         if (vUv.y > front) discard;
-        float sweep = exp(-pow((vUv.y - front) * 40., 2.)) * step(0.001, uReveal) * (1. - step(0.999, uReveal));
-        vec2 o = vec2(0.0016, 0.);
-        float r = texture2D(uMap, vUv + o).r;
         vec4 t = texture2D(uMap, vUv);
-        float b = texture2D(uMap, vUv - o).b;
-        vec3 c = vec3(r, t.g, b) * uTint;
-        float scan = 0.82 + 0.18 * sin(vUv.y * 520. - uTime * 8.);
-        float flicker = 0.94 + 0.06 * sin(uTime * 31. + uSeed * 7.) * sin(uTime * 11. + uSeed);
-        float glitch = step(0.985, fract(sin(floor(uTime * 6. + uSeed) * 91.3) * 437.5)) * 0.35;
-        c *= scan * flicker * (1. + glitch);
-        c *= t.a * 1.25;
-        c += uEdge * sweep * 1.4;
-        gl_FragColor = vec4(c * uVis, 1.);
+        // A soft leading edge while the panel unrolls.
+        float edge = smoothstep(0., 0.06, front - vUv.y);
+        gl_FragColor = vec4(t.rgb, t.a * edge * uVis);
         ${outro}
       }`,
-  }), 2.2, 0.1);
+  });
 }
 
-function Hologram({ glow }: { glow: THREE.Texture }) {
+function Hologram() {
   const [texs, setTexs] = useState<THREE.Texture[] | null>(null);
   useEffect(() => {
     let alive = true;
@@ -1344,12 +1334,11 @@ function Hologram({ glow }: { glow: THREE.Texture }) {
       alive = false;
     };
   }, []);
-  const mats = useMemo(() => deskLayout.map((_, i) => holoMaterial(i * 1.7)), []);
+  const mats = useMemo(() => deskLayout.map(() => holoMaterial()), []);
   useEffect(() => {
     if (texs) mats.forEach((m, i) => (m.uniforms.uMap.value = texs[i]));
   }, [texs, mats]);
   const refs = useRef<(THREE.Mesh | null)[]>([]);
-  const beams = useRef<THREE.Group>(null);
   const tmp = useMemo(() => ({ p: new THREE.Vector3(), phone: V(0, 0, -2) }), []);
 
   useFrame(() => {
@@ -1361,7 +1350,6 @@ function Hologram({ glow }: { glow: THREE.Texture }) {
       const inMob = i in mobLayout;
       const reveal = smooth(3.62 + i * 0.04, 3.9 + i * 0.04, k);
       const mat = mats[i];
-      mat.uniforms.uTime.value = live.time;
       mat.uniforms.uReveal.value = reveal;
       mat.uniforms.uVis.value = (1 - conv) * (mob && !inMob ? 0 : 1);
       const base = mob ? (inMob ? mobLayout[i] : V(0, 0, 0)) : deskLayout[i].p;
@@ -1373,7 +1361,6 @@ function Hologram({ glow }: { glow: THREE.Texture }) {
       m.scale.setScalar(Math.max(0.001, 1 - conv * 0.92));
       m.visible = reveal > 0.001 && conv < 0.999;
     });
-    if (beams.current) beams.current.visible = k > 3.7 && k < 4.5;
   });
 
   return (
@@ -1383,9 +1370,6 @@ function Hologram({ glow }: { glow: THREE.Texture }) {
           <planeGeometry args={[PW, PHt]} />
         </mesh>
       ))}
-      <group ref={beams} position={C} visible={false}>
-        <Glow glow={glow} color={pal.violet} scale={30} opacity={0.18} />
-      </group>
     </>
   );
 }
@@ -1529,7 +1513,7 @@ function World({ reduce }: { reduce: boolean }) {
       <Jackpot glow={glow} />
       <Sphere glow={glow} />
       <Network glow={glow} />
-      <Hologram glow={glow} />
+      <Hologram />
       <Projection glow={glow} />
     </>
   );

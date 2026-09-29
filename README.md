@@ -1,7 +1,7 @@
-# Orbit waitlist site
+# Orbit
 
-Marketing and waitlist landing page for **Orbit, the AI assistant for your life.**
-Built with React, TypeScript, Vite, Tailwind CSS v4, Motion and Phosphor icons.
+A scroll-driven 3D story and password-gated app preview for **Orbit, the AI assistant for your life.**
+Built with React, TypeScript, Vite, Tailwind CSS v4, Three.js and Phosphor icons.
 
 ```bash
 npm install
@@ -29,13 +29,12 @@ The site is then served at `https://<user>.github.io/orbit/`. To save real signu
 src/
   index.css                 colour tokens (CSS variables) + Tailwind theme aliases
   lib/waitlist.ts           waitlist integration layer (the only place that talks to a backend)
-  data/integrations.ts      integration tiles and their status badges (edit statuses here)
   components/
-    Navbar, Hero, Problem, Features, Assistant, Privacy, Integrations, Faq, FinalCta, Footer
+    AppGate.tsx             password gate (static site, not security); sets sessionStorage["orbit.unlock"]
     WaitlistForm.tsx        two-step signup form (email, then optional name + interest)
-    PlaceholderPage.tsx     #/privacy, #/terms, #/sign-in placeholders
-    ui/                     Button, Logo (Tracked wordmark + mark), OrbitAppIcon, ThemeToggle, Reveal, Section
-    previews/               product UI previews (all content is illustrative demo data)
+    PlaceholderPage.tsx     #/privacy, #/terms placeholders
+    ui/                     Button, Logo (Tracked wordmark + mark), OrbitAppIcon, ThemeToggle
+  story/                    the phone story 3D experience
 ```
 
 Colour tokens use the product names (`--paper`, `--white`, `--soft`, `--line`, `--ink`, `--muted`,
@@ -85,5 +84,4 @@ production traffic, consider adding rate limiting or a CAPTCHA at the edge as we
 ## Notes
 
 - All product previews use fictional demo data and are labelled as such.
-- Integration statuses live in `src/data/integrations.ts`. None are claimed as live.
 - `public/og-image.png` (1200x630) and `public/favicon.svg` provide the social card and favicon.

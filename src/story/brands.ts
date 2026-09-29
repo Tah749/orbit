@@ -31,7 +31,7 @@ import {
   siGoogledrive,
   siFacebook,
 } from "simple-icons";
-import { roundRect } from "../journey/textures";
+import { roundRect } from "./textures";
 import { aboveNames, belowNames } from "./apps";
 
 /*

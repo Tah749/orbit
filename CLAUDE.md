@@ -33,10 +33,9 @@ accounts, and no user data is processed.
 ## What this repo is (and is not)
 
 It is:
-- A marketing site whose job is to explain Orbit and collect waitlist signups.
-- Two scroll-driven 3D experiences (`#/story`, `#/journey`) meant to make visitors want the product.
+- A scroll-driven 3D story (`#/story`) that demonstrates Orbit and collects waitlist signups.
 - The Orbit app front end (`#/app`, `src/orbit/`): a full, working app running entirely on sample data
-  held in the browser. No server, no database, no real connections.
+  held in the browser. Gated behind a password (static site, not security). No server, no database, no real connections.
 - A folder of brand explorations (`brand/`): names, logos and colour schemes.
 
 It is not:
@@ -51,10 +50,10 @@ These come from the project owner and apply to every change.
 2. **No secrets in the client.** Only the Supabase *anon* key may appear, in a `VITE_` variable.
    Never a service-role key, never any other secret.
 3. **Never store waitlist emails in `localStorage`/`sessionStorage`.** Browser storage holds only the
-   light/dark preference (`orbit-theme`) and the app's own sample data (`orbit.app.v1`, see `src/orbit/store.ts`).
+   light/dark preference (`orbit-theme`), the app's own sample data (`orbit.app.v1`, see `src/orbit/store.ts`),
+   and the app gate unlock flag (`sessionStorage["orbit.unlock"]`).
 4. **No invented facts.** No fake customers, testimonials, partnerships, press logos, user counts,
-   ratings or "live" integrations. Integration statuses live in `src/data/integrations.ts` and are
-   only "In development", "Planned" or "Coming soon".
+   ratings or "live" integrations.
 5. **No unsupported claims** about security, privacy, compliance, accuracy or finance (no "bank-grade",
    "GDPR compliant", "never wrong", savings figures, etc.). Say what Orbit is *designed* to do.
 6. **Demo data must look like demo data.** Previews carry a "Demo data" label; the story footer says
@@ -95,14 +94,11 @@ relative (`base: "./"`) so the build works from any subpath.
 
 | Hash | What it is | Entry |
 | --- | --- | --- |
-| `#/` (or none) | Classic marketing site | `Navbar`, `Hero`, lazy `BelowFold` |
-| `#/story` | Phone story: the main 3D scroll narrative | `src/story/Story.tsx` |
-| `#/journey` | 3D flight through space | `src/journey/Journey.tsx` |
-| `#/app`, `#/app/<section>/<id>` | The Orbit app (sample data) | `src/orbit/App.tsx` |
-| `#/privacy`, `#/terms`, `#/sign-in`, other | Placeholder pages | `PlaceholderPage.tsx` |
-| `#anchor` | In-page links on the classic site | |
+| `#/` (or none), `#/story`, unknown | Phone story: the 3D scroll narrative | `src/story/Story.tsx` |
+| `#/privacy`, `#/terms` | Placeholder pages | `PlaceholderPage.tsx` |
+| `#/app`, `#/app/<section>/<id>` | The Orbit app (sample data); requires password | lazy `AppGate.tsx` → `src/orbit/App.tsx` |
 
-Heavy pages (`story`, `journey`, `app`, below-the-fold) are `lazy()` chunks.
+Heavy pages (`story`, `app`) are `lazy()` chunks.
 
 ## Directory map
 
@@ -111,15 +107,15 @@ index.html                 Vite entry; inline script applies the saved theme bef
 public/                    favicon.svg (Tracked mark), og-image.png
 src/
   main.tsx, App.tsx        bootstrap + hash router
-  index.css                colour tokens (Oat light/dark, space palette), Tailwind aliases, keyframes
+  index.css                colour tokens (Oat light/dark), Tailwind aliases, keyframes
   lib/
     waitlist.ts            the ONLY backend touchpoint (Supabase REST insert, or dev-mode simulation)
     theme.ts               light/dark: currentMode(), setMode(), useMode()
-  data/integrations.ts     integration tiles + honest status badges
-  components/              classic site sections: Navbar, Hero, Problem, Features, Assistant,
-                           Privacy, Integrations, Faq, FinalCta, Footer, WaitlistForm, PlaceholderPage
-    ui/                    Button, Logo (Orb + Wordmark), OrbitAppIcon, ThemeToggle, Reveal, Section
-    previews/              product UI mockups used on the site and in the story (demo data)
+  components/              page gates and minimal UI
+    AppGate.tsx            lazy password gate; sets sessionStorage["orbit.unlock"]; loads App.tsx on success
+    PlaceholderPage.tsx    #/privacy, #/terms
+    ui/                    Button, Logo (Orb + Wordmark), OrbitAppIcon, ThemeToggle
+    WaitlistForm.tsx       two-step signup form
   orbit/                   the Orbit app (see "The Orbit app" below and src/orbit/DESIGN.md)
     App.tsx, CommandPalette.tsx, router.ts, sections.ts, store.ts, time.ts
     data/                  types + sample data per domain (mail, calendar, tasks, money, plans, life, business)
@@ -127,7 +123,9 @@ src/
     sections/<key>/        one folder per section (today, ask, inbox, calendar, tasks, money, business,
                            plans, deliveries, health, people, admin, settings)
   story/                   the phone story (see below)
-  journey/                 the space journey (see below)
+    glsl.ts                simplex noise and fbm helpers for shaders
+    textures.ts            glow and card-atlas helpers
+    previews.tsx           app-style feature chapter panels (acts 6–9)
 brand/                     brand explorations, each with an index.html gallery
   names/  logos/  colours/  colours-v2/
 brag-output/               promo video assets (work/ is ignored)
@@ -167,8 +165,6 @@ Rules:
 - **Never hard-code hex colours in components.** Use tokens/Tailwind aliases, or `var(--token)` in
   arbitrary values (`shadow-[0_40px_80px_-40px_var(--shade)]`). Buttons on accent use `text-paper`.
 - Check new UI in **both** light and dark.
-- The 3D journey is the one exception: it adds `theme-space` to `<html>` while mounted, which swaps in
-  the original night-sky palette (dark purple, rose accent) in both modes.
 
 ### Logo: "Tracked"
 
@@ -196,27 +192,34 @@ The flagship page. A scroll-driven film in five acts plus feature chapters and a
 | --- | --- | --- |
 | 0 | Open | A dark phone floats on a soft studio backdrop. "One phone. Too many moving parts." |
 | 1 | Phone | Screen wakes, notifications pile up, cards burst out of the screen |
-| 2 | Problem | Camera dives through the glass into a slot machine of real app icons. Visitor pulls the lever (click/tap, or keep scrolling); reels land on Orbit: jackpot |
+| 2 | Problem | Camera dives through the glass into a slot machine of real app icons. Reels land on Orbit: jackpot |
 | 3 | Connection | Winning Orbit tokens form a sphere; the other apps become a network around it |
-| 4 | Product | The sphere opens like a lens; Orbit's UI appears as hologram panels |
+| 4 | Product | The sphere opens like a lens; Orbit's UI appears as flat app-style panels |
 | 5 | Return | Pull back out through the glass; the phone now runs Orbit and projects a hologram |
-| 6-9 | Inside Orbit | Ask, Your day, Your money, Your plans: DOM preview cards beside the phone |
+| 6-9 | Inside Orbit | Ask, Your day, Your money, Your plans: flat app-style panels beside the phone |
 | 10 | Join | Pull back; app icon, "Join the waitlist.", the form, trademark notice, footer |
+
+Design: the story's UI follows `src/orbit/DESIGN.md`. Feature chapters use Newsreader serif titles,
+hairline rules, ink buttons, square tags, and Source labels. Dashboard and hologram panels in `canvas.ts`
+are flat app-style screens; no glows or gradients.
 
 Files:
 - `state.ts`: shared mutable state (`story.progress`, `story.stops`, `theme.mode`), `actCount = 11`,
   `actAt(p)` (scroll progress to an eased act position k), `smooth`, `ramp`.
-- `Story.tsx`: DOM layer: `acts` list (also the progress rail labels), each `<Act>` section, header
-  with theme/sound toggles, lever hint, flash overlay, Lenis setup, act stops measured on resize.
+- `Story.tsx`: DOM layer: each `<Act>` section, header with theme/sound toggles, flash overlay, Lenis setup,
+  act stops measured on resize.
 - `StoryScene.tsx`: the three.js scene. Camera `Rig` follows Catmull-Rom curves through 11 keyframes
   (`keys`), with separate desktop/mobile framing (`desk`, `mob`, `m`) and `setViewOffset` to shift the
   subject beside the text. Components: `Backdrop`, `Shadow`, `Phone`, `Burst`, `Machine`, `Jackpot`,
   `Sphere`, `Network`, `Hologram`, `Projection`.
-- `canvas.ts`: canvas-drawn textures: lock screen, Orbit dashboard (`dashPal` per mode), hologram
+- `canvas.ts`: canvas-drawn textures: lock screen, Orbit dashboard (`dashPal` per mode), flat app-style
   panels, machine marquee.
 - `brands.ts`: `brands[]` (index 0 is Orbit, then ~29 apps via simple-icons), brand atlas for reels,
   notification card atlas, `drawOrbitIcon`, `drawBrandTile`.
 - `apps.ts`: which apps sit above/below the payline and join the network.
+- `glsl.ts`: simplex noise and fbm helpers for custom shaders.
+- `textures.ts`: glow and card-atlas helpers.
+- `previews.tsx`: app-style feature chapter panels (acts 6–9), built from `src/orbit/ui` and sample data.
 - `sound.ts`: `sfx`, a WebAudio synth (lever, ticks, clunks, jackpot, whooshes). Off until the
   visitor turns it on.
 
@@ -224,9 +227,8 @@ Key mechanics:
 - **Scroll never re-renders React.** Scroll writes `story.progress`; the scene reads it every frame.
   The rig eases its own `k` toward `actAt(progress)`; `live.k` / `live.prevK` hold it for the frame.
   Use `crossed(a)` for one-shot cues (sounds) when k passes a value going forward.
-- **Slot machine:** `slot.pulledAt` / `slot.wonAt`. A manual pull is time-driven (`manualStop`); scroll
-  mode is k-driven (`stopAt`, `JACKPOT`). Scrolling back above k 1.8 resets it. The DOM hint
-  `#lever-hint` dispatches `story:pull`.
+- **Slot machine:** `slot.pulledAt` / `slot.wonAt`. The lever is pulled by scrolling, k-driven
+  (`stopAt`, `JACKPOT`). Scrolling back above k 1.8 resets it.
 - **Theme in 3D:** `StoryScene` takes `mode`, sets `theme.mode` and `pal = palettes[mode]`, and keys
   the `<Canvas>` on mode, so a theme switch rebuilds the scene and its textures. Add any new colour
   to **both** palettes.
@@ -235,14 +237,6 @@ Key mechanics:
   turns brightness into opacity with a deep tone. Use `glowBlend()` for sprites/basic materials.
 - **Screen flash:** `#story-flash` fires only while the camera is actually moving through the glass.
 - Reduced motion: camera eases fast and parallax/shake are skipped. No-WebGL: a static fallback.
-
-## The 3D journey (`src/journey/`)
-
-`#/journey` flies the camera through a space scene (stars, nebula, planets, glass cards), with DOM
-chapters and waitlist forms (`journey-hero`, `journey-final`). `flight.ts` holds shared state like the
-story's. `glsl.ts` has simplex noise/fbm; `textures.ts` has glow and card-atlas helpers the story
-reuses. `parts.tsx` holds `Glass`, `Preview`, `Chips`, `AskCard`, shared with the story (tone `violet`
-for the journey, `oat` for the story). The journey keeps its space look by design.
 
 ## The Orbit app (`src/orbit/`)
 
@@ -263,7 +257,7 @@ look (editorial, hairline rules, serif titles, ink buttons, no AI-looking patter
 ## Waitlist
 
 - `WaitlistForm` is two steps: email, then optional first name + interest. Pass a `source` string
-  (`hero`, `footer-cta`, `story-final`, `journey-hero`, `journey-final`).
+  (`story-final`).
 - `submitWaitlist` (`src/lib/waitlist.ts`) inserts into Supabase `waitlist_signups` with the anon key
   and `Prefer: return=minimal`; HTTP 409 means "already on the list".
 - Without `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` it runs in **development mode**: validates,
@@ -303,7 +297,10 @@ sessions; don't run `playwright install`):
   scroll position). A blurry frame mid-dive usually means the camera hasn't arrived yet.
 - Scroll the story to an act by centring its `[data-act]` section; check 1440x900 and 390x844, and
   both `colorScheme: "light"` and `"dark"`.
-- Check: no console errors, no horizontal overflow, text readable over the scene, lever works.
+- Check: no console errors, no horizontal overflow, text readable over the scene, slot machine responds
+  to scroll.
+- Test the app gate at `#/app`: enter the password and verify it sets `sessionStorage["orbit.unlock"]`
+  and loads the app.
 - Stop the preview server with `fuser -k 4173/tcp`. (`pkill -f "vite preview"` also matches and
   kills the shell running it.)
 
