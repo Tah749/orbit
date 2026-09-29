@@ -7,3 +7,4 @@ dist-standalone
 brag-output/work
 .claude/worktrees/
 .claude/settings.local.json
+brag-output-*/work
